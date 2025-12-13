@@ -33,6 +33,8 @@
 --blue-strong: rgba(33, 150, 243, 0.2);
 --delete-color: #f44336;
 --warning-color: #ff9800;
+--warning-light: #ffb74d;
+--warning-bg: rgba(255, 152, 0, 0.1);
 }
 
 * {
@@ -1515,6 +1517,14 @@ color: var(--success-color);
 color: var(--delete-color);
 }
 
+.hasil-nilai.selisih {
+color: var(--warning-color);
+background-color: var(--warning-bg);
+padding: 4px 8px;
+border-radius: 6px;
+font-weight: 800;
+}
+
 /* Style untuk status validasi */
 .hasil-item.validasi-item {
 margin-top: 15px;
@@ -1788,6 +1798,11 @@ RUMUS PERHITUNGAN
 <span class="hasil-label">Hasil (Credit - Saldo):</span>
 <span class="hasil-nilai cocok" id="displayHasilPerhitungan">IDR 0</span>
 </div>
+<!-- BARU: Kolom Selisih -->
+<div class="hasil-item">
+<span class="hasil-label">Selisih:</span>
+<span class="hasil-nilai selisih" id="displaySelisih">IDR 0</span>
+</div>
 <!-- Tambahan untuk validasi -->
 <div class="hasil-item validasi-item">
 <span class="hasil-label">Status:</span>
@@ -1951,6 +1966,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const displayKemenanganNaga = document.getElementById('displayKemenanganNaga');
     const displaySaldoKanan = document.getElementById('displaySaldoKanan');
     const displayHasilPerhitungan = document.getElementById('displayHasilPerhitungan');
+    const displaySelisih = document.getElementById('displaySelisih');
     const statusValidasi = document.getElementById('statusValidasi');
     const validasiStatusMessage = document.getElementById('validasiStatusMessage');
     const seamlessDataForSum = document.getElementById('seamlessDataForSum');
@@ -2804,6 +2820,18 @@ document.addEventListener('DOMContentLoaded', function() {
         const hasilPerhitungan = totalCredit - saldo;
         displayHasilPerhitungan.textContent = `IDR ${hasilPerhitungan.toLocaleString('id-ID')}`;
 
+        // Hitung selisih antara Hasil (Credit - Saldo) dan Kemenangan Naga
+        const selisih = Math.abs(hasilPerhitungan - kemenangan);
+        
+        // Tampilkan selisih jika ada perbedaan
+        if (selisih > 0.01) { // Gunakan toleransi kecil untuk angka desimal
+            displaySelisih.textContent = `IDR ${selisih.toLocaleString('id-ID')}`;
+            displaySelisih.classList.add('selisih');
+        } else {
+            displaySelisih.textContent = 'IDR 0';
+            displaySelisih.classList.remove('selisih');
+        }
+
         // Validasi dengan kemenangan naga
         validasiPerhitungan();
     }
@@ -2878,6 +2906,20 @@ document.addEventListener('DOMContentLoaded', function() {
         const hasilPerhitungan = totalCredit - saldo;
         displayHasilPerhitungan.textContent = `IDR ${hasilPerhitungan.toLocaleString('id-ID')}`;
 
+        // Hitung selisih antara Hasil (Credit - Saldo) dan Kemenangan Naga
+        const kemenanganStr = inputKemenanganNaga.value.trim().replace(/,/g, '');
+        const kemenangan = parseFloat(kemenanganStr) || 0;
+        const selisih = Math.abs(hasilPerhitungan - kemenangan);
+        
+        // Tampilkan selisih jika ada perbedaan
+        if (selisih > 0.01) { // Gunakan toleransi kecil untuk angka desimal
+            displaySelisih.textContent = `IDR ${selisih.toLocaleString('id-ID')}`;
+            displaySelisih.classList.add('selisih');
+        } else {
+            displaySelisih.textContent = 'IDR 0';
+            displaySelisih.classList.remove('selisih');
+        }
+
         // Validasi dengan hasil scatter
         validasiPerhitungan();
     }
@@ -2938,6 +2980,8 @@ document.addEventListener('DOMContentLoaded', function() {
         displayKemenanganNaga.textContent = 'IDR 0';
         displaySaldoKanan.textContent = 'IDR 0';
         displayHasilPerhitungan.textContent = 'IDR 0';
+        displaySelisih.textContent = 'IDR 0';
+        displaySelisih.classList.remove('selisih');
         statusValidasi.textContent = '-';
         statusValidasi.className = 'hasil-nilai';
         totalCredit = 0;
