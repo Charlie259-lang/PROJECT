@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aplikasi Memo & Reportan</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -352,10 +353,7 @@
         
         /* Style untuk teks di dalam (rata tengah) */
         .date-text, .clock-text {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             font-weight: 600;
-            color: #2c3e50;
-            font-size: clamp(14px, 1.6vw, 18px);
             text-align: center;
             white-space: nowrap;
             overflow: hidden;
@@ -364,13 +362,36 @@
             flex: 1;
         }
         
+        /* Font khusus untuk tanggal - Orbitron */
+        .date-text {
+            font-family: 'Orbitron', sans-serif;
+            color: #2c3e50;
+            font-size: clamp(14px, 1.6vw, 18px);
+            font-weight: 600;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Font khusus untuk jam digital - Share Tech Mono dengan efek kedip halus */
         .clock-text {
-            font-size: clamp(20px, 2.2vw, 30px);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: clamp(22px, 2.4vw, 32px);
             font-weight: 700;
             letter-spacing: 1.5px;
-            font-family: 'Courier New', monospace;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
             color: #5d3fd3;
+            text-shadow: 0 2px 4px rgba(93, 63, 211, 0.3);
+            animation: gentleBlink 4s infinite;
+        }
+        
+        /* Animasi kedip halus untuk jam */
+        @keyframes gentleBlink {
+            0%, 100% {
+                opacity: 1;
+                text-shadow: 0 0 5px rgba(93, 63, 211, 0.5);
+            }
+            50% {
+                opacity: 0.9;
+                text-shadow: 0 0 10px rgba(93, 63, 211, 0.8);
+            }
         }
         
         /* Icon juga diatur agar ikut rata tengah */
@@ -424,12 +445,15 @@
             100% { opacity: 1; }
         }
         
+        /* Font khusus untuk ping - Share Tech Mono */
         .network-ping {
+            font-family: 'Share Tech Mono', monospace;
             font-weight: 700;
             color: #2c3e50;
             min-width: 60px;
             text-align: center;
-            font-size: clamp(14px, 1.5vw, 18px);
+            font-size: clamp(16px, 1.7vw, 20px);
+            letter-spacing: 0.5px;
         }
         
         .network-result {
@@ -1081,6 +1105,10 @@
             .date-content, .clock-content, .network-content {
                 padding: 10px 15px;
             }
+            
+            .clock-text {
+                font-size: clamp(20px, 2.2vw, 28px);
+            }
         }
         
         @media (max-width: 480px) {
@@ -1130,12 +1158,16 @@
                 gap: 8px;
             }
             
-            .date-text, .clock-text {
+            .date-text {
                 font-size: 14px;
             }
             
             .clock-text {
                 font-size: 18px;
+            }
+            
+            .network-ping {
+                font-size: 16px;
             }
             
             .date-icon, .clock-icon, .network-icon {
@@ -1425,7 +1457,7 @@
             currentDateElement.textContent = formattedDate;
         }
         
-        // Fungsi untuk memperbarui jam digital
+        // Fungsi untuk memperbarui jam digital dengan efek kedip
         function updateClock() {
             const now = new Date();
             const hours = String(now.getHours()).padStart(2, '0');
