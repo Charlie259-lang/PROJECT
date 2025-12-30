@@ -157,9 +157,9 @@
             max-width: 1200px;
         }
         
-        /* HEADER */
+        /* HEADER - TAMBAHKAN MARGIN BOTTOM 30px */
         .header {
-            margin-bottom: 0;
+            margin-bottom: 30px; /* Jarak antara header dan info-bar */
             padding: 25px 30px;
             border-radius: 15px 15px 0 0;
             background: linear-gradient(135deg, #8a2be2 0%, #6a0dad 100%);
@@ -850,6 +850,12 @@
                 grid-template-columns: 1fr;
             }
             
+            .header {
+                margin-bottom: 30px; /* Pastikan spacing tetap ada di mobile */
+                padding: 20px 15px;
+                min-height: 160px;
+            }
+            
             .header h1 {
                 font-size: 2rem;
             }
@@ -910,6 +916,7 @@
             }
             
             .header {
+                margin-bottom: 30px; /* Pastikan spacing tetap ada di mobile */
                 padding: 20px 15px;
                 min-height: 160px;
             }
@@ -955,6 +962,10 @@
         }
         
         @media (max-width: 480px) {
+            .header {
+                margin-bottom: 30px; /* Pastikan spacing tetap ada di mobile */
+            }
+            
             .header h1 {
                 font-size: 1.6rem;
             }
