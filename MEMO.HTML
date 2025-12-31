@@ -2587,6 +2587,22 @@ Catatan khusus: Ada kendala deposit via Bank BRI pukul 14:00-15:30 WIB.`,
         
         // Jalankan inisialisasi saat halaman dimuat
         document.addEventListener('DOMContentLoaded', init);
+        <!-- Tambahkan di dalam form-container setelah tombol reset -->
+<div class="form-group" style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 20px;">
+    <label><i class="fas fa-database"></i> Backup & Restore Data</label>
+    <div style="display: flex; gap: 15px; margin-top: 15px;">
+        <button type="button" class="btn" id="exportData" style="background: linear-gradient(135deg, #1dd1a1 0%, #10ac84 100%);">
+            <i class="fas fa-download"></i> Export Data
+        </button>
+        <button type="button" class="btn" id="importData" style="background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);">
+            <i class="fas fa-upload"></i> Import Data
+        </button>
+        <input type="file" id="importFile" accept=".json" style="display: none;">
+    </div>
+    <p style="font-size: 0.9rem; margin-top: 10px; color: rgba(255,255,255,0.7);">
+        Export untuk backup, import untuk restore data dari file.
+    </p>
+</div>
     </script>
 </body>
 </html>
