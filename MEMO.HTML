@@ -197,6 +197,9 @@
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
             transition: all 0.3s ease;
+            position: relative;
+            flex-direction: column;
+            align-items: flex-start;
         }
         
         .api-status.online {
@@ -1290,6 +1293,39 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
+        /* Tombol Troubleshooting */
+        .troubleshoot-btn {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+            border: 1px solid #e74c3c;
+            border-radius: 5px;
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            margin-top: 5px;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .troubleshoot-btn:hover {
+            background: rgba(231, 76, 60, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        /* Tombol Sync */
+        #syncButton {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #f39c12 0%, #d35400 100%);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: pulse 2s infinite;
+        }
+        
         /* Responsif */
         @media (max-width: 1200px) {
             .sidebar {
@@ -1682,8 +1718,10 @@
         
         <!-- Status Koneksi Database -->
         <div class="api-status online" id="apiStatus">
-            <div class="api-status-dot online" id="apiStatusDot"></div>
-            <span id="apiStatusText">Terhubung ke Spreadsheet Anda</span>
+            <div style="display: flex; align-items: center; gap: 8px; width: 100%;">
+                <div class="api-status-dot online" id="apiStatusDot"></div>
+                <span id="apiStatusText">Terhubung ke Spreadsheet Anda</span>
+            </div>
         </div>
         
         <div class="category-title">Kategori Utama</div>
@@ -1913,7 +1951,7 @@
     <script>
         // ========== KONFIGURASI ==========
         const SPREADSHEET_ID = "1oirwkd74CMLvcfAIkBLn_UJJDhha8sJ7gN8FRhrlipw";
-        const API_KEY = "AIzaSyB9q5Q7kQhT2QhQ2QhQ2QhQ2QhQ2QhQ2QhQ"; // API Key untuk Google Sheets API
+        const API_KEY = "AIzaSyDWFvaSwqZPcZgp5Crkr_RhvJW7nWH4Qv0"; // API Key Anda
         const API_URL = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/Sheet1?key=${API_KEY}`;
         const WRITE_API_URL = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/Sheet1:append?valueInputOption=USER_ENTERED&key=${API_KEY}`;
         const CLEAR_API_URL = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/Sheet1:clear?key=${API_KEY}`;
@@ -2053,6 +2091,9 @@
             } else if (type === 'info') {
                 notification.style.background = 'linear-gradient(135deg, #3498db 0%, #2980b9 100%)';
                 notification.children[0].className = 'fas fa-info-circle';
+            } else if (type === 'warning') {
+                notification.style.background = 'linear-gradient(135deg, #f39c12 0%, #d35400 100%)';
+                notification.children[0].className = 'fas fa-exclamation-triangle';
             }
             
             notification.classList.add('show');
@@ -2097,67 +2138,117 @@
         
         // ========== FUNGSI GOOGLE SHEETS API ==========
         
-        // Fungsi untuk mengambil data dari Google Sheets
-        async function fetchDataFromSheets() {
+        // Fungsi untuk mengambil data dari Google Sheets dengan retry logic
+        async function fetchDataFromSheets(maxRetries = 3) {
             showLoading();
             
-            try {
-                const response = await fetch(API_URL);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                
-                // Proses data dari Google Sheets
-                if (data.values && data.values.length > 0) {
-                    const headers = data.values[0];
-                    const rows = data.values.slice(1);
+            let retryCount = 0;
+            
+            while (retryCount < maxRetries) {
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 10000);
                     
-                    savedData = rows.map(row => {
-                        const obj = {};
-                        headers.forEach((header, index) => {
-                            obj[header] = row[index] || '';
-                        });
-                        return obj;
+                    const response = await fetch(API_URL, {
+                        signal: controller.signal,
+                        headers: {
+                            'Accept': 'application/json',
+                            'Cache-Control': 'no-cache'
+                        }
                     });
                     
-                    // Simpan ke cache
-                    localStorage.setItem('memoReportanDataCache', JSON.stringify(savedData));
+                    clearTimeout(timeoutId);
                     
-                    // Update counter
-                    updateCounters();
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
                     
-                    // Update status
-                    updateApiStatus(true, `Terhubung (${savedData.length} data)`);
+                    const data = await response.json();
                     
-                    showNotification(`Berhasil memuat ${savedData.length} data dari Spreadsheet`, 'success');
-                } else {
-                    // Sheet kosong
-                    savedData = [];
-                    localStorage.setItem('memoReportanDataCache', JSON.stringify(savedData));
-                    updateCounters();
-                    updateApiStatus(true, 'Spreadsheet kosong');
-                    showNotification('Spreadsheet masih kosong', 'info');
+                    // Proses data dari Google Sheets
+                    if (data.values && data.values.length > 0) {
+                        const headers = data.values[0];
+                        const rows = data.values.slice(1);
+                        
+                        savedData = rows.map(row => {
+                            const obj = {};
+                            headers.forEach((header, index) => {
+                                obj[header] = row[index] || '';
+                            });
+                            return obj;
+                        });
+                        
+                        // Simpan ke cache
+                        localStorage.setItem('memoReportanDataCache', JSON.stringify(savedData));
+                        
+                        // Update counter
+                        updateCounters();
+                        
+                        // Update status
+                        updateApiStatus(true, `Terhubung (${savedData.length} data)`);
+                        
+                        // Jika ini bukan percobaan pertama, tampilkan notifikasi sukses
+                        if (retryCount > 0) {
+                            showNotification(`Koneksi pulih! Berhasil memuat ${savedData.length} data`, 'success');
+                        } else {
+                            showNotification(`Berhasil memuat ${savedData.length} data dari Spreadsheet`, 'success');
+                        }
+                        
+                        return savedData;
+                    } else {
+                        // Sheet kosong
+                        savedData = [];
+                        localStorage.setItem('memoReportanDataCache', JSON.stringify(savedData));
+                        updateCounters();
+                        updateApiStatus(true, 'Spreadsheet kosong - siap menerima data');
+                        showNotification('Spreadsheet siap digunakan (masih kosong)', 'info');
+                        return savedData;
+                    }
+                } catch (error) {
+                    retryCount++;
+                    
+                    if (retryCount === maxRetries) {
+                        console.error('Error fetching data after retries:', error);
+                        
+                        // Fallback ke cache jika ada
+                        const cacheData = localStorage.getItem('memoReportanDataCache');
+                        if (cacheData && JSON.parse(cacheData).length > 0) {
+                            savedData = JSON.parse(cacheData);
+                            updateCounters();
+                            updateApiStatus(false, 'Menggunakan data cache - offline mode');
+                            showNotification('Mode offline aktif (menggunakan data cache)', 'info');
+                            
+                            // Tampilkan notifikasi lebih detail
+                            setTimeout(() => {
+                                showNotification(`Tips: Cek koneksi internet & API Key di Google Cloud Console`, 'info');
+                            }, 2000);
+                        } else {
+                            savedData = [];
+                            updateApiStatus(false, 'Gagal terhubung ke Spreadsheet');
+                            
+                            // Berikan petunjuk troubleshooting
+                            let errorMessage = 'Gagal terhubung ke Spreadsheet';
+                            if (error.name === 'AbortError') {
+                                errorMessage += ' - Waktu tunggu habis';
+                            } else if (error.message.includes('Failed to fetch')) {
+                                errorMessage += ' - Cek koneksi internet';
+                            }
+                            
+                            showNotification(errorMessage, 'error');
+                            
+                            // Tampilkan petunjuk troubleshooting
+                            setTimeout(() => {
+                                showNotification('Pastikan API Key aktif & Sheet bisa diakses publik', 'info');
+                            }, 3000);
+                        }
+                        return savedData;
+                    }
+                    
+                    // Tunggu sebelum mencoba lagi (exponential backoff)
+                    await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
+                } finally {
+                    hideLoading();
                 }
-                
-                return savedData;
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                
-                // Fallback ke cache jika ada
-                if (savedData.length > 0) {
-                    showNotification('Menggunakan data cache, koneksi terputus', 'info');
-                    updateApiStatus(false, 'Menggunakan data cache');
-                } else {
-                    updateApiStatus(false, 'Gagal terhubung ke Spreadsheet');
-                    showNotification('Gagal mengambil data dari Spreadsheet', 'error');
-                }
-                
-                return savedData;
-            } finally {
-                hideLoading();
             }
         }
         
@@ -2176,28 +2267,6 @@
                     new Date().toISOString()
                 ];
                 
-                // Jika spreadsheet kosong, tambahkan header terlebih dahulu
-                if (savedData.length === 0) {
-                    const headerResponse = await fetch(API_URL);
-                    const sheetData = await headerResponse.json();
-                    
-                    if (!sheetData.values || sheetData.values.length === 0) {
-                        // Tambahkan header
-                        const headerRequest = {
-                            values: [['id', 'category', 'subcategory', 'judul', 'isi', 'timestamp']]
-                        };
-                        
-                        await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/Sheet1!A1:F1?valueInputOption=USER_ENTERED&key=${API_KEY}`, {
-                            method: 'PUT',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify(headerRequest)
-                        });
-                    }
-                }
-                
-                // Tambahkan data baru
                 const requestBody = {
                     values: [rowData]
                 };
@@ -2211,7 +2280,8 @@
                 });
                 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    const errorData = await response.json();
+                    throw new Error(errorData.error?.message || `HTTP error! status: ${response.status}`);
                 }
                 
                 const result = await response.json();
@@ -2224,19 +2294,319 @@
                 return result;
             } catch (error) {
                 console.error('Error saving data:', error);
-                showNotification('Gagal menyimpan ke Spreadsheet', 'error');
                 
-                // Fallback: simpan di localStorage
-                data.id = 'local-' + Date.now();
-                data.timestamp = new Date().toISOString();
-                savedData.push(data);
-                localStorage.setItem('memoReportanDataCache', JSON.stringify(savedData));
-                updateCounters();
+                // Cek tipe error
+                if (error.message.includes('API key not valid')) {
+                    showNotification('API Key tidak valid. Periksa konfigurasi API Key.', 'error');
+                } else if (error.message.includes('insufficient permission')) {
+                    showNotification('Izin tidak cukup. Periksa izin Spreadsheet.', 'error');
+                } else if (error.message.includes('timed out') || error.message.includes('Failed to fetch')) {
+                    showNotification('Koneksi timeout. Data disimpan secara lokal.', 'info');
+                    
+                    // Simpan di localStorage sebagai fallback
+                    data.id = 'local-' + Date.now();
+                    data.timestamp = new Date().toISOString();
+                    savedData.push(data);
+                    localStorage.setItem('memoReportanDataCache', JSON.stringify(savedData));
+                    updateCounters();
+                    updateApiStatus(false, 'Data disimpan lokal - offline');
+                    
+                    // Tampilkan tombol sinkronisasi
+                    showSyncButton();
+                } else {
+                    showNotification('Gagal menyimpan ke Spreadsheet: ' + error.message, 'error');
+                }
                 
-                return { success: false, message: 'Saved locally' };
+                return { success: false, message: error.message };
             } finally {
                 hideLoading();
             }
+        }
+        
+        // Fungsi untuk menampilkan tombol sinkronisasi
+        function showSyncButton() {
+            // Cek apakah tombol sudah ada
+            if (document.getElementById('syncButton')) return;
+            
+            const syncButton = document.createElement('button');
+            syncButton.id = 'syncButton';
+            syncButton.className = 'btn';
+            syncButton.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #f39c12 0%, #d35400 100%);
+                z-index: 1000;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                animation: pulse 2s infinite;
+            `;
+            syncButton.innerHTML = `
+                <i class="fas fa-sync-alt"></i>
+                <span>Sinkronkan Data</span>
+            `;
+            
+            syncButton.addEventListener('click', async () => {
+                showLoading();
+                showNotification('Menyinkronkan data ke Spreadsheet...', 'info');
+                
+                // Ambil data dari cache
+                const localData = JSON.parse(localStorage.getItem('memoReportanDataCache') || '[]');
+                const unsyncedData = localData.filter(item => item.id && item.id.startsWith('local-'));
+                
+                if (unsyncedData.length === 0) {
+                    showNotification('Tidak ada data yang perlu disinkronkan', 'info');
+                    hideLoading();
+                    syncButton.remove();
+                    return;
+                }
+                
+                // Coba sinkronkan setiap data
+                let successCount = 0;
+                let failCount = 0;
+                
+                for (const data of unsyncedData) {
+                    try {
+                        // Hapus ID lokal sebelum dikirim
+                        const dataToSend = { ...data };
+                        delete dataToSend.id;
+                        
+                        await saveDataToSheets(dataToSend);
+                        successCount++;
+                    } catch (error) {
+                        failCount++;
+                        console.error('Gagal sinkron data:', error);
+                    }
+                }
+                
+                if (successCount > 0) {
+                    showNotification(`Berhasil sinkron ${successCount} data ke Spreadsheet!`, 'success');
+                    // Hapus data lokal yang sudah berhasil disinkron
+                    const updatedData = localData.filter(item => !item.id.startsWith('local-'));
+                    localStorage.setItem('memoReportanDataCache', JSON.stringify(updatedData));
+                }
+                
+                if (failCount > 0) {
+                    showNotification(`${failCount} data gagal disinkronkan`, 'error');
+                }
+                
+                hideLoading();
+                
+                // Perbarui tampilan
+                await fetchDataFromSheets();
+                
+                // Sembunyikan tombol jika semua data berhasil disinkron
+                if (failCount === 0) {
+                    syncButton.remove();
+                }
+            });
+            
+            document.body.appendChild(syncButton);
+        }
+        
+        // Update status API dengan informasi lebih detail
+        function updateApiStatus(isOnline, message) {
+            if (isOnline) {
+                apiStatus.className = 'api-status online';
+                apiStatusDot.className = 'api-status-dot online';
+                apiStatusText.textContent = message;
+                
+                // Tambahkan animasi heartbeat
+                apiStatusDot.style.animation = 'pulseDot 2s infinite';
+                
+                // Hapus tombol troubleshooting jika ada
+                const existingButton = document.querySelector('.troubleshoot-btn');
+                if (existingButton) existingButton.remove();
+            } else {
+                apiStatus.className = 'api-status offline';
+                apiStatusDot.className = 'api-status-dot offline';
+                apiStatusText.textContent = message;
+                
+                // Hapus animasi untuk offline
+                apiStatusDot.style.animation = 'none';
+                
+                // Tampilkan tombol troubleshooting
+                showTroubleshootingButton();
+            }
+        }
+        
+        // Tambahkan tombol troubleshooting
+        function showTroubleshootingButton() {
+            // Hapus tombol sebelumnya jika ada
+            const existingButton = document.querySelector('.troubleshoot-btn');
+            if (existingButton) existingButton.remove();
+            
+            const troubleshootBtn = document.createElement('button');
+            troubleshootBtn.className = 'troubleshoot-btn';
+            troubleshootBtn.innerHTML = '<i class="fas fa-question-circle"></i> Perbaiki Koneksi';
+            
+            troubleshootBtn.addEventListener('click', () => {
+                showTroubleshootingGuide();
+            });
+            
+            apiStatus.appendChild(troubleshootBtn);
+        }
+        
+        // Tampilkan panduan troubleshooting
+        function showTroubleshootingGuide() {
+            const guide = `
+                <div style="
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: white;
+                    padding: 30px;
+                    border-radius: 15px;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                    z-index: 2000;
+                    max-width: 500px;
+                    width: 90%;
+                    max-height: 80vh;
+                    overflow-y: auto;
+                ">
+                    <h3 style="color: #2c3e50; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-tools" style="color: #e74c3c;"></i>
+                        Panduan Troubleshooting
+                    </h3>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <h4 style="color: #3498db; margin-bottom: 10px;">1. Cek API Key</h4>
+                        <p style="margin-bottom: 10px; color: #2c3e50;">
+                            Pastikan API Key di kode sudah benar:
+                        </p>
+                        <code style="
+                            background: #f8f9fa;
+                            padding: 8px;
+                            border-radius: 5px;
+                            font-family: monospace;
+                            display: block;
+                            margin-bottom: 15px;
+                            word-break: break-all;
+                            border: 1px solid #e0e0e0;
+                        ">
+                            ${API_KEY}
+                        </code>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <h4 style="color: #3498db; margin-bottom: 10px;">2. Aktifkan Google Sheets API</h4>
+                        <p style="margin-bottom: 10px; color: #2c3e50;">
+                            Buka <a href="https://console.cloud.google.com/apis/library/sheets.googleapis.com" target="_blank" style="color: #3498db;">
+                                Google Cloud Console
+                            </a> dan pastikan Google Sheets API sudah diaktifkan.
+                        </p>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <h4 style="color: #3498db; margin-bottom: 10px;">3. Izin Spreadsheet</h4>
+                        <p style="margin-bottom: 10px; color: #2c3e50;">
+                            Pastikan spreadsheet bisa diakses oleh siapa saja dengan link:
+                        </p>
+                        <ol style="margin-left: 20px; color: #2c3e50;">
+                            <li>Buka spreadsheet Anda</li>
+                            <li>Klik "Share" di kanan atas</li>
+                            <li>Atur ke "Anyone with the link can edit"</li>
+                        </ol>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <h4 style="color: #3498db; margin-bottom: 10px;">4. Testing Koneksi</h4>
+                        <button id="testConnectionBtn" style="
+                            background: #3498db;
+                            color: white;
+                            border: none;
+                            padding: 10px 20px;
+                            border-radius: 5px;
+                            cursor: pointer;
+                            display: flex;
+                            align-items: center;
+                            gap: 10px;
+                        ">
+                            <i class="fas fa-plug"></i> Test Koneksi Sekarang
+                        </button>
+                        <div id="testResult" style="margin-top: 10px;"></div>
+                    </div>
+                    
+                    <button onclick="this.parentElement.remove()" style="
+                        background: #e74c3c;
+                        color: white;
+                        border: none;
+                        padding: 10px 20px;
+                        border-radius: 5px;
+                        cursor: pointer;
+                        float: right;
+                    ">
+                        Tutup
+                    </button>
+                </div>
+            `;
+            
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 1999;
+            `;
+            
+            overlay.innerHTML = guide;
+            document.body.appendChild(overlay);
+            
+            // Tambahkan event listener untuk tombol test
+            setTimeout(() => {
+                const testBtn = document.getElementById('testConnectionBtn');
+                const testResult = document.getElementById('testResult');
+                
+                if (testBtn) {
+                    testBtn.addEventListener('click', async () => {
+                        testBtn.disabled = true;
+                        testBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Testing...';
+                        
+                        try {
+                            const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}?key=${API_KEY}`);
+                            if (response.ok) {
+                                testResult.innerHTML = `
+                                    <div style="
+                                        background: #d5f4e6;
+                                        color: #27ae60;
+                                        padding: 10px;
+                                        border-radius: 5px;
+                                        border: 1px solid #2ecc71;
+                                        margin-top: 10px;
+                                    ">
+                                        <i class="fas fa-check-circle"></i>
+                                        Koneksi berhasil! Spreadsheet dapat diakses.
+                                    </div>
+                                `;
+                            } else {
+                                throw new Error(`HTTP ${response.status}`);
+                            }
+                        } catch (error) {
+                            testResult.innerHTML = `
+                                <div style="
+                                    background: #fdeaea;
+                                    color: #e74c3c;
+                                    padding: 10px;
+                                    border-radius: 5px;
+                                    border: 1px solid #e74c3c;
+                                    margin-top: 10px;
+                                ">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    Gagal terhubung: ${error.message}
+                                </div>
+                            `;
+                        } finally {
+                            testBtn.disabled = false;
+                            testBtn.innerHTML = '<i class="fas fa-plug"></i> Test Koneksi Sekarang';
+                        }
+                    });
+                }
+            }, 100);
         }
         
         // Fungsi untuk menghapus semua data
@@ -2281,19 +2651,6 @@
                 return false;
             } finally {
                 hideLoading();
-            }
-        }
-        
-        // Update status API
-        function updateApiStatus(isOnline, message) {
-            if (isOnline) {
-                apiStatus.className = 'api-status online';
-                apiStatusDot.className = 'api-status-dot online';
-                apiStatusText.textContent = message;
-            } else {
-                apiStatus.className = 'api-status offline';
-                apiStatusDot.className = 'api-status-dot offline';
-                apiStatusText.textContent = message;
             }
         }
         
@@ -2844,8 +3201,26 @@
             setInterval(updateClock, 1000);
             
             // Load data dari Google Sheets
-            showNotification('Memuat data dari Spreadsheet Anda...', 'info');
-            await fetchDataFromSheets();
+            showNotification('Memulai koneksi ke Spreadsheet...', 'info');
+            
+            // Coba koneksi terlebih dahulu
+            try {
+                // Test koneksi cepat
+                const testResponse = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}?key=${API_KEY}&fields=spreadsheetId`, {
+                    method: 'HEAD',
+                    cache: 'no-cache'
+                });
+                
+                if (testResponse.ok) {
+                    updateApiStatus(true, 'Terhubung ke Spreadsheet...');
+                    await fetchDataFromSheets();
+                } else {
+                    throw new Error('Test connection failed');
+                }
+            } catch (error) {
+                console.log('Test connection failed, trying with full fetch...');
+                await fetchDataFromSheets();
+            }
             
             // Update counters
             updateCounters();
@@ -2865,21 +3240,28 @@
                 updateDateDisplay();
             }, 60000);
             
-            // Refresh data setiap 3 menit
+            // Coba reconnect setiap 5 menit jika offline
             setInterval(async () => {
-                await fetchDataFromSheets();
-                if (!isMainPage) {
-                    if (activeCategory === 'memo' && activeSubcategory) {
-                        renderSavedData('memo', activeSubcategory, currentSearchKeyword);
-                    } else if (activeCategory === 'reportan') {
-                        renderSavedData('reportan', '', currentSearchKeyword);
-                    }
+                if (!apiStatus.classList.contains('online')) {
+                    console.log('Mencoba reconnect...');
+                    await fetchDataFromSheets();
                 }
-            }, 180000);
+            }, 300000);
         }
         
         // Jalankan inisialisasi saat halaman dimuat
         document.addEventListener('DOMContentLoaded', init);
+        
+        // Tambahkan event listener untuk online/offline detection
+        window.addEventListener('online', async () => {
+            showNotification('Koneksi internet kembali', 'success');
+            await fetchDataFromSheets();
+        });
+        
+        window.addEventListener('offline', () => {
+            updateApiStatus(false, 'Tidak ada koneksi internet');
+            showNotification('Koneksi internet terputus', 'error');
+        });
     </script>
 </body>
 </html>
