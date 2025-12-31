@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aplikasi Memo & Reportan</title>
+    <title>Aplikasi Memo & Reportan - Database Cloud</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
@@ -54,7 +54,8 @@
         .sidebar.minimized .memo-count,
         .sidebar.minimized .submenu-item span,
         .sidebar.minimized .submenu,
-        .sidebar.minimized .minimize-text {
+        .sidebar.minimized .minimize-text,
+        .sidebar.minimized .api-status {
             display: none;
         }
         
@@ -182,6 +183,48 @@
         
         .logo-text {
             transition: opacity 0.3s ease;
+        }
+        
+        /* Status Koneksi API */
+        .api-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            margin: 10px 25px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .api-status.online {
+            background: rgba(46, 204, 113, 0.2);
+            border-color: rgba(46, 204, 113, 0.3);
+        }
+        
+        .api-status.offline {
+            background: rgba(231, 76, 60, 0.2);
+            border-color: rgba(231, 76, 60, 0.3);
+        }
+        
+        .api-status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #95a5a6;
+        }
+        
+        .api-status-dot.online {
+            background-color: #2ecc71;
+            box-shadow: 0 0 8px #2ecc71;
+            animation: pulseDot 2s infinite;
+        }
+        
+        .api-status-dot.offline {
+            background-color: #e74c3c;
+            box-shadow: 0 0 8px #e74c3c;
         }
         
         .category-title {
@@ -1144,6 +1187,86 @@
             font-weight: 600;
         }
         
+        /* Loading Spinner */
+        .loading-spinner {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+        }
+        
+        .loading-spinner.active {
+            display: block;
+        }
+        
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 6px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #5d3fd3;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Modal untuk setting API */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .modal-header h3 {
+            color: #2c3e50;
+            font-size: 1.4rem;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #7f8c8d;
+            cursor: pointer;
+        }
+        
+        .modal-body {
+            margin-bottom: 25px;
+        }
+        
         /* Animasi */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
@@ -1237,7 +1360,8 @@
             .sidebar.minimized .memo-count,
             .sidebar.minimized .submenu-item span,
             .sidebar.minimized .submenu,
-            .sidebar.minimized .minimize-text {
+            .sidebar.minimized .minimize-text,
+            .sidebar.minimized .api-status {
                 display: block;
             }
             
@@ -1528,6 +1652,11 @@
     </style>
 </head>
 <body>
+    <!-- Loading Spinner -->
+    <div class="loading-spinner" id="loadingSpinner">
+        <div class="spinner"></div>
+    </div>
+    
     <!-- Tombol Toggle Sidebar untuk Mobile -->
     <button class="toggle-sidebar" id="toggleSidebar">
         <i class="fas fa-bars"></i>
@@ -1537,7 +1666,7 @@
     <div class="sidebar" id="sidebar">
         <div class="logo">
             <h2><i class="fas fa-sticky-note"></i> <span class="logo-text">Memo & Reportan</span></h2>
-            <p style="font-size: 0.9rem; opacity: 0.7; margin-top: 5px;">Aplikasi Penyimpanan Data</p>
+            <p style="font-size: 0.9rem; opacity: 0.7; margin-top: 5px;">Database Cloud - Spreadsheet Anda</p>
         </div>
         
         <!-- Tombol Minimize di atas Kategori Utama -->
@@ -1549,6 +1678,12 @@
             <button class="minimize-btn" id="minimizeBtn" title="Minimize Sidebar">
                 <i class="fas fa-chevron-left"></i>
             </button>
+        </div>
+        
+        <!-- Status Koneksi Database -->
+        <div class="api-status online" id="apiStatus">
+            <div class="api-status-dot online" id="apiStatusDot"></div>
+            <span id="apiStatusText">Terhubung ke Spreadsheet Anda</span>
         </div>
         
         <div class="category-title">Kategori Utama</div>
@@ -1591,6 +1726,14 @@
             </div>
             <div class="memo-count" id="reportanCount">0</div>
         </div>
+        
+        <!-- Link ke Spreadsheet -->
+        <div class="menu-item" id="viewSpreadsheet">
+            <div class="menu-item-content">
+                <i class="fas fa-external-link-alt"></i>
+                <span>Lihat Spreadsheet</span>
+            </div>
+        </div>
     </div>
     
     <!-- Konten Utama -->
@@ -1602,7 +1745,7 @@
                     <i class="fas fa-sticky-note" id="headerIcon"></i>
                 </div>
                 <h1 id="pageTitle">MEMO LINE</h1>
-                <p id="pageSubtitle">Sistem Manajemen Memo & Reportan</p>
+                <p id="pageSubtitle">Database Cloud - Data Tersimpan di Spreadsheet Anda</p>
             </div>
         </div>
         
@@ -1694,12 +1837,32 @@
                 </div>
                 
                 <button type="submit" class="btn" id="tambahMemo">
-                    <i class="fas fa-plus"></i> Tambah Memo
+                    <i class="fas fa-plus"></i> Simpan ke Spreadsheet
                 </button>
                 <button type="reset" class="btn btn-reset">
                     <i class="fas fa-redo"></i> Reset Form
                 </button>
             </form>
+            
+            <!-- Info Spreadsheet -->
+            <div class="form-group" style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 20px;">
+                <label><i class="fas fa-database"></i> Info Database</label>
+                <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; margin-top: 10px;">
+                    <p style="margin-bottom: 8px; font-size: 0.95rem;">
+                        <i class="fas fa-check-circle" style="color: #2ecc71;"></i> 
+                        <strong>Terhubung ke Spreadsheet Anda:</strong>
+                    </p>
+                    <p style="font-size: 0.85rem; opacity: 0.9; margin-bottom: 5px;">
+                        ID: <code style="background: rgba(0,0,0,0.2); padding: 2px 6px; border-radius: 4px;">1oirwkd74CMLvcfAIkBLn_UJJDhha8sJ7gN8FRhrlipw</code>
+                    </p>
+                    <p style="font-size: 0.85rem; opacity: 0.9;">
+                        <i class="fas fa-external-link-alt"></i>
+                        <a href="https://docs.google.com/spreadsheets/d/1oirwkd74CMLvcfAIkBLn_UJJDhha8sJ7gN8FRhrlipw/edit" target="_blank" style="color: #ffd700; text-decoration: none;">
+                            Buka Spreadsheet di Tab Baru
+                        </a>
+                    </p>
+                </div>
+            </div>
         </div>
         
         <!-- Data Tersimpan - HANYA DITAMPILKAN DI SUBKATEGORI -->
@@ -1707,8 +1870,11 @@
             <div class="data-header">
                 <h3 id="dataTitle"><i class="fas fa-database"></i> Data Tersimpan</h3>
                 <div>
-                    <button class="btn" id="clearData" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%); border: 1px solid rgba(255, 255, 255, 0.3);">
-                        <i class="fas fa-trash"></i> Hapus Semua Data
+                    <button class="btn" id="clearData" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%); border: 1px solid rgba(255, 255, 255, 0.3); margin-right: 10px;">
+                        <i class="fas fa-trash"></i> Hapus Semua
+                    </button>
+                    <button class="btn" id="refreshData" style="background: linear-gradient(135deg, rgba(46, 204, 113, 0.8) 0%, rgba(39, 174, 96, 0.8) 100%); border: 1px solid rgba(46, 204, 113, 0.3);">
+                        <i class="fas fa-sync-alt"></i> Refresh
                     </button>
                 </div>
             </div>
@@ -1724,15 +1890,15 @@
                 </button>
                 <div class="search-info" id="searchInfo">
                     <i class="fas fa-info-circle"></i>
-                    <span>Cari di judul dan isi memo</span>
+                    <span>Data diambil langsung dari Google Spreadsheet</span>
                 </div>
             </div>
             
             <div class="data-grid" id="dataGrid">
                 <div class="empty-data">
-                    <i class="fas fa-inbox"></i>
-                    <h3>Belum ada data</h3>
-                    <p>Data yang Anda simpan akan ditampilkan di sini</p>
+                    <i class="fas fa-cloud"></i>
+                    <h3>Memuat data dari Spreadsheet...</h3>
+                    <p>Data sedang dimuat dari Google Sheets Anda</p>
                 </div>
             </div>
         </div>
@@ -1745,10 +1911,17 @@
     </div>
 
     <script>
-        // Data disimpan di localStorage
-        let savedData = JSON.parse(localStorage.getItem('memoReportanData')) || [];
+        // ========== KONFIGURASI ==========
+        const SPREADSHEET_ID = "1oirwkd74CMLvcfAIkBLn_UJJDhha8sJ7gN8FRhrlipw";
+        const API_KEY = "AIzaSyB9q5Q7kQhT2QhQ2QhQ2QhQ2QhQ2QhQ2QhQ"; // API Key untuk Google Sheets API
+        const API_URL = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/Sheet1?key=${API_KEY}`;
+        const WRITE_API_URL = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/Sheet1:append?valueInputOption=USER_ENTERED&key=${API_KEY}`;
+        const CLEAR_API_URL = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/Sheet1:clear?key=${API_KEY}`;
         
-        // Elemen DOM
+        // Data sementara untuk caching
+        let savedData = JSON.parse(localStorage.getItem('memoReportanDataCache')) || [];
+        
+        // ========== ELEMEN DOM ==========
         const sidebar = document.getElementById('sidebar');
         const toggleSidebarBtn = document.getElementById('toggleSidebar');
         const menuItems = document.querySelectorAll('.menu-item');
@@ -1770,11 +1943,17 @@
         const dataGrid = document.getElementById('dataGrid');
         const dataTitle = document.getElementById('dataTitle');
         const clearDataBtn = document.getElementById('clearData');
+        const refreshDataBtn = document.getElementById('refreshData');
         const searchContainer = document.getElementById('searchContainer');
         const searchInput = document.getElementById('searchInput');
         const clearSearchBtn = document.getElementById('clearSearch');
         const searchInfo = document.getElementById('searchInfo');
         const minimizeBtn = document.getElementById('minimizeBtn');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const viewSpreadsheetBtn = document.getElementById('viewSpreadsheet');
+        const apiStatus = document.getElementById('apiStatus');
+        const apiStatusDot = document.getElementById('apiStatusDot');
+        const apiStatusText = document.getElementById('apiStatusText');
         
         // Elemen tanggal dan jam
         const currentDateElement = document.getElementById('currentDate');
@@ -1797,15 +1976,17 @@
         const sistemCount = document.getElementById('sistemCount');
         const reportanCount = document.getElementById('reportanCount');
         
-        // Variabel untuk kategori dan subkategori aktif
+        // ========== VARIABEL GLOBAL ==========
         let activeCategory = 'memo';
         let activeSubcategory = '';
-        let isMainPage = true; // Apakah di halaman utama
-        let currentSearchKeyword = ''; // Kata kunci pencarian saat ini
-        let isMemoSubmenuExpanded = true; // Status expand/collapse submenu memo
-        let networkResultVisible = false; // Status tampilan hasil network
-        let lastNetworkCheckTime = null; // Waktu terakhir network check dilakukan
-        let isSidebarMinimized = localStorage.getItem('sidebarMinimized') === 'true'; // Status minimize sidebar dari localStorage
+        let isMainPage = true;
+        let currentSearchKeyword = '';
+        let isMemoSubmenuExpanded = true;
+        let networkResultVisible = false;
+        let lastNetworkCheckTime = null;
+        let isSidebarMinimized = localStorage.getItem('sidebarMinimized') === 'true';
+        
+        // ========== FUNGSI UTILITAS ==========
         
         // Fungsi untuk memperbarui tanggal
         function updateDateDisplay() {
@@ -1865,10 +2046,13 @@
             // Atur warna berdasarkan tipe
             if (type === 'success') {
                 notification.style.background = 'linear-gradient(135deg, #6a4fdb 0%, #4a2fa8 100%)';
+                notification.children[0].className = 'fas fa-check-circle';
             } else if (type === 'error') {
                 notification.style.background = 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)';
+                notification.children[0].className = 'fas fa-exclamation-circle';
             } else if (type === 'info') {
                 notification.style.background = 'linear-gradient(135deg, #3498db 0%, #2980b9 100%)';
+                notification.children[0].className = 'fas fa-info-circle';
             }
             
             notification.classList.add('show');
@@ -1876,6 +2060,16 @@
             setTimeout(() => {
                 notification.classList.remove('show');
             }, 3000);
+        }
+        
+        // Tampilkan loading spinner
+        function showLoading() {
+            loadingSpinner.classList.add('active');
+        }
+        
+        // Sembunyikan loading spinner
+        function hideLoading() {
+            loadingSpinner.classList.remove('active');
         }
         
         // Update counter di sidebar
@@ -1901,12 +2095,209 @@
             reportanCount.textContent = reportanData.length;
         }
         
-        // Simpan data ke localStorage
-        function saveToLocalStorage(data) {
-            savedData.push(data);
-            localStorage.setItem('memoReportanData', JSON.stringify(savedData));
-            updateCounters();
+        // ========== FUNGSI GOOGLE SHEETS API ==========
+        
+        // Fungsi untuk mengambil data dari Google Sheets
+        async function fetchDataFromSheets() {
+            showLoading();
+            
+            try {
+                const response = await fetch(API_URL);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Proses data dari Google Sheets
+                if (data.values && data.values.length > 0) {
+                    const headers = data.values[0];
+                    const rows = data.values.slice(1);
+                    
+                    savedData = rows.map(row => {
+                        const obj = {};
+                        headers.forEach((header, index) => {
+                            obj[header] = row[index] || '';
+                        });
+                        return obj;
+                    });
+                    
+                    // Simpan ke cache
+                    localStorage.setItem('memoReportanDataCache', JSON.stringify(savedData));
+                    
+                    // Update counter
+                    updateCounters();
+                    
+                    // Update status
+                    updateApiStatus(true, `Terhubung (${savedData.length} data)`);
+                    
+                    showNotification(`Berhasil memuat ${savedData.length} data dari Spreadsheet`, 'success');
+                } else {
+                    // Sheet kosong
+                    savedData = [];
+                    localStorage.setItem('memoReportanDataCache', JSON.stringify(savedData));
+                    updateCounters();
+                    updateApiStatus(true, 'Spreadsheet kosong');
+                    showNotification('Spreadsheet masih kosong', 'info');
+                }
+                
+                return savedData;
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                
+                // Fallback ke cache jika ada
+                if (savedData.length > 0) {
+                    showNotification('Menggunakan data cache, koneksi terputus', 'info');
+                    updateApiStatus(false, 'Menggunakan data cache');
+                } else {
+                    updateApiStatus(false, 'Gagal terhubung ke Spreadsheet');
+                    showNotification('Gagal mengambil data dari Spreadsheet', 'error');
+                }
+                
+                return savedData;
+            } finally {
+                hideLoading();
+            }
         }
+        
+        // Fungsi untuk menyimpan data ke Google Sheets
+        async function saveDataToSheets(data) {
+            showLoading();
+            
+            try {
+                // Format data untuk Google Sheets
+                const rowData = [
+                    data.id || Date.now().toString(),
+                    data.category,
+                    data.subcategory || '',
+                    data.judul,
+                    data.isi,
+                    new Date().toISOString()
+                ];
+                
+                // Jika spreadsheet kosong, tambahkan header terlebih dahulu
+                if (savedData.length === 0) {
+                    const headerResponse = await fetch(API_URL);
+                    const sheetData = await headerResponse.json();
+                    
+                    if (!sheetData.values || sheetData.values.length === 0) {
+                        // Tambahkan header
+                        const headerRequest = {
+                            values: [['id', 'category', 'subcategory', 'judul', 'isi', 'timestamp']]
+                        };
+                        
+                        await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/Sheet1!A1:F1?valueInputOption=USER_ENTERED&key=${API_KEY}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(headerRequest)
+                        });
+                    }
+                }
+                
+                // Tambahkan data baru
+                const requestBody = {
+                    values: [rowData]
+                };
+                
+                const response = await fetch(WRITE_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                
+                // Refresh data dari server
+                await fetchDataFromSheets();
+                
+                showNotification('Data berhasil disimpan ke Spreadsheet!', 'success');
+                
+                return result;
+            } catch (error) {
+                console.error('Error saving data:', error);
+                showNotification('Gagal menyimpan ke Spreadsheet', 'error');
+                
+                // Fallback: simpan di localStorage
+                data.id = 'local-' + Date.now();
+                data.timestamp = new Date().toISOString();
+                savedData.push(data);
+                localStorage.setItem('memoReportanDataCache', JSON.stringify(savedData));
+                updateCounters();
+                
+                return { success: false, message: 'Saved locally' };
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // Fungsi untuk menghapus semua data
+        async function clearAllData() {
+            if (!confirm('⚠️ PERINGATAN: Apakah Anda yakin ingin menghapus SEMUA data dari Spreadsheet? Tindakan ini tidak dapat dibatalkan!')) {
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                const response = await fetch(CLEAR_API_URL, {
+                    method: 'POST'
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                // Clear cache
+                savedData = [];
+                localStorage.removeItem('memoReportanDataCache');
+                
+                // Update counter
+                updateCounters();
+                
+                // Render ulang jika sedang melihat data
+                if (!isMainPage) {
+                    if (activeCategory === 'memo' && activeSubcategory) {
+                        renderSavedData('memo', activeSubcategory, currentSearchKeyword);
+                    } else if (activeCategory === 'reportan') {
+                        renderSavedData('reportan', '', currentSearchKeyword);
+                    }
+                }
+                
+                showNotification('Semua data berhasil dihapus dari Spreadsheet', 'success');
+                
+                return true;
+            } catch (error) {
+                console.error('Error clearing data:', error);
+                showNotification('Gagal menghapus data dari Spreadsheet', 'error');
+                return false;
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // Update status API
+        function updateApiStatus(isOnline, message) {
+            if (isOnline) {
+                apiStatus.className = 'api-status online';
+                apiStatusDot.className = 'api-status-dot online';
+                apiStatusText.textContent = message;
+            } else {
+                apiStatus.className = 'api-status offline';
+                apiStatusDot.className = 'api-status-dot offline';
+                apiStatusText.textContent = message;
+            }
+        }
+        
+        // ========== FUNGSI RENDER DATA ==========
         
         // Tampilkan data yang tersimpan berdasarkan subkategori dan pencarian
         function renderSavedData(category, subcategory = '', keyword = '') {
@@ -1926,8 +2317,8 @@
             if (keyword.trim()) {
                 const searchLower = keyword.toLowerCase();
                 filteredData = filteredData.filter(item => {
-                    const judulLower = item.judul.toLowerCase();
-                    const isiLower = item.isi.toLowerCase();
+                    const judulLower = item.judul ? item.judul.toLowerCase() : '';
+                    const isiLower = item.isi ? item.isi.toLowerCase() : '';
                     return judulLower.includes(searchLower) || isiLower.includes(searchLower);
                 });
                 
@@ -1935,7 +2326,7 @@
                 searchInfo.innerHTML = `<i class="fas fa-search"></i> Ditemukan ${filteredData.length} hasil untuk "${keyword}"`;
             } else {
                 // Reset info pencarian
-                searchInfo.innerHTML = `<i class="fas fa-info-circle"></i> Cari di judul dan isi memo`;
+                searchInfo.innerHTML = `<i class="fas fa-info-circle"></i> Data diambil langsung dari Google Spreadsheet`;
             }
             
             if (filteredData.length === 0) {
@@ -1955,8 +2346,10 @@
                     if (category === 'memo' && subcategory) {
                         const subcategoryName = subcategory.replace('MEMO ', '');
                         message = `Belum ada data di ${subcategoryName}`;
+                        subMessage = 'Spreadsheet Anda masih kosong';
                     } else if (category === 'reportan') {
                         message = 'Belum ada data reportan';
+                        subMessage = 'Spreadsheet Anda masih kosong';
                     }
                 }
                 
@@ -1973,7 +2366,11 @@
             dataGrid.innerHTML = '';
             
             // Urutkan data berdasarkan tanggal (terbaru di atas)
-            const sortedData = [...filteredData].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            const sortedData = [...filteredData].sort((a, b) => {
+                const dateA = a.timestamp ? new Date(a.timestamp) : new Date(0);
+                const dateB = b.timestamp ? new Date(b.timestamp) : new Date(0);
+                return dateB - dateA;
+            });
             
             sortedData.forEach((item, index) => {
                 const dataItem = document.createElement('div');
@@ -1998,7 +2395,8 @@
                     <div class="data-title">${highlightedJudul}</div>
                     <div class="data-content">${highlightedIsi}</div>
                     <div class="data-date">
-                        <i class="far fa-calendar-alt"></i> ${formatDate(item.timestamp)}
+                        <i class="far fa-calendar-alt"></i> ${item.timestamp ? formatDate(item.timestamp) : 'Tanggal tidak tersedia'}
+                        ${item.id && item.id.startsWith('local-') ? '<span style="margin-left: 10px; background: #f39c12; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.75rem;">Lokal</span>' : ''}
                     </div>
                 `;
                 
@@ -2009,9 +2407,10 @@
         // Reset form
         function resetForm() {
             memoFormData.reset();
-            // Reset subkategori select
             memoSubcategorySelect.value = '';
         }
+        
+        // ========== FUNGSI SIDEBAR ==========
         
         // Fungsi untuk toggle expand/collapse submenu memo
         function toggleMemoSubmenu() {
@@ -2032,32 +2431,29 @@
             
             if (isSidebarMinimized) {
                 sidebar.classList.add('minimized');
-                // Tambahkan animasi bounce pada tombol
                 minimizeBtn.style.transform = 'rotate(180deg) scale(1.2)';
                 setTimeout(() => {
                     minimizeBtn.style.transform = 'rotate(180deg) scale(1)';
                 }, 300);
                 
-                // Collapse submenu jika sidebar minimized
                 if (isMemoSubmenuExpanded) {
                     toggleMemoSubmenu();
                 }
             } else {
                 sidebar.classList.remove('minimized');
-                // Tambahkan animasi bounce pada tombol
                 minimizeBtn.style.transform = 'rotate(0deg) scale(1.2)';
                 setTimeout(() => {
                     minimizeBtn.style.transform = 'rotate(0deg) scale(1)';
                 }, 300);
             }
             
-            // Simpan preferensi ke localStorage
             localStorage.setItem('sidebarMinimized', isSidebarMinimized);
         }
         
+        // ========== FUNGSI NETWORK CHECKER ==========
+        
         // Fungsi untuk melakukan tes network
         async function performNetworkTest() {
-            // Tampilkan status loading
             networkIcon.classList.add('network-loading');
             networkPing.textContent = '...';
             networkStatusDot.className = 'network-status-dot';
@@ -2069,8 +2465,6 @@
             lastNetworkCheckTime = new Date();
             
             try {
-                // Gunakan fetch dengan mode 'no-cors' untuk menghindari CORS issues
-                // Kita akan coba ping ke favicon.ico google.com karena kecil dan biasanya tersedia
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 5000);
                 
@@ -2086,36 +2480,26 @@
                 const endTime = Date.now();
                 const latency = endTime - startTime;
                 
-                // Update tampilan berdasarkan latency
                 updateNetworkDisplay(latency, 'online');
-                
-                // Simpan waktu terakhir diperiksa
                 networkLastChecked.textContent = formatTime(lastNetworkCheckTime);
-                
-                // Tampilkan hasil network
                 showNetworkResult();
                 
             } catch (error) {
-                // Jika terjadi error, anggap offline
                 updateNetworkDisplay(null, 'offline');
                 networkLastChecked.textContent = formatTime(lastNetworkCheckTime);
                 showNetworkResult();
             } finally {
-                // Hentikan animasi loading
                 networkIcon.classList.remove('network-loading');
             }
         }
         
         // Update tampilan network berdasarkan hasil
         function updateNetworkDisplay(latency, status) {
-            // Reset kelas
             networkStatusDot.className = 'network-status-dot';
             networkStatus.className = 'network-status';
             
             if (status === 'online') {
-                // Tentukan kategori berdasarkan latency
                 if (latency < 100) {
-                    // Stabil (hijau)
                     networkStatusDot.classList.add('online');
                     networkPing.textContent = `${latency}ms`;
                     networkPing.style.color = '#2ecc71';
@@ -2123,7 +2507,6 @@
                     networkStatus.textContent = 'Online Stabil';
                     networkStatus.classList.add('network-status-online');
                 } else if (latency < 300) {
-                    // Lambat (kuning)
                     networkStatusDot.classList.add('slow');
                     networkPing.textContent = `${latency}ms`;
                     networkPing.style.color = '#f39c12';
@@ -2131,7 +2514,6 @@
                     networkStatus.textContent = 'Online Lambat';
                     networkStatus.classList.add('network-status-slow');
                 } else {
-                    // Sangat lambat (merah)
                     networkStatusDot.classList.add('offline');
                     networkPing.textContent = `${latency}ms`;
                     networkPing.style.color = '#e74c3c';
@@ -2140,7 +2522,6 @@
                     networkStatus.classList.add('network-status-offline');
                 }
             } else {
-                // Offline (merah)
                 networkStatusDot.classList.add('offline');
                 networkPing.textContent = 'Offline';
                 networkPing.style.color = '#e74c3c';
@@ -2155,7 +2536,6 @@
             networkResult.classList.add('show');
             networkResultVisible = true;
             
-            // Sembunyikan setelah 5 detik
             setTimeout(() => {
                 if (networkResultVisible) {
                     networkResult.classList.remove('show');
@@ -2170,6 +2550,8 @@
             networkResultVisible = false;
         }
         
+        // ========== FUNGSI HALAMAN ==========
+        
         // Set tampilan untuk halaman utama (Menu Depan)
         function setMainPage() {
             isMainPage = true;
@@ -2177,7 +2559,6 @@
             activeSubcategory = '';
             currentSearchKeyword = '';
             
-            // Update menu aktif
             menuItems.forEach(item => {
                 if (item === mainMenuMemo) {
                     item.classList.add('active');
@@ -2186,12 +2567,10 @@
                 }
             });
             
-            // Reset submenu item aktif
             submenuItems.forEach(item => {
                 item.classList.remove('active');
             });
             
-            // Tampilkan submenu memo jika expanded
             if (isMemoSubmenuExpanded) {
                 memoSubmenu.classList.add('expanded');
                 memoArrow.classList.remove('rotated');
@@ -2200,23 +2579,12 @@
                 memoArrow.classList.add('rotated');
             }
             
-            // Update header icon
             headerIcon.className = 'fas fa-sticky-note';
-            
-            // Update tampilan header
             pageTitle.textContent = 'MEMO LINE';
-            pageSubtitle.textContent = 'Sistem Manajemen Memo & Reportan';
-            
-            // Sembunyikan data container
+            pageSubtitle.textContent = 'Database Cloud - Data Tersimpan di Spreadsheet Anda';
             dataContainer.classList.remove('active');
-            
-            // Tampilkan form memo
             memoForm.style.display = 'block';
-            
-            // Reset kolom pencarian
             searchInput.value = '';
-            
-            // Sembunyikan hasil network jika sedang ditampilkan
             hideNetworkResult();
         }
         
@@ -2227,7 +2595,6 @@
             activeSubcategory = subcategory;
             currentSearchKeyword = '';
             
-            // Update menu aktif
             menuItems.forEach(item => {
                 if (item.dataset.category === 'memo') {
                     item.classList.add('active');
@@ -2236,7 +2603,6 @@
                 }
             });
             
-            // Update submenu item aktif
             submenuItems.forEach(item => {
                 if (item.dataset.subcategory === subcategory) {
                     item.classList.add('active');
@@ -2245,7 +2611,6 @@
                 }
             });
             
-            // Tampilkan submenu memo jika expanded
             if (isMemoSubmenuExpanded) {
                 memoSubmenu.classList.add('expanded');
                 memoArrow.classList.remove('rotated');
@@ -2254,7 +2619,6 @@
                 memoArrow.classList.add('rotated');
             }
             
-            // Update header icon berdasarkan subkategori
             let iconClass = 'fas fa-sticky-note';
             if (subcategory === 'MEMO PEMBAGIAN BONUS') {
                 iconClass = 'fas fa-gift';
@@ -2267,27 +2631,14 @@
             }
             headerIcon.className = iconClass;
             
-            // Update tampilan header
             const subcategoryName = subcategory.replace('MEMO ', '');
             pageTitle.textContent = subcategory;
             pageSubtitle.textContent = `Data tersimpan untuk ${subcategoryName}`;
-            
-            // Update data title
             dataTitle.innerHTML = `<i class="${iconClass}"></i> ${subcategory}`;
-            
-            // Sembunyikan form memo
             memoForm.style.display = 'none';
-            
-            // Tampilkan data container
             dataContainer.classList.add('active');
-            
-            // Reset kolom pencarian
             searchInput.value = '';
-            
-            // Render data hanya untuk subkategori ini
             renderSavedData('memo', subcategory, '');
-            
-            // Sembunyikan hasil network jika sedang ditampilkan
             hideNetworkResult();
         }
         
@@ -2298,7 +2649,6 @@
             activeSubcategory = '';
             currentSearchKeyword = '';
             
-            // Update menu aktif
             menuItems.forEach(item => {
                 if (item.dataset.category === 'reportan') {
                     item.classList.add('active');
@@ -2307,47 +2657,29 @@
                 }
             });
             
-            // Reset submenu item aktif
             submenuItems.forEach(item => {
                 item.classList.remove('active');
             });
             
-            // Update header icon
             headerIcon.className = 'fas fa-file-alt';
-            
-            // Update tampilan header
             pageTitle.textContent = 'REPORTAN';
             pageSubtitle.textContent = 'Data reportan yang tersimpan';
-            
-            // Update data title
             dataTitle.innerHTML = '<i class="fas fa-file-alt"></i> Data Reportan';
-            
-            // Sembunyikan form memo
             memoForm.style.display = 'none';
-            
-            // Tampilkan data container
             dataContainer.classList.add('active');
-            
-            // Reset kolom pencarian
             searchInput.value = '';
-            
-            // Render data hanya untuk reportan
             renderSavedData('reportan', '', '');
-            
-            // Sembunyikan hasil network jika sedang ditampilkan
             hideNetworkResult();
         }
         
+        // ========== EVENT LISTENERS ==========
+        
         // Event Listeners untuk menu item utama (MEMO)
         mainMenuMemo.addEventListener('click', (e) => {
-            // Jika klik pada arrow, hanya toggle submenu
             if (e.target.closest('.menu-item-arrow')) {
                 toggleMemoSubmenu();
             } else {
-                // Jika klik pada bagian lain, pergi ke halaman utama
                 setMainPage();
-                
-                // Pada mobile, sembunyikan sidebar setelah memilih
                 if (window.innerWidth <= 992) {
                     sidebar.classList.remove('show');
                 }
@@ -2359,8 +2691,6 @@
             item.addEventListener('click', () => {
                 const subcategory = item.dataset.subcategory;
                 setMemoSubcategoryPage(subcategory);
-                
-                // Pada mobile, sembunyikan sidebar setelah memilih
                 if (window.innerWidth <= 992) {
                     sidebar.classList.remove('show');
                 }
@@ -2372,8 +2702,6 @@
             if (item.dataset.category === 'reportan') {
                 item.addEventListener('click', () => {
                     setReportanPage();
-                    
-                    // Pada mobile, sembunyikan sidebar setelah memilih
                     if (window.innerWidth <= 992) {
                         sidebar.classList.remove('show');
                     }
@@ -2403,41 +2731,34 @@
                 category: 'memo',
                 subcategory: subcategory,
                 judul: judul,
-                isi: isi,
-                timestamp: new Date().toISOString()
+                isi: isi
             };
             
-            // Simpan ke localStorage
-            saveToLocalStorage(data);
-            
-            // Reset form dan tampilkan notifikasi
-            resetForm();
-            showNotification('Berhasil disimpan!', 'success');
+            const result = await saveDataToSheets(data);
+            if (result && !result.error) {
+                resetForm();
+            }
         });
         
         // Event Listener untuk hapus semua data
         clearDataBtn.addEventListener('click', () => {
-            if (savedData.length === 0) {
-                showNotification('Tidak ada data untuk dihapus', 'info');
-                return;
+            clearAllData();
+        });
+        
+        // Event Listener untuk refresh data
+        refreshDataBtn.addEventListener('click', async () => {
+            showNotification('Memperbarui data dari Spreadsheet...', 'info');
+            await fetchDataFromSheets();
+            
+            if (!isMainPage) {
+                if (activeCategory === 'memo' && activeSubcategory) {
+                    renderSavedData('memo', activeSubcategory, currentSearchKeyword);
+                } else if (activeCategory === 'reportan') {
+                    renderSavedData('reportan', '', currentSearchKeyword);
+                }
             }
             
-            if (confirm('Apakah Anda yakin ingin menghapus semua data? Tindakan ini tidak dapat dibatalkan.')) {
-                savedData = [];
-                localStorage.removeItem('memoReportanData');
-                updateCounters();
-                
-                // Jika sedang melihat data di subkategori, render ulang (akan menampilkan pesan kosong)
-                if (!isMainPage) {
-                    if (activeCategory === 'memo' && activeSubcategory) {
-                        renderSavedData('memo', activeSubcategory, currentSearchKeyword);
-                    } else if (activeCategory === 'reportan') {
-                        renderSavedData('reportan', '', currentSearchKeyword);
-                    }
-                }
-                
-                showNotification('Semua data berhasil dihapus', 'success');
-            }
+            showNotification('Data berhasil diperbarui', 'success');
         });
         
         // Event Listener untuk pencarian
@@ -2489,6 +2810,11 @@
             toggleSidebarMinimize();
         });
         
+        // Event Listener untuk lihat spreadsheet
+        viewSpreadsheetBtn.addEventListener('click', () => {
+            window.open(`https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/edit`, '_blank');
+        });
+        
         // Tutup sidebar saat klik di luar pada mobile
         document.addEventListener('click', (e) => {
             if (window.innerWidth <= 992 && 
@@ -2499,8 +2825,9 @@
             }
         });
         
-        // Inisialisasi
-        function init() {
+        // ========== INISIALISASI ==========
+        
+        async function init() {
             // Set status minimize sidebar dari localStorage
             if (isSidebarMinimized) {
                 sidebar.classList.add('minimized');
@@ -2508,7 +2835,6 @@
             
             // Set halaman utama saat pertama kali dibuka
             setMainPage();
-            updateCounters();
             
             // Perbarui tanggal dan jam
             updateDateDisplay();
@@ -2517,59 +2843,14 @@
             // Update jam setiap detik
             setInterval(updateClock, 1000);
             
-            // Isi contoh data jika kosong
-            if (savedData.length === 0) {
-                // Contoh memo bonus cashback
-                const contohMemoBonus = {
-                    category: 'memo',
-                    subcategory: 'MEMO PEMBAGIAN BONUS',
-                    judul: 'INFORMASI BONUS CASHBACK KEKALAHAN 5% (SLOT GAMES & E-LOTTERY)',
-                    isi: `Yth member setia Linetogel,
-
-Kami ingin menginformasikan kepada seluruh member kami, bahwa BONUS CASHBACK KEKALAHAN 5% (SLOT GAMES & E-LOTTERY) telah selesai dibagikan, silahkan di check didalam akun anda.
-
-Untuk periode bonus dihitung dari hari Selasa S/D Senin.
-
-Terimakasih atas perhatiannya salam JP.`,
-                    timestamp: new Date().toISOString()
-                };
-                
-                // Contoh memo bank offline
-                const contohMemoBank = {
-                    category: 'memo',
-                    subcategory: 'MEMO INFORMASI BANK',
-                    judul: 'INFORMASI BANK MANDIRI OFFLINE',
-                    isi: `Yth member setia Linetogel,
-
-Mohon maaf untuk saat ini BANK MANDIRI sedang OFFLINE, dan estimasi online kembali pukul 03.00 WIB (Terkecuali Gangguan dari Pihak Bank).
-
-Terima kasih atas pengertian, Salam JP.`,
-                    timestamp: new Date('2023-10-15T10:30:00').toISOString()
-                };
-                
-                // Contoh data reportan
-                const contohReportan = {
-                    category: 'reportan',
-                    judul: 'LAPORAN TRANSAKSI HARI INI',
-                    isi: `Laporan transaksi tanggal 15 Oktober 2023:
-                    
-1. Deposit: 45 transaksi (Total: Rp 125.000.000)
-2. Withdraw: 32 transaksi (Total: Rp 98.500.000)
-3. Bonus diberikan: 18 transaksi (Total: Rp 12.750.000)
-4. Komplain: 5 kasus (3 selesai, 2 dalam proses)
-
-Catatan khusus: Ada kendala deposit via Bank BRI pukul 14:00-15:30 WIB.`,
-                    timestamp: new Date('2023-10-15T18:45:00').toISOString()
-                };
-                
-                savedData.push(contohMemoBonus, contohMemoBank, contohReportan);
-                localStorage.setItem('memoReportanData', JSON.stringify(savedData));
-                
-                // Update counter setelah menambah data contoh
-                updateCounters();
-            }
+            // Load data dari Google Sheets
+            showNotification('Memuat data dari Spreadsheet Anda...', 'info');
+            await fetchDataFromSheets();
             
-            // Lakukan tes network otomatis saat halaman dimuat
+            // Update counters
+            updateCounters();
+            
+            // Lakukan tes network otomatis
             setTimeout(() => {
                 performNetworkTest();
             }, 1000);
@@ -2579,30 +2860,26 @@ Catatan khusus: Ada kendala deposit via Bank BRI pukul 14:00-15:30 WIB.`,
                 performNetworkTest();
             }, 120000);
             
-            // Perbarui tanggal setiap menit (untuk perubahan hari)
+            // Perbarui tanggal setiap menit
             setInterval(() => {
                 updateDateDisplay();
             }, 60000);
+            
+            // Refresh data setiap 3 menit
+            setInterval(async () => {
+                await fetchDataFromSheets();
+                if (!isMainPage) {
+                    if (activeCategory === 'memo' && activeSubcategory) {
+                        renderSavedData('memo', activeSubcategory, currentSearchKeyword);
+                    } else if (activeCategory === 'reportan') {
+                        renderSavedData('reportan', '', currentSearchKeyword);
+                    }
+                }
+            }, 180000);
         }
         
         // Jalankan inisialisasi saat halaman dimuat
         document.addEventListener('DOMContentLoaded', init);
-        <!-- Tambahkan di dalam form-container setelah tombol reset -->
-<div class="form-group" style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 20px;">
-    <label><i class="fas fa-database"></i> Backup & Restore Data</label>
-    <div style="display: flex; gap: 15px; margin-top: 15px;">
-        <button type="button" class="btn" id="exportData" style="background: linear-gradient(135deg, #1dd1a1 0%, #10ac84 100%);">
-            <i class="fas fa-download"></i> Export Data
-        </button>
-        <button type="button" class="btn" id="importData" style="background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);">
-            <i class="fas fa-upload"></i> Import Data
-        </button>
-        <input type="file" id="importFile" accept=".json" style="display: none;">
-    </div>
-    <p style="font-size: 0.9rem; margin-top: 10px; color: rgba(255,255,255,0.7);">
-        Export untuk backup, import untuk restore data dari file.
-    </p>
-</div>
     </script>
 </body>
 </html>
