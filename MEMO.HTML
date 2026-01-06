@@ -3,49 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aplikasi Memo & Reportan - Database Cloud</title>
+    <title>MEMO FORM</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700&family=Share+Tech+Mono&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         body {
-            display: flex;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #f8f6ff 0%, #f0edff 100%);
+            font-family: 'Inter', sans-serif;
+            /* BACKGROUND IMAGE UPDATE: Menggunakan gambar tema Natal */
+            background: url('https://cdn.areabermain.club/assets/cdn/az6/2025/12/10/20251210/7f0bdc56062fceb10a05b6412f5ce6e2/linetogel-bg-natal2025.webp') no-repeat center center fixed;
+            background-size: cover;
+            background-color: #2c3e50; /* Warna cadangan jika gambar gagal dimuat */
             color: #333;
-            transition: all 0.3s ease;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative; /* Penting untuk positioning overlay shadow */
         }
-        
-        /* Sidebar Menu - Diperlebar dengan warna biru keunguan */
+
+        /* Efek Shadow / Overlay Gelap pada Background */
+        /* Ini membuat background terlihat ada bayangan/gelapnya agar konten lebih fokus */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5); /* Overlay gelap 50% */
+            z-index: -1;
+            pointer-events: none; /* Agar klik tembus */
+        }
+
+        /* SIDEBAR */
         .sidebar {
-            width: 320px;
-            background: linear-gradient(180deg, #5d3fd3 0%, #3a1f8c 100%);
+            width: 350px;
+            background: linear-gradient(135deg, #6a4fdb 0%, #4a2fa8 100%);
             color: white;
-            padding: 20px 0;
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
             position: fixed;
             height: 100vh;
             overflow-y: auto;
+            transition: all 0.3s ease;
             z-index: 100;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            /* UPDATE SHADOW: Bayangan lebih tegas dan gelap agar menonjol dari background */
+            box-shadow: 10px 0 25px rgba(0, 0, 0, 0.4); 
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
-        /* Sidebar Minimized State */
+
         .sidebar.minimized {
             width: 80px;
         }
-        
-        .sidebar.minimized .logo h2 {
-            justify-content: center;
-            font-size: 1.5rem;
+
+        .logo {
+            padding: 30px 25px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
+
+        .logo h2 {
+            font-size: 1.6rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .logo p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 8px;
+        }
+
         .sidebar.minimized .logo-text,
         .sidebar.minimized .logo p,
         .sidebar.minimized .category-title,
@@ -54,472 +87,284 @@
         .sidebar.minimized .memo-count,
         .sidebar.minimized .submenu-item span,
         .sidebar.minimized .submenu,
-        .sidebar.minimized .minimize-text,
-        .sidebar.minimized .api-status {
+        .sidebar.minimized .minimize-text {
             display: none;
         }
-        
-        .sidebar.minimized .menu-item {
-            padding: 18px 15px;
-            justify-content: center;
-        }
-        
-        .sidebar.minimized .menu-item-content {
-            justify-content: center;
-            gap: 0;
-        }
-        
-        .sidebar.minimized .menu-item i {
-            font-size: 1.5rem;
-            width: auto;
-        }
-        
-        .sidebar.minimized .logo h2 i {
-            margin: 0;
-        }
-        
-        /* Tombol Minimize - Posisi di atas Kategori Utama */
+
         .minimize-btn-container {
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            padding: 0 25px 10px 25px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-            margin-bottom: 15px;
+            align-items: center;
+            padding: 15px 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.05);
         }
-        
+
         .minimize-label {
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 1.1rem;
-            color: rgba(255, 255, 255, 0.9);
-            font-weight: 600;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            gap: 10px;
+            font-size: 0.9rem;
+            opacity: 0.8;
         }
-        
-        .minimize-label i {
-            font-size: 1rem;
-            color: rgba(255, 255, 255, 0.8);
-        }
-        
+
         .minimize-btn {
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
+            width: 35px;
+            height: 35px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
-            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            flex-shrink: 0;
-            position: relative;
-            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s;
         }
-        
-        .minimize-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.2) 50%, transparent 70%);
-            transform: translateX(-100%);
-            transition: transform 0.6s;
-        }
-        
+
         .minimize-btn:hover {
             background: rgba(255, 255, 255, 0.2);
-            transform: scale(1.15) rotate(5deg);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transform: scale(1.1);
         }
-        
-        .minimize-btn:hover::before {
-            transform: translateX(100%);
-        }
-        
-        .minimize-btn:active {
-            transform: scale(0.95) rotate(-5deg);
-            transition: all 0.1s;
-        }
-        
+
         .sidebar.minimized .minimize-btn {
             transform: rotate(180deg);
         }
-        
-        .sidebar.minimized .minimize-btn:hover {
-            transform: rotate(180deg) scale(1.15);
-        }
-        
-        .sidebar.minimized .minimize-btn:active {
-            transform: rotate(180deg) scale(0.95);
-        }
-        
-        .logo {
-            text-align: center;
-            padding: 20px 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-            margin-bottom: 20px;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-        
-        .logo h2 {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            font-size: 1.8rem;
-            color: white;
-            transition: all 0.3s ease;
-        }
-        
-        .logo-text {
-            transition: opacity 0.3s ease;
-        }
-        
-        /* Status Koneksi API */
-        .api-status {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 15px;
-            margin: 10px 25px;
-            border-radius: 10px;
-            font-size: 0.85rem;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
-            position: relative;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        
-        .api-status.online {
-            background: rgba(46, 204, 113, 0.2);
-            border-color: rgba(46, 204, 113, 0.3);
-        }
-        
-        .api-status.offline {
-            background: rgba(231, 76, 60, 0.2);
-            border-color: rgba(231, 76, 60, 0.3);
-        }
-        
-        .api-status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background-color: #95a5a6;
-        }
-        
-        .api-status-dot.online {
-            background-color: #2ecc71;
-            box-shadow: 0 0 8px #2ecc71;
-            animation: pulseDot 2s infinite;
-        }
-        
-        .api-status-dot.offline {
-            background-color: #e74c3c;
-            box-shadow: 0 0 8px #e74c3c;
-        }
-        
+
         .category-title {
-            padding: 12px 25px;
-            font-size: 1rem;
-            color: rgba(255, 255, 255, 0.8);
+            padding: 20px 25px 10px;
+            font-size: 0.9rem;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-top: 10px;
-            border-top: 1px solid rgba(255, 255, 255, 0.15);
-            transition: all 0.3s ease;
-            white-space: nowrap;
-            overflow: hidden;
+            opacity: 0.7;
+            font-weight: 600;
         }
-        
+
         .menu-item {
             padding: 18px 25px;
-            cursor: pointer;
-            transition: all 0.3s;
-            border-left: 4px solid transparent;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            font-size: 1.05rem;
-            color: white;
-            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
         }
-        
+
         .menu-item:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-            border-left-color: #8a2be2;
+            background: rgba(255, 255, 255, 0.05);
+            border-left-color: rgba(255, 255, 255, 0.3);
         }
-        
+
         .menu-item.active {
-            background-color: rgba(138, 43, 226, 0.2);
-            border-left-color: #8a2be2;
-            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: #ffd700;
         }
-        
+
         .menu-item-content {
             display: flex;
             align-items: center;
             gap: 15px;
-            color: white;
-            transition: all 0.3s ease;
         }
-        
+
         .menu-item i {
             font-size: 1.3rem;
             width: 28px;
-            text-align: center;
-            color: white;
-            transition: all 0.3s ease;
-            flex-shrink: 0;
         }
-        
+
+        .menu-item span {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
         .menu-item-arrow {
-            transition: all 0.3s;
-            font-size: 1rem;
-            opacity: 0.7;
-            color: rgba(255, 255, 255, 0.7);
+            transition: transform 0.3s;
         }
-        
+
         .menu-item-arrow.rotated {
             transform: rotate(180deg);
         }
-        
-        .submenu {
-            display: none;
-            padding-left: 35px;
-            background-color: rgba(255, 255, 255, 0.05);
-            overflow: hidden;
-            transition: max-height 0.3s ease-out;
-            max-height: 0;
+
+        .memo-count {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            min-width: 35px;
+            text-align: center;
         }
-        
+
+        /* SUBMENU */
+        .submenu {
+            background: rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            max-height: 0;
+            transition: max-height 0.3s ease;
+        }
+
         .submenu.expanded {
-            display: block;
             max-height: 500px;
         }
-        
+
         .submenu-item {
-            padding: 14px 25px;
+            padding: 15px 25px 15px 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             cursor: pointer;
             transition: all 0.3s;
             border-left: 3px solid transparent;
-            font-size: 0.95rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: white;
         }
-        
+
         .submenu-item:hover {
-            background-color: rgba(255, 255, 255, 0.08);
-            border-left-color: #2ecc71;
+            background: rgba(255, 255, 255, 0.05);
+            border-left-color: rgba(255, 255, 255, 0.2);
         }
-        
+
         .submenu-item.active {
-            background-color: rgba(46, 204, 113, 0.2);
-            border-left-color: #2ecc71;
-            color: white;
+            background: rgba(255, 255, 255, 0.08);
+            border-left-color: #ffd700;
         }
-        
-        .submenu-item i {
-            color: white;
-        }
-        
-        .memo-count {
-            background-color: #8a2be2;
-            color: white;
-            border-radius: 50%;
-            width: 28px;
-            height: 28px;
+
+        .submenu-item span {
             display: flex;
             align-items: center;
+            gap: 12px;
+            font-size: 1rem;
+        }
+
+        .sidebar.minimized .menu-item {
+            padding: 18px;
             justify-content: center;
-            font-size: 0.9rem;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            flex-shrink: 0;
         }
-        
-        /* Konten Utama */
+
+        .sidebar.minimized .menu-item-content {
+            justify-content: center;
+        }
+
+        /* MAIN CONTENT */
         .main-content {
-            flex: 1;
-            margin-left: 320px;
+            margin-left: 350px;
             padding: 40px;
-            max-width: none;
-            width: calc(100% - 320px);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            width: calc(100% - 350px);
+            min-height: 100vh;
+            transition: all 0.3s ease;
         }
-        
+
         .sidebar.minimized ~ .main-content {
             margin-left: 80px;
             width: calc(100% - 80px);
         }
-        
-        /* HEADER dengan tema biru keunguan */
+
+        /* HEADER - TATA LETAK TERBARU (TERPUSAT) */
         .header {
+            background: linear-gradient(135deg, #6a4fdb 0%, #4a2fa8 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
             margin-bottom: 30px;
-            padding: 30px 40px;
-            border-radius: 15px 15px 0 0;
-            background: linear-gradient(135deg, #5d3fd3 0%, #3a1f8c 100%);
-            box-shadow: 0 8px 20px rgba(93, 63, 211, 0.2);
-            position: relative;
-            overflow: hidden;
-            border-left: 5px solid #ffd700;
-            text-align: center;
+            /* UPDATE SHADOW: Bayangan hitam tegas agar melayang di atas background */
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            min-height: 200px;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 200px;
-            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
         }
-        
-        .sidebar.minimized ~ .main-content .header {
-            padding: 30px 30px;
-        }
-        
+
         .header::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
-            animation: shine 3s infinite;
+            top: -50%;
+            right: -20%;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
         }
-        
-        @keyframes shine {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 50%;
         }
-        
+
         .header-content {
+            position: relative;
+            z-index: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            position: relative;
-            z-index: 1;
+            gap: 10px;
             width: 100%;
         }
-        
-        .header h1 {
-            color: white;
-            font-size: 3rem;
-            font-weight: 800;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-            letter-spacing: 1.5px;
-            position: relative;
-            z-index: 1;
-            margin: 15px 0;
-            text-align: center;
-            width: 100%;
-            transition: all 0.3s ease;
-        }
-        
-        .sidebar.minimized ~ .main-content .header h1 {
-            font-size: 2.5rem;
-        }
-        
-        .header p {
-            color: rgba(255, 255, 255, 0.9);
-            margin-top: 10px;
-            font-size: 1.3rem;
-            position: relative;
-            z-index: 1;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-            text-align: center;
-            width: 100%;
-            max-width: 800px;
-            transition: all 0.3s ease;
-        }
-        
-        .sidebar.minimized ~ .main-content .header p {
-            font-size: 1.1rem;
-        }
-        
+
         .header-icon {
-            background: rgba(255, 255, 255, 0.2);
-            width: 85px;
-            height: 85px;
-            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2.5rem;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            margin-bottom: 20px;
-            transition: all 0.3s ease;
+            font-size: 2.2rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px;
         }
-        
-        .sidebar.minimized ~ .main-content .header-icon {
-            width: 70px;
-            height: 70px;
-            font-size: 2rem;
+
+        .header h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            text-align: center;
         }
-        
-        /* BAR INFORMASI DI BAWAH HEADER - GRID 3 KOLOM SAMA BESAR dengan tema biru keunguan */
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            text-align: center;
+            width: 100%;
+            margin-top: 0;
+        }
+
+        /* INFO BAR */
         .info-bar {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
-            align-items: center;
-            margin-bottom: 30px;
-            padding: 20px 35px;
-            background: white;
-            border-radius: 0 0 15px 15px;
-            box-shadow: 0 8px 25px rgba(93, 63, 211, 0.1);
-            border: 1px solid #e9ecef;
-            border-top: none;
-            position: relative;
-            z-index: 5;
-            min-height: 90px;
             gap: 20px;
-            width: 100%;
-            transition: all 0.3s ease;
+            margin-bottom: 35px;
         }
-        
-        .sidebar.minimized ~ .main-content .info-bar {
-            padding: 20px 25px;
-        }
-        
-        /* Semua kolom memiliki ukuran yang sama */
+
         .info-left, .info-center, .info-right {
             display: flex;
-            height: 100%;
-            align-items: center;
             justify-content: center;
+            align-items: center;
         }
-        
-        /* STYLE UNTUK KOTAK TANGGAL, JAM & NETWORK CHECKER DENGAN ANIMASI GRADIENT DI DALAM */
+
         .date-container, .clock-container, .network-checker {
-            position: relative;
             background: white;
             border-radius: 15px;
             padding: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
+            position: relative;
             min-width: 240px;
             z-index: 1;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            /* UPDATE SHADOW: Bayangan lebih tegas pada info bar */
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
             transition: all 0.3s ease;
             overflow: hidden;
         }
-        
+
         /* Gradient background yang berputar di dalam */
         .date-container::before, .clock-container::before, .network-checker::before {
             content: '';
@@ -536,7 +381,7 @@
             animation: gradientRotate 3s linear infinite;
             border-radius: 15px;
         }
-        
+
         /* Konten di atas gradient */
         .date-content, .clock-content, .network-content {
             position: relative;
@@ -551,7 +396,7 @@
             height: 100%;
             z-index: 2;
         }
-        
+
         /* Animasi untuk gradient berputar */
         @keyframes gradientRotate {
             0% {
@@ -566,13 +411,13 @@
                 transform: rotate(360deg);
             }
         }
-        
+
         /* Efek hover */
         .date-container:hover, .clock-container:hover, .network-checker:hover {
             transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.25);
         }
-        
+
         /* Style untuk teks di dalam (rata tengah) */
         .date-text, .clock-text {
             font-weight: 600;
@@ -583,7 +428,7 @@
             letter-spacing: 0.3px;
             flex: 1;
         }
-        
+
         /* Font khusus untuk tanggal - Orbitron */
         .date-text {
             font-family: 'Orbitron', sans-serif;
@@ -592,7 +437,7 @@
             font-weight: 600;
             text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
         }
-        
+
         /* Font khusus untuk jam digital - Share Tech Mono dengan efek kedip halus */
         .clock-text {
             font-family: 'Share Tech Mono', monospace;
@@ -603,7 +448,7 @@
             text-shadow: 0 2px 4px rgba(93, 63, 211, 0.3);
             animation: gentleBlink 4s infinite;
         }
-        
+
         /* Animasi kedip halus untuk jam */
         @keyframes gentleBlink {
             0%, 100% {
@@ -615,7 +460,7 @@
                 text-shadow: 0 0 10px rgba(93, 63, 211, 0.8);
             }
         }
-        
+
         /* Icon juga diatur agar ikut rata tengah */
         .date-icon, .clock-icon, .network-icon {
             color: #5d3fd3;
@@ -623,16 +468,16 @@
             min-width: 32px;
             flex-shrink: 0;
         }
-        
+
         .clock-icon {
             color: #3a1f8c;
         }
-        
+
         /* Network checker specific styles */
         .network-checker {
             cursor: pointer;
         }
-        
+
         .network-status-dot {
             width: 12px;
             height: 12px;
@@ -642,31 +487,31 @@
             flex-shrink: 0;
             box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
         }
-        
+
         .network-status-dot.online {
             background-color: #2ecc71;
             box-shadow: 0 0 10px #2ecc71;
             animation: pulseDot 2s infinite;
         }
-        
+
         .network-status-dot.slow {
             background-color: #f39c12;
             box-shadow: 0 0 10px #f39c12;
             animation: pulseDot 2s infinite;
         }
-        
+
         .network-status-dot.offline {
             background-color: #e74c3c;
             box-shadow: 0 0 10px #e74c3c;
             animation: pulseDot 2s infinite;
         }
-        
+
         @keyframes pulseDot {
             0% { opacity: 1; }
             50% { opacity: 0.7; }
             100% { opacity: 1; }
         }
-        
+
         /* Font khusus untuk ping - Share Tech Mono */
         .network-ping {
             font-family: 'Share Tech Mono', monospace;
@@ -677,7 +522,7 @@
             font-size: clamp(16px, 1.7vw, 20px);
             letter-spacing: 0.5px;
         }
-        
+
         .network-result {
             position: absolute;
             top: 100%;
@@ -696,13 +541,13 @@
             z-index: 10;
             border: 1px solid #e0e0e0;
         }
-        
+
         .network-result.show {
             opacity: 1;
             transform: translateY(0);
             pointer-events: auto;
         }
-        
+
         .network-result::before {
             content: '';
             position: absolute;
@@ -716,7 +561,7 @@
             border-top: 1px solid #e0e0e0;
             z-index: -1;
         }
-        
+
         .network-result-title {
             font-weight: 700;
             color: #2c3e50;
@@ -728,7 +573,7 @@
             padding-bottom: 10px;
             border-bottom: 2px solid #f0f0f0;
         }
-        
+
         .network-result-item {
             display: flex;
             justify-content: space-between;
@@ -736,20 +581,20 @@
             margin-bottom: 10px;
             font-size: 0.95rem;
         }
-        
+
         .network-result-label {
             color: #7f8c8d;
         }
-        
+
         .network-result-value {
             font-weight: 600;
             color: #2c3e50;
         }
-        
+
         .network-latency {
             color: #2c3e50;
         }
-        
+
         .network-status {
             padding: 5px 12px;
             border-radius: 12px;
@@ -757,41 +602,240 @@
             font-weight: 700;
             display: inline-block;
         }
-        
+
         .network-status-online {
             background-color: #d5f4e6;
             color: #27ae60;
             border: 1px solid #2ecc71;
         }
-        
+
         .network-status-slow {
             background-color: #fef9e7;
             color: #f39c12;
             border: 1px solid #f39c12;
         }
-        
+
         .network-status-offline {
             background-color: #fdeaea;
             color: #e74c3c;
             border: 1px solid #e74c3c;
         }
-        
+
         .network-loading {
             animation: pulse 1.5s infinite;
         }
-        
+
         @keyframes pulse {
             0% { opacity: 1; }
             50% { opacity: 0.5; }
             100% { opacity: 1; }
         }
-        
+
+        /* TOMBOL COPY STYLES - DI SAMPING JUDUL DAN ISI */
+        .title-with-copy {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            gap: 10px;
+        }
+
+        .data-title {
+            font-weight: 700;
+            color: white;
+            font-size: 1.2rem;
+            flex: 1;
+        }
+
+        .btn-copy-title, .btn-copy-content {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            width: 40px;
+            height: 36px;
+        }
+
+        .btn-copy-title:hover, .btn-copy-content:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 3px 8px rgba(255, 255, 255, 0.1);
+        }
+
+        .content-with-copy {
+            margin-bottom: 18px;
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .content-header span {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 600;
+        }
+
+        .data-content {
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+            max-height: 140px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
+        }
+
+        .copy-success {
+            position: fixed;
+            top: 25px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1001;
+            opacity: 0;
+            transition: all 0.3s;
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .copy-success.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* EDIT MODAL STYLES */
+        .edit-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .edit-modal-content {
+            background: linear-gradient(135deg, #6a4fdb 0%, #4a2fa8 100%);
+            width: 600px;
+            max-width: 90%;
+            padding: 30px;
+            border-radius: 15px;
+            /* UPDATE SHADOW: Modal dengan bayangan kuat */
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .edit-modal-content h2 {
+            color: white;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .edit-modal-content select {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            font-size: 1rem;
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .edit-modal-content input, .edit-modal-content textarea {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            font-size: 1rem;
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .edit-modal-content input::placeholder, .edit-modal-content textarea::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .edit-modal-content textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .edit-modal-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .btn-modal-cancel, .btn-modal-save {
+            flex: 1;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-modal-cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-modal-cancel:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .btn-modal-save {
+            background: linear-gradient(135deg, #8a2be2 0%, #6a0dad 100%);
+            color: white;
+            border: none;
+        }
+
+        .btn-modal-save:hover {
+            background: linear-gradient(135deg, #9a3bf2 0%, #7a1dbd 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.3);
+        }
+
         /* Form Container dengan tema biru keunguan */
         .form-container {
             background: linear-gradient(135deg, #6a4fdb 0%, #4a2fa8 100%);
             padding: 40px;
             border-radius: 15px;
-            box-shadow: 0 8px 25px rgba(93, 63, 211, 0.2);
+            /* UPDATE SHADOW: Form container dengan bayangan tegas */
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
             margin-bottom: 40px;
             animation: fadeIn 0.5s;
             margin-top: 20px;
@@ -799,11 +843,11 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             transition: all 0.3s ease;
         }
-        
+
         .sidebar.minimized ~ .main-content .form-container {
             padding: 30px;
         }
-        
+
         .form-title {
             margin-bottom: 30px;
             color: white;
@@ -815,11 +859,11 @@
             font-size: 1.5rem;
             text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
         }
-        
+
         .form-group {
             margin-bottom: 25px;
         }
-        
+
         label {
             display: block;
             margin-bottom: 10px;
@@ -831,7 +875,7 @@
             font-size: 1.1rem;
             text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
         }
-        
+
         input, textarea, select {
             width: 100%;
             padding: 16px 20px;
@@ -842,24 +886,24 @@
             transition: all 0.3s;
             color: white;
         }
-        
+
         input::placeholder, textarea::placeholder {
             color: rgba(255, 255, 255, 0.6);
         }
-        
+
         input:focus, textarea:focus, select:focus {
             outline: none;
             border-color: rgba(255, 255, 255, 0.5);
             box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.1);
             background: rgba(255, 255, 255, 0.15);
         }
-        
+
         textarea {
             min-height: 220px;
             resize: vertical;
             line-height: 1.6;
         }
-        
+
         select {
             appearance: none;
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
@@ -868,12 +912,12 @@
             background-size: 20px;
             padding-right: 50px;
         }
-        
+
         option {
             background-color: #4a2fa8;
             color: white;
         }
-        
+
         .btn {
             background: linear-gradient(135deg, #8a2be2 0%, #6a0dad 100%);
             color: white;
@@ -890,27 +934,34 @@
             gap: 12px;
             box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);
         }
-        
+
         .btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 6px 20px rgba(138, 43, 226, 0.4);
         }
-        
+
         .btn:active {
             transform: translateY(0);
         }
-        
+
         .btn-reset {
             background: rgba(255, 255, 255, 0.2);
             margin-left: 20px;
             border: 1px solid rgba(255, 255, 255, 0.3);
         }
-        
+
         .btn-reset:hover {
             background: rgba(255, 255, 255, 0.3);
             box-shadow: 0 6px 20px rgba(255, 255, 255, 0.2);
         }
-        
+
+        .btn-refresh {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 12px 20px;
+            font-size: 1rem;
+        }
+
         /* Notifikasi */
         .notification {
             position: fixed;
@@ -931,18 +982,31 @@
             font-size: 1.05rem;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
+
         .notification.show {
             opacity: 1;
             transform: translateY(0);
         }
-        
+
+        .notification.error {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+
+        .notification.warning {
+            background: linear-gradient(135deg, #f39c12 0%, #d35400 100%);
+        }
+
+        .notification.info {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        }
+
         /* Data Tersimpan dengan tema biru keunguan untuk semua subkategori */
         .data-container {
             background: linear-gradient(135deg, #6a4fdb 0%, #4a2fa8 100%);
             padding: 40px;
             border-radius: 15px;
-            box-shadow: 0 8px 25px rgba(93, 63, 211, 0.2);
+            /* UPDATE SHADOW: Data container dengan bayangan tegas */
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
             margin-top: 30px;
             animation: fadeIn 0.5s;
             display: none;
@@ -950,15 +1014,15 @@
             color: white;
             transition: all 0.3s ease;
         }
-        
+
         .sidebar.minimized ~ .main-content .data-container {
             padding: 30px;
         }
-        
+
         .data-container.active {
             display: block;
         }
-        
+
         .data-header {
             display: flex;
             justify-content: space-between;
@@ -967,7 +1031,7 @@
             padding-bottom: 20px;
             border-bottom: 2px solid rgba(255, 255, 255, 0.2);
         }
-        
+
         .data-header h3 {
             font-size: 1.4rem;
             color: white;
@@ -975,7 +1039,7 @@
             align-items: center;
             gap: 12px;
         }
-        
+
         /* Search Container dengan tema biru keunguan */
         .search-container {
             display: flex;
@@ -988,16 +1052,16 @@
             border: 2px solid rgba(255, 255, 255, 0.2);
             transition: all 0.3s ease;
         }
-        
+
         .sidebar.minimized ~ .main-content .search-container {
             padding: 15px;
         }
-        
+
         .search-box {
             flex: 1;
             position: relative;
         }
-        
+
         .search-input {
             width: 100%;
             padding: 16px 20px 16px 60px;
@@ -1008,18 +1072,18 @@
             transition: all 0.3s;
             color: white;
         }
-        
+
         .search-input::placeholder {
             color: rgba(255, 255, 255, 0.6);
         }
-        
+
         .search-input:focus {
             outline: none;
             border-color: rgba(255, 255, 255, 0.5);
             box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.1);
             background: rgba(255, 255, 255, 0.15);
         }
-        
+
         .search-icon {
             position: absolute;
             left: 20px;
@@ -1028,7 +1092,7 @@
             color: white;
             font-size: 1.3rem;
         }
-        
+
         .search-info {
             font-size: 1rem;
             color: rgba(255, 255, 255, 0.9);
@@ -1039,7 +1103,7 @@
             align-items: center;
             gap: 8px;
         }
-        
+
         .search-clear {
             background: rgba(255, 255, 255, 0.2);
             color: white;
@@ -1054,13 +1118,13 @@
             gap: 8px;
             font-weight: 600;
         }
-        
+
         .search-clear:hover {
             background: rgba(255, 255, 255, 0.3);
             transform: translateY(-2px);
             box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
         }
-        
+
         /* Data Grid */
         .data-grid {
             display: grid;
@@ -1068,12 +1132,12 @@
             gap: 25px;
             transition: all 0.3s ease;
         }
-        
+
         .sidebar.minimized ~ .main-content .data-grid {
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 20px;
         }
-        
+
         .data-item {
             background: rgba(255, 255, 255, 0.1);
             border: 2px solid rgba(255, 255, 255, 0.2);
@@ -1081,15 +1145,18 @@
             padding: 25px;
             transition: all 0.3s;
             backdrop-filter: blur(10px);
+            /* UPDATE SHADOW: Data item dengan shadow saat hover */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        
+
         .data-item:hover {
             background: rgba(255, 255, 255, 0.15);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            /* UPDATE SHADOW: Shadow lebih besar saat di-hover */
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
             transform: translateY(-5px);
             border-color: rgba(255, 255, 255, 0.4);
         }
-        
+
         /* Kategori Memo dengan warna berbeda-beda */
         .data-category {
             display: inline-block;
@@ -1102,7 +1169,7 @@
             margin-bottom: 12px;
             box-shadow: 0 2px 5px rgba(138, 43, 226, 0.3);
         }
-        
+
         /* Subkategori dengan variasi warna biru keunguan */
         .data-subcategory {
             display: inline-block;
@@ -1115,43 +1182,24 @@
             margin-left: 8px;
             box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
         }
-        
+
         /* Warna berbeda untuk setiap subkategori memo */
         .data-subcategory[data-subcategory="MEMO PEMBAGIAN BONUS"] {
             background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
         }
-        
+
         .data-subcategory[data-subcategory="MEMO INFORMASI BANK"] {
             background: linear-gradient(135deg, #48dbfb 0%, #0abde3 100%);
         }
-        
+
         .data-subcategory[data-subcategory="MEMO KENDALA PERMAINAN"] {
             background: linear-gradient(135deg, #1dd1a1 0%, #10ac84 100%);
         }
-        
+
         .data-subcategory[data-subcategory="MEMO KENDALA SISTEM"] {
             background: linear-gradient(135deg, #f368e0 0%, #ff9ff3 100%);
         }
-        
-        .data-title {
-            font-weight: 700;
-            margin-bottom: 12px;
-            color: white;
-            font-size: 1.2rem;
-        }
-        
-        .data-content {
-            color: rgba(255, 255, 255, 0.9);
-            margin-bottom: 18px;
-            line-height: 1.6;
-            max-height: 140px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            display: -webkit-box;
-            -webkit-line-clamp: 4;
-            -webkit-box-orient: vertical;
-        }
-        
+
         .data-date {
             font-size: 0.9rem;
             color: rgba(255, 255, 255, 0.8);
@@ -1159,29 +1207,50 @@
             align-items: center;
             gap: 8px;
         }
-        
+
         .empty-data {
             text-align: center;
             padding: 50px 20px;
             color: rgba(255, 255, 255, 0.8);
             grid-column: 1 / -1;
         }
-        
+
         .empty-data i {
             font-size: 3.5rem;
             margin-bottom: 20px;
             color: rgba(255, 255, 255, 0.5);
         }
-        
+
         .empty-data h3 {
             font-size: 1.4rem;
             margin-bottom: 10px;
         }
-        
+
         .empty-data p {
             font-size: 1.05rem;
         }
-        
+
+        .loading {
+            text-align: center;
+            padding: 30px;
+            grid-column: 1 / -1;
+        }
+
+        .loading-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         .highlight {
             background-color: rgba(255, 255, 255, 0.3);
             padding: 3px 5px;
@@ -1189,93 +1258,13 @@
             color: #ffd700;
             font-weight: 600;
         }
-        
-        /* Loading Spinner */
-        .loading-spinner {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 1000;
-        }
-        
-        .loading-spinner.active {
-            display: block;
-        }
-        
-        .spinner {
-            width: 60px;
-            height: 60px;
-            border: 6px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: #5d3fd3;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        /* Modal untuk setting API */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .modal-overlay.active {
-            display: flex;
-        }
-        
-        .modal {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            max-width: 500px;
-            width: 90%;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-        
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #e9ecef;
-        }
-        
-        .modal-header h3 {
-            color: #2c3e50;
-            font-size: 1.4rem;
-        }
-        
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            color: #7f8c8d;
-            cursor: pointer;
-        }
-        
-        .modal-body {
-            margin-bottom: 25px;
-        }
-        
+
         /* Animasi */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        
+
         /* Tombol Toggle Sidebar untuk Mobile */
         .toggle-sidebar {
             display: none;
@@ -1292,40 +1281,28 @@
             box-shadow: 0 4px 15px rgba(93, 63, 211, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
-        /* Tombol Troubleshooting */
-        .troubleshoot-btn {
-            background: rgba(231, 76, 60, 0.2);
-            color: #e74c3c;
-            border: 1px solid #e74c3c;
-            border-radius: 5px;
-            padding: 5px 10px;
-            font-size: 0.8rem;
-            margin-top: 5px;
-            cursor: pointer;
-            width: 100%;
-            text-align: center;
-            transition: all 0.3s;
+
+        /* Responsif untuk Header */
+        @media (max-width: 1200px) {
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .sidebar.minimized ~ .main-content .header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .header-icon {
+                width: 70px;
+                height: 70px;
+                font-size: 2rem;
+            }
+            
+            .header p {
+                font-size: 1.1rem;
+            }
         }
-        
-        .troubleshoot-btn:hover {
-            background: rgba(231, 76, 60, 0.3);
-            transform: translateY(-2px);
-        }
-        
-        /* Tombol Sync */
-        #syncButton {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #f39c12 0%, #d35400 100%);
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            animation: pulse 2s infinite;
-        }
-        
+
         /* Responsif */
         @media (max-width: 1200px) {
             .sidebar {
@@ -1365,6 +1342,30 @@
         }
         
         @media (max-width: 992px) {
+            .header {
+                margin-bottom: 30px;
+                padding: 25px;
+                min-height: 180px;
+            }
+            
+            .header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .sidebar.minimized ~ .main-content .header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .header-icon {
+                width: 70px;
+                height: 70px;
+                font-size: 2rem;
+            }
+            
+            .header p {
+                font-size: 1.1rem;
+            }
+            
             .sidebar {
                 width: 280px;
                 transform: translateX(-100%);
@@ -1396,8 +1397,7 @@
             .sidebar.minimized .memo-count,
             .sidebar.minimized .submenu-item span,
             .sidebar.minimized .submenu,
-            .sidebar.minimized .minimize-text,
-            .sidebar.minimized .api-status {
+            .sidebar.minimized .minimize-text {
                 display: block;
             }
             
@@ -1441,32 +1441,6 @@
             
             .data-grid {
                 grid-template-columns: 1fr;
-            }
-            
-            .header {
-                margin-bottom: 30px;
-                padding: 25px;
-                min-height: 180px;
-            }
-            
-            .header h1 {
-                font-size: 2.2rem;
-            }
-            
-            .sidebar.minimized ~ .main-content .header h1 {
-                font-size: 2.2rem;
-            }
-            
-            .header-icon {
-                width: 70px;
-                height: 70px;
-                font-size: 2rem;
-            }
-            
-            .sidebar.minimized ~ .main-content .header-icon {
-                width: 70px;
-                height: 70px;
-                font-size: 2rem;
             }
             
             .search-container {
@@ -1515,6 +1489,11 @@
             .sidebar.minimized ~ .main-content .data-container {
                 padding: 30px;
             }
+            
+            .edit-modal-content {
+                width: 95%;
+                padding: 20px;
+            }
         }
         
         @media (max-width: 768px) {
@@ -1546,17 +1525,7 @@
                 font-size: 1.8rem;
             }
             
-            .sidebar.minimized ~ .main-content .header-icon {
-                width: 60px;
-                height: 60px;
-                font-size: 1.8rem;
-            }
-            
             .header p {
-                font-size: 1.1rem;
-            }
-            
-            .sidebar.minimized ~ .main-content .header p {
                 font-size: 1.1rem;
             }
             
@@ -1596,6 +1565,25 @@
             .clock-text {
                 font-size: clamp(20px, 2.2vw, 28px);
             }
+            
+            .edit-modal-buttons {
+                flex-direction: column;
+            }
+            
+            .edit-modal-buttons button {
+                width: 100%;
+            }
+            
+            .title-with-copy {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .btn-copy-title, .btn-copy-content {
+                width: 100%;
+                justify-content: center;
+            }
         }
         
         @media (max-width: 480px) {
@@ -1618,17 +1606,7 @@
                 font-size: 1.6rem;
             }
             
-            .sidebar.minimized ~ .main-content .header-icon {
-                width: 55px;
-                height: 55px;
-                font-size: 1.6rem;
-            }
-            
             .header p {
-                font-size: 1rem;
-            }
-            
-            .sidebar.minimized ~ .main-content .header p {
                 font-size: 1rem;
             }
             
@@ -1688,11 +1666,48 @@
     </style>
 </head>
 <body>
-    <!-- Loading Spinner -->
-    <div class="loading-spinner" id="loadingSpinner">
-        <div class="spinner"></div>
+    <!-- Modal Edit Memo -->
+    <div class="edit-modal" id="editModal">
+        <div class="edit-modal-content">
+            <h2><i class="fas fa-edit"></i> Edit Memo</h2>
+            
+            <form id="editFormData">
+                <input type="hidden" id="editMemoId" value="">
+                <input type="hidden" id="editMemoSheet" value="">
+                
+                <div style="margin-bottom: 20px;">
+                    <label style="color: white; margin-bottom: 8px; display: block; font-weight: 600;">Subkategori Memo</label>
+                    <select id="editMemoSubcategory" disabled>
+                        <option value="">Pilih Subkategori</option>
+                        <option value="MEMO PEMBAGIAN BONUS">MEMO PEMBAGIAN BONUS</option>
+                        <option value="MEMO INFORMASI BANK">MEMO INFORMASI BANK</option>
+                        <option value="MEMO KENDALA PERMAINAN">MEMO KENDALA PERMAINAN</option>
+                        <option value="MEMO KENDALA SISTEM">MEMO KENDALA SISTEM</option>
+                    </select>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <label style="color: white; margin-bottom: 8px; display: block; font-weight: 600;">Judul Memo</label>
+                    <input type="text" id="editMemoJudul" required>
+                </div>
+                
+                <div style="margin-bottom: 25px;">
+                    <label style="color: white; margin-bottom: 8px; display: block; font-weight: 600;">Isi / Memo</label>
+                    <textarea id="editMemoIsi" required></textarea>
+                </div>
+                
+                <div class="edit-modal-buttons">
+                    <button type="button" class="btn-modal-cancel" id="cancelEditModal">
+                        <i class="fas fa-times"></i> Batal
+                    </button>
+                    <button type="submit" class="btn-modal-save">
+                        <i class="fas fa-save"></i> Simpan Perubahan
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-    
+
     <!-- Tombol Toggle Sidebar untuk Mobile -->
     <button class="toggle-sidebar" id="toggleSidebar">
         <i class="fas fa-bars"></i>
@@ -1702,7 +1717,7 @@
     <div class="sidebar" id="sidebar">
         <div class="logo">
             <h2><i class="fas fa-sticky-note"></i> <span class="logo-text">Memo & Reportan</span></h2>
-            <p style="font-size: 0.9rem; opacity: 0.7; margin-top: 5px;">Database Cloud - Spreadsheet Anda</p>
+            <p style="font-size: 0.9rem; opacity: 0.7; margin-top: 5px;">Aplikasi Penyimpanan Data</p>
         </div>
         
         <!-- Tombol Minimize di atas Kategori Utama -->
@@ -1714,14 +1729,6 @@
             <button class="minimize-btn" id="minimizeBtn" title="Minimize Sidebar">
                 <i class="fas fa-chevron-left"></i>
             </button>
-        </div>
-        
-        <!-- Status Koneksi Database -->
-        <div class="api-status online" id="apiStatus">
-            <div style="display: flex; align-items: center; gap: 8px; width: 100%;">
-                <div class="api-status-dot online" id="apiStatusDot"></div>
-                <span id="apiStatusText">Terhubung ke Spreadsheet Anda</span>
-            </div>
         </div>
         
         <div class="category-title">Kategori Utama</div>
@@ -1764,26 +1771,18 @@
             </div>
             <div class="memo-count" id="reportanCount">0</div>
         </div>
-        
-        <!-- Link ke Spreadsheet -->
-        <div class="menu-item" id="viewSpreadsheet">
-            <div class="menu-item-content">
-                <i class="fas fa-external-link-alt"></i>
-                <span>Lihat Spreadsheet</span>
-            </div>
-        </div>
     </div>
     
     <!-- Konten Utama -->
     <div class="main-content">
-        <!-- HEADER dengan tema biru keunguan -->
+        <!-- HEADER dengan tema biru keunguan - TATA LETAK TERBARU (TERPUSAT) -->
         <div class="header">
             <div class="header-content">
                 <div class="header-icon">
                     <i class="fas fa-sticky-note" id="headerIcon"></i>
                 </div>
                 <h1 id="pageTitle">MEMO LINE</h1>
-                <p id="pageSubtitle">Database Cloud - Data Tersimpan di Spreadsheet Anda</p>
+                <p id="pageSubtitle">Sistem Manajemen Memo & Reportan</p>
             </div>
         </div>
         
@@ -1851,8 +1850,11 @@
         
         <!-- Form Memo dengan tema biru keunguan -->
         <div class="form-container" id="memoForm">
-            <h3 class="form-title"><i class="fas fa-edit"></i> Form Tambah Memo Baru</h3>
+            <h3 class="form-title"><i class="fas fa-edit"></i> <span id="formTitle">Form Tambah Memo Baru</span></h3>
             <form id="memoFormData">
+                <!-- Input hidden untuk menyimpan ID saat edit -->
+                <input type="hidden" id="memoId" value="">
+                
                 <div class="form-group">
                     <label for="memoJudul"><i class="fas fa-heading"></i> Judul Memo</label>
                     <input type="text" id="memoJudul" placeholder="Contoh: INFORMASI BONUS CASHBACK KEKALAHAN 5% (SLOT GAMES & E-LOTTERY)" required>
@@ -1874,33 +1876,34 @@
                     </select>
                 </div>
                 
-                <button type="submit" class="btn" id="tambahMemo">
-                    <i class="fas fa-plus"></i> Simpan ke Spreadsheet
-                </button>
-                <button type="reset" class="btn btn-reset">
-                    <i class="fas fa-redo"></i> Reset Form
-                </button>
-            </form>
-            
-            <!-- Info Spreadsheet -->
-            <div class="form-group" style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 20px;">
-                <label><i class="fas fa-database"></i> Info Database</label>
-                <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; margin-top: 10px;">
-                    <p style="margin-bottom: 8px; font-size: 0.95rem;">
-                        <i class="fas fa-check-circle" style="color: #2ecc71;"></i> 
-                        <strong>Terhubung ke Spreadsheet Anda:</strong>
-                    </p>
-                    <p style="font-size: 0.85rem; opacity: 0.9; margin-bottom: 5px;">
-                        ID: <code style="background: rgba(0,0,0,0.2); padding: 2px 6px; border-radius: 4px;">1oirwkd74CMLvcfAIkBLn_UJJDhha8sJ7gN8FRhrlipw</code>
-                    </p>
-                    <p style="font-size: 0.85rem; opacity: 0.9;">
-                        <i class="fas fa-external-link-alt"></i>
-                        <a href="https://docs.google.com/spreadsheets/d/1oirwkd74CMLvcfAIkBLn_UJJDhha8sJ7gN8FRhrlipw/edit" target="_blank" style="color: #ffd700; text-decoration: none;">
-                            Buka Spreadsheet di Tab Baru
-                        </a>
-                    </p>
+                <div class="form-group">
+                    <button type="submit" class="btn" id="submitMemo">
+                        <i class="fas fa-plus"></i> <span id="submitButtonText">Tambah Memo</span>
+                    </button>
+                    <button type="button" class="btn btn-reset" id="cancelEdit" style="display: none;">
+                        <i class="fas fa-times"></i> Batal Edit
+                    </button>
+                    <button type="reset" class="btn btn-reset">
+                        <i class="fas fa-redo"></i> Reset Form
+                    </button>
                 </div>
-            </div>
+                
+                <!-- Google Sheets Integration Status -->
+                <div class="form-group" style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 20px;">
+                    <label><i class="fas fa-google"></i> Google Spreadsheet Integration</label>
+                    <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+                        <div id="googleSyncStatus" style="font-size: 0.9rem; color: rgba(255,255,255,0.8);">
+                            <i class="fas fa-sync-alt"></i> Data akan otomatis dikirim ke Google Spreadsheet
+                        </div>
+                        <button type="button" class="btn btn-refresh" id="refreshConnection">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                    <div id="spreadsheetInfo" style="margin-top: 10px; font-size: 0.85rem; color: rgba(255,255,255,0.7);">
+                        Spreadsheet ID: 1oirwkd74CMLvcfAIkBLn_UJJDhha8sJ7gN8FRhrlipw
+                    </div>
+                </div>
+            </form>
         </div>
         
         <!-- Data Tersimpan - HANYA DITAMPILKAN DI SUBKATEGORI -->
@@ -1908,11 +1911,11 @@
             <div class="data-header">
                 <h3 id="dataTitle"><i class="fas fa-database"></i> Data Tersimpan</h3>
                 <div>
-                    <button class="btn" id="clearData" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%); border: 1px solid rgba(255, 255, 255, 0.3); margin-right: 10px;">
-                        <i class="fas fa-trash"></i> Hapus Semua
+                    <button class="btn btn-refresh" id="refreshData">
+                        <i class="fas fa-sync-alt"></i> Refresh Data
                     </button>
-                    <button class="btn" id="refreshData" style="background: linear-gradient(135deg, rgba(46, 204, 113, 0.8) 0%, rgba(39, 174, 96, 0.8) 100%); border: 1px solid rgba(46, 204, 113, 0.3);">
-                        <i class="fas fa-sync-alt"></i> Refresh
+                    <button class="btn" id="toggleEditMode" style="background: linear-gradient(135deg, #ffa726 0%, #f57c00 100%); margin-left: 10px;">
+                        <i class="fas fa-edit"></i> <span id="editModeText">Edit Data</span>
                     </button>
                 </div>
             </div>
@@ -1928,15 +1931,22 @@
                 </button>
                 <div class="search-info" id="searchInfo">
                     <i class="fas fa-info-circle"></i>
-                    <span>Data diambil langsung dari Google Spreadsheet</span>
+                    <span>Cari di judul dan isi memo</span>
+                </div>
+            </div>
+            
+            <!-- Info Mode Edit -->
+            <div id="editModeInfo" style="display: none; background: rgba(255, 167, 38, 0.2); border: 1px solid rgba(255, 167, 38, 0.5); border-radius: 10px; padding: 15px; margin-bottom: 20px; color: white;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-info-circle" style="color: #ffa726;"></i>
+                    <span><strong>Mode Edit Aktif</strong> - Klik tombol edit pada data yang ingin diedit</span>
                 </div>
             </div>
             
             <div class="data-grid" id="dataGrid">
-                <div class="empty-data">
-                    <i class="fas fa-cloud"></i>
-                    <h3>Memuat data dari Spreadsheet...</h3>
-                    <p>Data sedang dimuat dari Google Sheets Anda</p>
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Memuat data dari Google Spreadsheet...</p>
                 </div>
             </div>
         </div>
@@ -1944,77 +1954,15 @@
     
     <!-- Notifikasi -->
     <div class="notification" id="notification">
-        <i class="fas fa-check-circle"></i>
+        <i class="fas fa-check-circle" id="notificationIcon"></i>
         <span id="notificationText">Berhasil disimpan!</span>
     </div>
 
     <script>
-        // ========== KONFIGURASI ==========
-        const SPREADSHEET_ID = "1oirwkd74CMLvcfAIkBLn_UJJDhha8sJ7gN8FRhrlipw";
-        const API_KEY = "AIzaSyDWFvaSwqZPcZgp5Crkr_RhvJW7nWH4Qv0"; // API Key Anda
-        const API_URL = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/Sheet1?key=${API_KEY}`;
-        const WRITE_API_URL = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/Sheet1:append?valueInputOption=USER_ENTERED&key=${API_KEY}`;
-        const CLEAR_API_URL = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/Sheet1:clear?key=${API_KEY}`;
-        
-        // Data sementara untuk caching
-        let savedData = JSON.parse(localStorage.getItem('memoReportanDataCache')) || [];
-        
-        // ========== ELEMEN DOM ==========
-        const sidebar = document.getElementById('sidebar');
-        const toggleSidebarBtn = document.getElementById('toggleSidebar');
-        const menuItems = document.querySelectorAll('.menu-item');
-        const mainMenuMemo = document.getElementById('mainMenuMemo');
-        const memoArrow = document.getElementById('memoArrow');
-        const memoSubmenu = document.getElementById('memoSubmenu');
-        const submenuItems = document.querySelectorAll('.submenu-item');
-        const pageTitle = document.getElementById('pageTitle');
-        const pageSubtitle = document.getElementById('pageSubtitle');
-        const headerIcon = document.getElementById('headerIcon');
-        const memoForm = document.getElementById('memoForm');
-        const memoSubcategorySelect = document.getElementById('memoSubcategory');
-        const memoFormData = document.getElementById('memoFormData');
-        const memoJudulInput = document.getElementById('memoJudul');
-        const memoIsiInput = document.getElementById('memoIsi');
-        const notification = document.getElementById('notification');
-        const notificationText = document.getElementById('notificationText');
-        const dataContainer = document.getElementById('dataContainer');
-        const dataGrid = document.getElementById('dataGrid');
-        const dataTitle = document.getElementById('dataTitle');
-        const clearDataBtn = document.getElementById('clearData');
-        const refreshDataBtn = document.getElementById('refreshData');
-        const searchContainer = document.getElementById('searchContainer');
-        const searchInput = document.getElementById('searchInput');
-        const clearSearchBtn = document.getElementById('clearSearch');
-        const searchInfo = document.getElementById('searchInfo');
-        const minimizeBtn = document.getElementById('minimizeBtn');
-        const loadingSpinner = document.getElementById('loadingSpinner');
-        const viewSpreadsheetBtn = document.getElementById('viewSpreadsheet');
-        const apiStatus = document.getElementById('apiStatus');
-        const apiStatusDot = document.getElementById('apiStatusDot');
-        const apiStatusText = document.getElementById('apiStatusText');
-        
-        // Elemen tanggal dan jam
-        const currentDateElement = document.getElementById('currentDate');
-        const digitalClockElement = document.getElementById('digitalClock');
-        
-        // Network checker elements
-        const networkChecker = document.getElementById('networkChecker');
-        const networkIcon = document.getElementById('networkIcon');
-        const networkStatusDot = document.getElementById('networkStatusDot');
-        const networkPing = document.getElementById('networkPing');
-        const networkResult = document.getElementById('networkResult');
-        const networkLatency = document.getElementById('networkLatency');
-        const networkStatus = document.getElementById('networkStatus');
-        const networkLastChecked = document.getElementById('networkLastChecked');
-        
-        // Counter elements
-        const bonusCount = document.getElementById('bonusCount');
-        const bankCount = document.getElementById('bankCount');
-        const permainanCount = document.getElementById('permainanCount');
-        const sistemCount = document.getElementById('sistemCount');
-        const reportanCount = document.getElementById('reportanCount');
-        
-        // ========== VARIABEL GLOBAL ==========
+        // Konfigurasi
+        const SPREADSHEET_ID = '1oirwkd74CMLvcfAIkBLn_UJJDhha8sJ7gN8FRhrlipw';
+
+        // Variabel global
         let activeCategory = 'memo';
         let activeSubcategory = '';
         let isMainPage = true;
@@ -2023,9 +1971,12 @@
         let networkResultVisible = false;
         let lastNetworkCheckTime = null;
         let isSidebarMinimized = localStorage.getItem('sidebarMinimized') === 'true';
-        
-        // ========== FUNGSI UTILITAS ==========
-        
+        let sheetDataCache = {};
+        let isEditMode = false;
+        let editingMemoId = '';
+
+        // ========== FUNGSI UTAMA ==========
+
         // Fungsi untuk memperbarui tanggal
         function updateDateDisplay() {
             const now = new Date();
@@ -2033,657 +1984,116 @@
                 weekday: 'long', 
                 year: 'numeric', 
                 month: 'long', 
-                day: 'numeric' 
+                day: 'numeric',
+                timeZone: 'Asia/Jakarta'
             };
             const formattedDate = now.toLocaleDateString('id-ID', options);
-            currentDateElement.textContent = formattedDate;
+            document.getElementById('currentDate').textContent = formattedDate;
         }
-        
-        // Fungsi untuk memperbarui jam digital dengan efek kedip
+
+        // Fungsi untuk memperbarui jam digital
         function updateClock() {
             const now = new Date();
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
             const seconds = String(now.getSeconds()).padStart(2, '0');
-            digitalClockElement.textContent = `${hours}:${minutes}:${seconds}`;
+            document.getElementById('digitalClock').textContent = `${hours}:${minutes}:${seconds}`;
         }
-        
-        // Format tanggal untuk data
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('id-ID', {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        }
-        
-        // Format waktu untuk network check
-        function formatTime(date) {
-            return date.toLocaleTimeString('id-ID', {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            });
-        }
-        
-        // Fungsi untuk menyoroti teks yang cocok dengan pencarian
-        function highlightText(text, keyword) {
-            if (!keyword.trim()) return text;
-            
-            const regex = new RegExp(`(${keyword})`, 'gi');
-            return text.replace(regex, '<span class="highlight">$1</span>');
-        }
-        
+
         // Tampilkan notifikasi
         function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const notificationIcon = document.getElementById('notificationIcon');
+            const notificationText = document.getElementById('notificationText');
+            
             notificationText.textContent = message;
+            notification.className = 'notification';
             
-            // Atur warna berdasarkan tipe
             if (type === 'success') {
-                notification.style.background = 'linear-gradient(135deg, #6a4fdb 0%, #4a2fa8 100%)';
-                notification.children[0].className = 'fas fa-check-circle';
+                notification.classList.add('show');
+                notificationIcon.className = 'fas fa-check-circle';
             } else if (type === 'error') {
-                notification.style.background = 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)';
-                notification.children[0].className = 'fas fa-exclamation-circle';
-            } else if (type === 'info') {
-                notification.style.background = 'linear-gradient(135deg, #3498db 0%, #2980b9 100%)';
-                notification.children[0].className = 'fas fa-info-circle';
+                notification.classList.add('show', 'error');
+                notificationIcon.className = 'fas fa-exclamation-circle';
             } else if (type === 'warning') {
-                notification.style.background = 'linear-gradient(135deg, #f39c12 0%, #d35400 100%)';
-                notification.children[0].className = 'fas fa-exclamation-triangle';
+                notification.classList.add('show', 'warning');
+                notificationIcon.className = 'fas fa-exclamation-triangle';
+            } else if (type === 'info') {
+                notification.classList.add('show', 'info');
+                notificationIcon.className = 'fas fa-info-circle';
             }
-            
-            notification.classList.add('show');
             
             setTimeout(() => {
                 notification.classList.remove('show');
-            }, 3000);
+            }, 4000);
         }
-        
-        // Tampilkan loading spinner
-        function showLoading() {
-            loadingSpinner.classList.add('active');
-        }
-        
-        // Sembunyikan loading spinner
-        function hideLoading() {
-            loadingSpinner.classList.remove('active');
-        }
-        
-        // Update counter di sidebar
-        function updateCounters() {
-            const bonusMemos = savedData.filter(item => 
-                item.category === 'memo' && item.subcategory === 'MEMO PEMBAGIAN BONUS'
-            );
-            const bankMemos = savedData.filter(item => 
-                item.category === 'memo' && item.subcategory === 'MEMO INFORMASI BANK'
-            );
-            const permainanMemos = savedData.filter(item => 
-                item.category === 'memo' && item.subcategory === 'MEMO KENDALA PERMAINAN'
-            );
-            const sistemMemos = savedData.filter(item => 
-                item.category === 'memo' && item.subcategory === 'MEMO KENDALA SISTEM'
-            );
-            const reportanData = savedData.filter(item => item.category === 'reportan');
+
+        // Fungsi untuk memuat data dari sheet
+        function loadDataFromSheet(subcategory, showLoading = true) {
+            const dataGrid = document.getElementById('dataGrid');
             
-            bonusCount.textContent = bonusMemos.length;
-            bankCount.textContent = bankMemos.length;
-            permainanCount.textContent = permainanMemos.length;
-            sistemCount.textContent = sistemMemos.length;
-            reportanCount.textContent = reportanData.length;
-        }
-        
-        // ========== FUNGSI GOOGLE SHEETS API ==========
-        
-        // Fungsi untuk mengambil data dari Google Sheets dengan retry logic
-        async function fetchDataFromSheets(maxRetries = 3) {
-            showLoading();
-            
-            let retryCount = 0;
-            
-            while (retryCount < maxRetries) {
-                try {
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 10000);
-                    
-                    const response = await fetch(API_URL, {
-                        signal: controller.signal,
-                        headers: {
-                            'Accept': 'application/json',
-                            'Cache-Control': 'no-cache'
-                        }
-                    });
-                    
-                    clearTimeout(timeoutId);
-                    
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    
-                    const data = await response.json();
-                    
-                    // Proses data dari Google Sheets
-                    if (data.values && data.values.length > 0) {
-                        const headers = data.values[0];
-                        const rows = data.values.slice(1);
-                        
-                        savedData = rows.map(row => {
-                            const obj = {};
-                            headers.forEach((header, index) => {
-                                obj[header] = row[index] || '';
-                            });
-                            return obj;
-                        });
-                        
-                        // Simpan ke cache
-                        localStorage.setItem('memoReportanDataCache', JSON.stringify(savedData));
-                        
-                        // Update counter
-                        updateCounters();
-                        
-                        // Update status
-                        updateApiStatus(true, `Terhubung (${savedData.length} data)`);
-                        
-                        // Jika ini bukan percobaan pertama, tampilkan notifikasi sukses
-                        if (retryCount > 0) {
-                            showNotification(`Koneksi pulih! Berhasil memuat ${savedData.length} data`, 'success');
-                        } else {
-                            showNotification(`Berhasil memuat ${savedData.length} data dari Spreadsheet`, 'success');
-                        }
-                        
-                        return savedData;
-                    } else {
-                        // Sheet kosong
-                        savedData = [];
-                        localStorage.setItem('memoReportanDataCache', JSON.stringify(savedData));
-                        updateCounters();
-                        updateApiStatus(true, 'Spreadsheet kosong - siap menerima data');
-                        showNotification('Spreadsheet siap digunakan (masih kosong)', 'info');
-                        return savedData;
-                    }
-                } catch (error) {
-                    retryCount++;
-                    
-                    if (retryCount === maxRetries) {
-                        console.error('Error fetching data after retries:', error);
-                        
-                        // Fallback ke cache jika ada
-                        const cacheData = localStorage.getItem('memoReportanDataCache');
-                        if (cacheData && JSON.parse(cacheData).length > 0) {
-                            savedData = JSON.parse(cacheData);
-                            updateCounters();
-                            updateApiStatus(false, 'Menggunakan data cache - offline mode');
-                            showNotification('Mode offline aktif (menggunakan data cache)', 'info');
-                            
-                            // Tampilkan notifikasi lebih detail
-                            setTimeout(() => {
-                                showNotification(`Tips: Cek koneksi internet & API Key di Google Cloud Console`, 'info');
-                            }, 2000);
-                        } else {
-                            savedData = [];
-                            updateApiStatus(false, 'Gagal terhubung ke Spreadsheet');
-                            
-                            // Berikan petunjuk troubleshooting
-                            let errorMessage = 'Gagal terhubung ke Spreadsheet';
-                            if (error.name === 'AbortError') {
-                                errorMessage += ' - Waktu tunggu habis';
-                            } else if (error.message.includes('Failed to fetch')) {
-                                errorMessage += ' - Cek koneksi internet';
-                            }
-                            
-                            showNotification(errorMessage, 'error');
-                            
-                            // Tampilkan petunjuk troubleshooting
-                            setTimeout(() => {
-                                showNotification('Pastikan API Key aktif & Sheet bisa diakses publik', 'info');
-                            }, 3000);
-                        }
-                        return savedData;
-                    }
-                    
-                    // Tunggu sebelum mencoba lagi (exponential backoff)
-                    await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
-                } finally {
-                    hideLoading();
-                }
-            }
-        }
-        
-        // Fungsi untuk menyimpan data ke Google Sheets
-        async function saveDataToSheets(data) {
-            showLoading();
-            
-            try {
-                // Format data untuk Google Sheets
-                const rowData = [
-                    data.id || Date.now().toString(),
-                    data.category,
-                    data.subcategory || '',
-                    data.judul,
-                    data.isi,
-                    new Date().toISOString()
-                ];
-                
-                const requestBody = {
-                    values: [rowData]
-                };
-                
-                const response = await fetch(WRITE_API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(requestBody)
-                });
-                
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error?.message || `HTTP error! status: ${response.status}`);
-                }
-                
-                const result = await response.json();
-                
-                // Refresh data dari server
-                await fetchDataFromSheets();
-                
-                showNotification('Data berhasil disimpan ke Spreadsheet!', 'success');
-                
-                return result;
-            } catch (error) {
-                console.error('Error saving data:', error);
-                
-                // Cek tipe error
-                if (error.message.includes('API key not valid')) {
-                    showNotification('API Key tidak valid. Periksa konfigurasi API Key.', 'error');
-                } else if (error.message.includes('insufficient permission')) {
-                    showNotification('Izin tidak cukup. Periksa izin Spreadsheet.', 'error');
-                } else if (error.message.includes('timed out') || error.message.includes('Failed to fetch')) {
-                    showNotification('Koneksi timeout. Data disimpan secara lokal.', 'info');
-                    
-                    // Simpan di localStorage sebagai fallback
-                    data.id = 'local-' + Date.now();
-                    data.timestamp = new Date().toISOString();
-                    savedData.push(data);
-                    localStorage.setItem('memoReportanDataCache', JSON.stringify(savedData));
-                    updateCounters();
-                    updateApiStatus(false, 'Data disimpan lokal - offline');
-                    
-                    // Tampilkan tombol sinkronisasi
-                    showSyncButton();
-                } else {
-                    showNotification('Gagal menyimpan ke Spreadsheet: ' + error.message, 'error');
-                }
-                
-                return { success: false, message: error.message };
-            } finally {
-                hideLoading();
-            }
-        }
-        
-        // Fungsi untuk menampilkan tombol sinkronisasi
-        function showSyncButton() {
-            // Cek apakah tombol sudah ada
-            if (document.getElementById('syncButton')) return;
-            
-            const syncButton = document.createElement('button');
-            syncButton.id = 'syncButton';
-            syncButton.className = 'btn';
-            syncButton.style.cssText = `
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                background: linear-gradient(135deg, #f39c12 0%, #d35400 100%);
-                z-index: 1000;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                animation: pulse 2s infinite;
-            `;
-            syncButton.innerHTML = `
-                <i class="fas fa-sync-alt"></i>
-                <span>Sinkronkan Data</span>
-            `;
-            
-            syncButton.addEventListener('click', async () => {
-                showLoading();
-                showNotification('Menyinkronkan data ke Spreadsheet...', 'info');
-                
-                // Ambil data dari cache
-                const localData = JSON.parse(localStorage.getItem('memoReportanDataCache') || '[]');
-                const unsyncedData = localData.filter(item => item.id && item.id.startsWith('local-'));
-                
-                if (unsyncedData.length === 0) {
-                    showNotification('Tidak ada data yang perlu disinkronkan', 'info');
-                    hideLoading();
-                    syncButton.remove();
-                    return;
-                }
-                
-                // Coba sinkronkan setiap data
-                let successCount = 0;
-                let failCount = 0;
-                
-                for (const data of unsyncedData) {
-                    try {
-                        // Hapus ID lokal sebelum dikirim
-                        const dataToSend = { ...data };
-                        delete dataToSend.id;
-                        
-                        await saveDataToSheets(dataToSend);
-                        successCount++;
-                    } catch (error) {
-                        failCount++;
-                        console.error('Gagal sinkron data:', error);
-                    }
-                }
-                
-                if (successCount > 0) {
-                    showNotification(`Berhasil sinkron ${successCount} data ke Spreadsheet!`, 'success');
-                    // Hapus data lokal yang sudah berhasil disinkron
-                    const updatedData = localData.filter(item => !item.id.startsWith('local-'));
-                    localStorage.setItem('memoReportanDataCache', JSON.stringify(updatedData));
-                }
-                
-                if (failCount > 0) {
-                    showNotification(`${failCount} data gagal disinkronkan`, 'error');
-                }
-                
-                hideLoading();
-                
-                // Perbarui tampilan
-                await fetchDataFromSheets();
-                
-                // Sembunyikan tombol jika semua data berhasil disinkron
-                if (failCount === 0) {
-                    syncButton.remove();
-                }
-            });
-            
-            document.body.appendChild(syncButton);
-        }
-        
-        // Update status API dengan informasi lebih detail
-        function updateApiStatus(isOnline, message) {
-            if (isOnline) {
-                apiStatus.className = 'api-status online';
-                apiStatusDot.className = 'api-status-dot online';
-                apiStatusText.textContent = message;
-                
-                // Tambahkan animasi heartbeat
-                apiStatusDot.style.animation = 'pulseDot 2s infinite';
-                
-                // Hapus tombol troubleshooting jika ada
-                const existingButton = document.querySelector('.troubleshoot-btn');
-                if (existingButton) existingButton.remove();
-            } else {
-                apiStatus.className = 'api-status offline';
-                apiStatusDot.className = 'api-status-dot offline';
-                apiStatusText.textContent = message;
-                
-                // Hapus animasi untuk offline
-                apiStatusDot.style.animation = 'none';
-                
-                // Tampilkan tombol troubleshooting
-                showTroubleshootingButton();
-            }
-        }
-        
-        // Tambahkan tombol troubleshooting
-        function showTroubleshootingButton() {
-            // Hapus tombol sebelumnya jika ada
-            const existingButton = document.querySelector('.troubleshoot-btn');
-            if (existingButton) existingButton.remove();
-            
-            const troubleshootBtn = document.createElement('button');
-            troubleshootBtn.className = 'troubleshoot-btn';
-            troubleshootBtn.innerHTML = '<i class="fas fa-question-circle"></i> Perbaiki Koneksi';
-            
-            troubleshootBtn.addEventListener('click', () => {
-                showTroubleshootingGuide();
-            });
-            
-            apiStatus.appendChild(troubleshootBtn);
-        }
-        
-        // Tampilkan panduan troubleshooting
-        function showTroubleshootingGuide() {
-            const guide = `
-                <div style="
-                    position: fixed;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    background: white;
-                    padding: 30px;
-                    border-radius: 15px;
-                    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-                    z-index: 2000;
-                    max-width: 500px;
-                    width: 90%;
-                    max-height: 80vh;
-                    overflow-y: auto;
-                ">
-                    <h3 style="color: #2c3e50; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-                        <i class="fas fa-tools" style="color: #e74c3c;"></i>
-                        Panduan Troubleshooting
-                    </h3>
-                    
-                    <div style="margin-bottom: 20px;">
-                        <h4 style="color: #3498db; margin-bottom: 10px;">1. Cek API Key</h4>
-                        <p style="margin-bottom: 10px; color: #2c3e50;">
-                            Pastikan API Key di kode sudah benar:
-                        </p>
-                        <code style="
-                            background: #f8f9fa;
-                            padding: 8px;
-                            border-radius: 5px;
-                            font-family: monospace;
-                            display: block;
-                            margin-bottom: 15px;
-                            word-break: break-all;
-                            border: 1px solid #e0e0e0;
-                        ">
-                            ${API_KEY}
-                        </code>
-                    </div>
-                    
-                    <div style="margin-bottom: 20px;">
-                        <h4 style="color: #3498db; margin-bottom: 10px;">2. Aktifkan Google Sheets API</h4>
-                        <p style="margin-bottom: 10px; color: #2c3e50;">
-                            Buka <a href="https://console.cloud.google.com/apis/library/sheets.googleapis.com" target="_blank" style="color: #3498db;">
-                                Google Cloud Console
-                            </a> dan pastikan Google Sheets API sudah diaktifkan.
-                        </p>
-                    </div>
-                    
-                    <div style="margin-bottom: 20px;">
-                        <h4 style="color: #3498db; margin-bottom: 10px;">3. Izin Spreadsheet</h4>
-                        <p style="margin-bottom: 10px; color: #2c3e50;">
-                            Pastikan spreadsheet bisa diakses oleh siapa saja dengan link:
-                        </p>
-                        <ol style="margin-left: 20px; color: #2c3e50;">
-                            <li>Buka spreadsheet Anda</li>
-                            <li>Klik "Share" di kanan atas</li>
-                            <li>Atur ke "Anyone with the link can edit"</li>
-                        </ol>
-                    </div>
-                    
-                    <div style="margin-bottom: 20px;">
-                        <h4 style="color: #3498db; margin-bottom: 10px;">4. Testing Koneksi</h4>
-                        <button id="testConnectionBtn" style="
-                            background: #3498db;
-                            color: white;
-                            border: none;
-                            padding: 10px 20px;
-                            border-radius: 5px;
-                            cursor: pointer;
-                            display: flex;
-                            align-items: center;
-                            gap: 10px;
-                        ">
-                            <i class="fas fa-plug"></i> Test Koneksi Sekarang
-                        </button>
-                        <div id="testResult" style="margin-top: 10px;"></div>
-                    </div>
-                    
-                    <button onclick="this.parentElement.remove()" style="
-                        background: #e74c3c;
-                        color: white;
-                        border: none;
-                        padding: 10px 20px;
-                        border-radius: 5px;
-                        cursor: pointer;
-                        float: right;
-                    ">
-                        Tutup
-                    </button>
+            if (showLoading) {
+                dataGrid.innerHTML = `
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Memuat data...</p>
                 </div>
-            `;
-            
-            const overlay = document.createElement('div');
-            overlay.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0,0,0,0.5);
-                z-index: 1999;
-            `;
-            
-            overlay.innerHTML = guide;
-            document.body.appendChild(overlay);
-            
-            // Tambahkan event listener untuk tombol test
-            setTimeout(() => {
-                const testBtn = document.getElementById('testConnectionBtn');
-                const testResult = document.getElementById('testResult');
-                
-                if (testBtn) {
-                    testBtn.addEventListener('click', async () => {
-                        testBtn.disabled = true;
-                        testBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Testing...';
-                        
-                        try {
-                            const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}?key=${API_KEY}`);
-                            if (response.ok) {
-                                testResult.innerHTML = `
-                                    <div style="
-                                        background: #d5f4e6;
-                                        color: #27ae60;
-                                        padding: 10px;
-                                        border-radius: 5px;
-                                        border: 1px solid #2ecc71;
-                                        margin-top: 10px;
-                                    ">
-                                        <i class="fas fa-check-circle"></i>
-                                        Koneksi berhasil! Spreadsheet dapat diakses.
-                                    </div>
-                                `;
-                            } else {
-                                throw new Error(`HTTP ${response.status}`);
-                            }
-                        } catch (error) {
-                            testResult.innerHTML = `
-                                <div style="
-                                    background: #fdeaea;
-                                    color: #e74c3c;
-                                    padding: 10px;
-                                    border-radius: 5px;
-                                    border: 1px solid #e74c3c;
-                                    margin-top: 10px;
-                                ">
-                                    <i class="fas fa-exclamation-circle"></i>
-                                    Gagal terhubung: ${error.message}
-                                </div>
-                            `;
-                        } finally {
-                            testBtn.disabled = false;
-                            testBtn.innerHTML = '<i class="fas fa-plug"></i> Test Koneksi Sekarang';
-                        }
-                    });
-                }
-            }, 100);
-        }
-        
-        // Fungsi untuk menghapus semua data
-        async function clearAllData() {
-            if (!confirm('⚠️ PERINGATAN: Apakah Anda yakin ingin menghapus SEMUA data dari Spreadsheet? Tindakan ini tidak dapat dibatalkan!')) {
-                return;
+                `;
             }
             
-            showLoading();
+            let sheetName = subcategory.replace('MEMO ', '');
             
-            try {
-                const response = await fetch(CLEAR_API_URL, {
-                    method: 'POST'
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                // Clear cache
-                savedData = [];
-                localStorage.removeItem('memoReportanDataCache');
-                
-                // Update counter
-                updateCounters();
-                
-                // Render ulang jika sedang melihat data
-                if (!isMainPage) {
-                    if (activeCategory === 'memo' && activeSubcategory) {
-                        renderSavedData('memo', activeSubcategory, currentSearchKeyword);
-                    } else if (activeCategory === 'reportan') {
-                        renderSavedData('reportan', '', currentSearchKeyword);
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    if (result.success) {
+                        sheetDataCache[subcategory] = result.data;
+                        renderDataFromCache(subcategory, currentSearchKeyword);
+                        updateSubcategoryCount(subcategory, result.count);
+                    } else {
+                        dataGrid.innerHTML = `
+                        <div class="empty-data">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <h3>Gagal memuat data</h3>
+                            <p>${result.message || 'Tidak ada data atau sheet belum dibuat'}</p>
+                            <button class="btn" onclick="loadDataFromSheet('${subcategory}')" style="margin-top: 15px;">
+                            <i class="fas fa-redo"></i> Coba Lagi
+                            </button>
+                        </div>
+                        `;
                     }
-                }
-                
-                showNotification('Semua data berhasil dihapus dari Spreadsheet', 'success');
-                
-                return true;
-            } catch (error) {
-                console.error('Error clearing data:', error);
-                showNotification('Gagal menghapus data dari Spreadsheet', 'error');
-                return false;
-            } finally {
-                hideLoading();
-            }
+                })
+                .withFailureHandler(function(error) {
+                    console.error('Error loading data:', error);
+                    dataGrid.innerHTML = `
+                    <div class="empty-data">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>Gagal memuat data</h3>
+                        <p>${error.message || 'Terjadi kesalahan'}</p>
+                    </div>
+                    `;
+                })
+                .getDataFromSheet(sheetName);
         }
-        
-        // ========== FUNGSI RENDER DATA ==========
-        
-        // Tampilkan data yang tersimpan berdasarkan subkategori dan pencarian
-        function renderSavedData(category, subcategory = '', keyword = '') {
-            let filteredData = [];
+
+        // Fungsi untuk merender data dari cache
+        function renderDataFromCache(subcategory, keyword = '') {
+            const data = sheetDataCache[subcategory] || [];
+            const dataGrid = document.getElementById('dataGrid');
+            const searchInfo = document.getElementById('searchInfo');
             
-            if (category === 'memo' && subcategory) {
-                // Filter data berdasarkan subkategori memo
-                filteredData = savedData.filter(item => 
-                    item.category === 'memo' && item.subcategory === subcategory
-                );
-            } else if (category === 'reportan') {
-                // Filter data untuk reportan
-                filteredData = savedData.filter(item => item.category === 'reportan');
-            }
+            let filteredData = [...data];
             
-            // Terapkan filter pencarian jika ada kata kunci
             if (keyword.trim()) {
                 const searchLower = keyword.toLowerCase();
                 filteredData = filteredData.filter(item => {
-                    const judulLower = item.judul ? item.judul.toLowerCase() : '';
-                    const isiLower = item.isi ? item.isi.toLowerCase() : '';
+                    const judulLower = (item.judul || '').toLowerCase();
+                    const isiLower = (item.isi || '').toLowerCase();
                     return judulLower.includes(searchLower) || isiLower.includes(searchLower);
                 });
                 
-                // Update info pencarian
                 searchInfo.innerHTML = `<i class="fas fa-search"></i> Ditemukan ${filteredData.length} hasil untuk "${keyword}"`;
             } else {
-                // Reset info pencarian
-                searchInfo.innerHTML = `<i class="fas fa-info-circle"></i> Data diambil langsung dari Google Spreadsheet`;
+                searchInfo.innerHTML = `<i class="fas fa-info-circle"></i> ${filteredData.length} data ditemukan`;
             }
             
             if (filteredData.length === 0) {
@@ -2691,31 +2101,17 @@
                 let subMessage = 'Tambah data baru untuk melihatnya di sini';
                 
                 if (keyword.trim()) {
-                    if (category === 'memo' && subcategory) {
-                        const subcategoryName = subcategory.replace('MEMO ', '');
-                        message = `Tidak ditemukan hasil untuk "${keyword}"`;
-                        subMessage = `Coba kata kunci lain di ${subcategoryName}`;
-                    } else if (category === 'reportan') {
-                        message = `Tidak ditemukan hasil untuk "${keyword}"`;
-                        subMessage = 'Coba kata kunci lain di Reportan';
-                    }
-                } else {
-                    if (category === 'memo' && subcategory) {
-                        const subcategoryName = subcategory.replace('MEMO ', '');
-                        message = `Belum ada data di ${subcategoryName}`;
-                        subMessage = 'Spreadsheet Anda masih kosong';
-                    } else if (category === 'reportan') {
-                        message = 'Belum ada data reportan';
-                        subMessage = 'Spreadsheet Anda masih kosong';
-                    }
+                    const subcategoryName = subcategory.replace('MEMO ', '');
+                    message = `Tidak ditemukan hasil untuk "${keyword}"`;
+                    subMessage = `Coba kata kunci lain di ${subcategoryName}`;
                 }
                 
                 dataGrid.innerHTML = `
-                    <div class="empty-data">
-                        <i class="fas fa-${keyword.trim() ? 'search' : 'inbox'}"></i>
-                        <h3>${message}</h3>
-                        <p>${subMessage}</p>
-                    </div>
+                <div class="empty-data">
+                    <i class="fas fa-${keyword.trim() ? 'search' : 'inbox'}"></i>
+                    <h3>${message}</h3>
+                    <p>${subMessage}</p>
+                </div>
                 `;
                 return;
             }
@@ -2724,227 +2120,760 @@
             
             // Urutkan data berdasarkan tanggal (terbaru di atas)
             const sortedData = [...filteredData].sort((a, b) => {
-                const dateA = a.timestamp ? new Date(a.timestamp) : new Date(0);
-                const dateB = b.timestamp ? new Date(b.timestamp) : new Date(0);
+                const dateA = new Date(b.tanggal || 0);
+                const dateB = new Date(a.tanggal || 0);
                 return dateB - dateA;
             });
             
-            sortedData.forEach((item, index) => {
+            sortedData.forEach((item) => {
                 const dataItem = document.createElement('div');
                 dataItem.className = 'data-item';
+                dataItem.id = `memo-${item.id}`;
                 
-                let categoryBadge = '';
-                let subcategoryBadge = '';
+                const subcategoryName = `MEMO ${item.sheet || ''}`;
+                const displayDate = item.tanggal || 'Tanggal tidak tersedia';
                 
-                if (item.category === 'memo') {
-                    categoryBadge = `<span class="data-category">MEMO</span>`;
-                    subcategoryBadge = `<span class="data-subcategory" data-subcategory="${item.subcategory}">${item.subcategory}</span>`;
-                } else {
-                    categoryBadge = `<span class="data-category">REPORTAN</span>`;
+                // Escape HTML untuk mencegah XSS
+                const safeJudul = (item.judul || '(Tanpa Judul)').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                const safeIsi = (item.isi || '(Tanpa Isi)').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                
+                // Tombol aksi (edit/hapus) - hanya tampil jika mode edit aktif
+                let actionButtons = '';
+                if (isEditMode) {
+                    actionButtons = `
+                    <div class="data-actions" style="margin-top: 15px; display: flex; gap: 10px;">
+                        <button class="btn-edit" onclick="editMemo('${item.id}', '${item.sheet}')" style="background: rgba(255, 255, 255, 0.15); color: white; border: 1px solid rgba(255, 255, 255, 0.3); padding: 8px 15px; border-radius: 6px; cursor: pointer; transition: all 0.3s; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; font-weight: 600; flex: 1; justify-content: center;">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn-delete" onclick="deleteMemo('${item.id}', '${item.sheet}')" style="background: rgba(231, 76, 60, 0.2); color: #e74c3c; border: 1px solid #e74c3c; padding: 8px 15px; border-radius: 6px; cursor: pointer; transition: all 0.3s; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; font-weight: 600; flex: 1; justify-content: center;">
+                            <i class="fas fa-trash"></i> Hapus
+                        </button>
+                    </div>
+                    `;
                 }
                 
-                // Sorot teks yang cocok dengan pencarian
-                const highlightedJudul = keyword.trim() ? highlightText(item.judul, keyword) : item.judul;
-                const highlightedIsi = keyword.trim() ? highlightText(item.isi, keyword) : item.isi;
-                
                 dataItem.innerHTML = `
-                    ${categoryBadge}${subcategoryBadge}
-                    <div class="data-title">${highlightedJudul}</div>
-                    <div class="data-content">${highlightedIsi}</div>
-                    <div class="data-date">
-                        <i class="far fa-calendar-alt"></i> ${item.timestamp ? formatDate(item.timestamp) : 'Tanggal tidak tersedia'}
-                        ${item.id && item.id.startsWith('local-') ? '<span style="margin-left: 10px; background: #f39c12; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.75rem;">Lokal</span>' : ''}
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div>
+                            <span class="data-category">MEMO</span>
+                            <span class="data-subcategory" data-subcategory="${subcategoryName}">${subcategoryName}</span>
+                        </div>
+                        ${isEditMode ? '<div class="edit-badge" style="background: rgba(255, 167, 38, 0.2); color: #ffa726; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; border: 1px solid rgba(255, 167, 38, 0.5);"><i class="fas fa-pencil-alt"></i> Edit</div>' : ''}
                     </div>
+                    
+                    <!-- Judul dengan tombol copy di samping -->
+                    <div class="title-with-copy">
+                        <div class="data-title" id="judul-${item.id}">${safeJudul}</div>
+                        <button class="btn-copy-title" onclick="copyJudul('${item.id}')" title="Salin Judul">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Isi memo dengan tombol copy di samping -->
+                    <div class="content-with-copy">
+                        <div class="content-header">
+                            <span>Isi Memo:</span>
+                            <button class="btn-copy-content" onclick="copyIsi('${item.id}')" title="Salin Isi">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                        <div class="data-content" id="isi-${item.id}">${safeIsi}</div>
+                    </div>
+                    
+                    <div class="data-date">
+                        <i class="far fa-calendar-alt"></i> ${displayDate}
+                    </div>
+                    ${actionButtons}
                 `;
                 
                 dataGrid.appendChild(dataItem);
             });
         }
+
+        // ========== FUNGSI COPY ==========
         
-        // Reset form
-        function resetForm() {
-            memoFormData.reset();
-            memoSubcategorySelect.value = '';
-        }
-        
-        // ========== FUNGSI SIDEBAR ==========
-        
-        // Fungsi untuk toggle expand/collapse submenu memo
-        function toggleMemoSubmenu() {
-            isMemoSubmenuExpanded = !isMemoSubmenuExpanded;
-            
-            if (isMemoSubmenuExpanded) {
-                memoSubmenu.classList.add('expanded');
-                memoArrow.classList.remove('rotated');
-            } else {
-                memoSubmenu.classList.remove('expanded');
-                memoArrow.classList.add('rotated');
-            }
-        }
-        
-        // Fungsi untuk toggle minimize sidebar
-        function toggleSidebarMinimize() {
-            isSidebarMinimized = !isSidebarMinimized;
-            
-            if (isSidebarMinimized) {
-                sidebar.classList.add('minimized');
-                minimizeBtn.style.transform = 'rotate(180deg) scale(1.2)';
-                setTimeout(() => {
-                    minimizeBtn.style.transform = 'rotate(180deg) scale(1)';
-                }, 300);
-                
-                if (isMemoSubmenuExpanded) {
-                    toggleMemoSubmenu();
-                }
-            } else {
-                sidebar.classList.remove('minimized');
-                minimizeBtn.style.transform = 'rotate(0deg) scale(1.2)';
-                setTimeout(() => {
-                    minimizeBtn.style.transform = 'rotate(0deg) scale(1)';
-                }, 300);
+        // Fungsi untuk menyalin judul
+        function copyJudul(memoId) {
+            const judulElement = document.getElementById(`judul-${memoId}`);
+            if (!judulElement) {
+                showNotification('❌ Gagal menemukan judul', 'error');
+                return;
             }
             
-            localStorage.setItem('sidebarMinimized', isSidebarMinimized);
-        }
-        
-        // ========== FUNGSI NETWORK CHECKER ==========
-        
-        // Fungsi untuk melakukan tes network
-        async function performNetworkTest() {
-            networkIcon.classList.add('network-loading');
-            networkPing.textContent = '...';
-            networkStatusDot.className = 'network-status-dot';
-            networkLatency.textContent = '...';
-            networkStatus.textContent = 'Memeriksa...';
-            networkStatus.className = 'network-status';
+            const judulText = judulElement.textContent;
             
-            const startTime = Date.now();
-            lastNetworkCheckTime = new Date();
-            
-            try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 5000);
-                
-                const response = await fetch('https://www.google.com/favicon.ico', {
-                    method: 'HEAD',
-                    mode: 'no-cors',
-                    signal: controller.signal,
-                    cache: 'no-cache'
+            navigator.clipboard.writeText(judulText)
+                .then(() => {
+                    showCopySuccess('✓ Judul berhasil disalin ke clipboard!');
+                    
+                    // Highlight effect
+                    judulElement.style.transition = 'all 0.3s';
+                    judulElement.style.color = '#ffd700';
+                    judulElement.style.textShadow = '0 0 10px rgba(255, 215, 0, 0.5)';
+                    
+                    setTimeout(() => {
+                        judulElement.style.color = 'white';
+                        judulElement.style.textShadow = 'none';
+                    }, 1000);
+                })
+                .catch(err => {
+                    console.error('Gagal menyalin judul:', err);
+                    
+                    // Fallback method
+                    const textArea = document.createElement('textarea');
+                    textArea.value = judulText;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    try {
+                        document.execCommand('copy');
+                        showCopySuccess('✓ Judul berhasil disalin ke clipboard!');
+                    } catch (fallbackErr) {
+                        showNotification('❌ Gagal menyalin judul', 'error');
+                    }
+                    document.body.removeChild(textArea);
                 });
+        }
+
+        // Fungsi untuk menyalin isi
+        function copyIsi(memoId) {
+            const isiElement = document.getElementById(`isi-${memoId}`);
+            if (!isiElement) {
+                showNotification('❌ Gagal menemukan isi memo', 'error');
+                return;
+            }
+            
+            const isiText = isiElement.textContent;
+            
+            navigator.clipboard.writeText(isiText)
+                .then(() => {
+                    showCopySuccess('✓ Isi memo berhasil disalin ke clipboard!');
+                    
+                    // Highlight effect
+                    isiElement.style.transition = 'all 0.3s';
+                    isiElement.style.backgroundColor = 'rgba(76, 175, 80, 0.2)';
+                    isiElement.style.padding = '15px';
+                    isiElement.style.borderRadius = '8px';
+                    
+                    setTimeout(() => {
+                        isiElement.style.backgroundColor = 'transparent';
+                        isiElement.style.padding = '0';
+                        isiElement.style.borderRadius = '0';
+                    }, 1000);
+                })
+                .catch(err => {
+                    console.error('Gagal menyalin isi:', err);
+                    
+                    // Fallback method
+                    const textArea = document.createElement('textarea');
+                    textArea.value = isiText;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    try {
+                        document.execCommand('copy');
+                        showCopySuccess('✓ Isi memo berhasil disalin ke clipboard!');
+                    } catch (fallbackErr) {
+                        showNotification('❌ Gagal menyalin isi memo', 'error');
+                    }
+                    document.body.removeChild(textArea);
+                });
+        }
+
+        // Fungsi untuk menampilkan notifikasi copy sukses
+        function showCopySuccess(message) {
+            // Cek apakah sudah ada elemen copy-success
+            let copySuccess = document.getElementById('copySuccess');
+            if (!copySuccess) {
+                copySuccess = document.createElement('div');
+                copySuccess.id = 'copySuccess';
+                copySuccess.className = 'copy-success';
+                document.body.appendChild(copySuccess);
+            }
+            
+            copySuccess.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+            copySuccess.classList.add('show');
+            
+            // Auto hide setelah 2 detik
+            setTimeout(() => {
+                copySuccess.classList.remove('show');
+            }, 2000);
+        }
+
+        // Fungsi untuk toggle mode edit
+        function toggleEditMode() {
+            isEditMode = !isEditMode;
+            
+            const editModeText = document.getElementById('editModeText');
+            const editModeInfo = document.getElementById('editModeInfo');
+            const toggleEditBtn = document.getElementById('toggleEditMode');
+            
+            if (isEditMode) {
+                editModeText.textContent = 'Keluar Edit';
+                editModeInfo.style.display = 'block';
+                toggleEditBtn.style.background = 'linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%)';
+                showNotification('Mode edit diaktifkan. Klik tombol edit pada data yang ingin diedit.', 'info');
+            } else {
+                editModeText.textContent = 'Edit Data';
+                editModeInfo.style.display = 'none';
+                toggleEditBtn.style.background = 'linear-gradient(135deg, #ffa726 0%, #f57c00 100%)';
                 
-                clearTimeout(timeoutId);
+                if (editingMemoId) {
+                    cancelEdit();
+                }
                 
-                const endTime = Date.now();
-                const latency = endTime - startTime;
-                
-                updateNetworkDisplay(latency, 'online');
-                networkLastChecked.textContent = formatTime(lastNetworkCheckTime);
-                showNetworkResult();
-                
-            } catch (error) {
-                updateNetworkDisplay(null, 'offline');
-                networkLastChecked.textContent = formatTime(lastNetworkCheckTime);
-                showNetworkResult();
-            } finally {
-                networkIcon.classList.remove('network-loading');
+                showNotification('Mode edit dinonaktifkan.', 'info');
+            }
+            
+            // Render ulang data agar tombol edit/hapus muncul/hilang
+            if (!isMainPage && activeCategory === 'memo' && activeSubcategory) {
+                renderDataFromCache(activeSubcategory, currentSearchKeyword);
             }
         }
-        
-        // Update tampilan network berdasarkan hasil
-        function updateNetworkDisplay(latency, status) {
-            networkStatusDot.className = 'network-status-dot';
-            networkStatus.className = 'network-status';
+
+        // Fungsi untuk membuka modal edit
+        function openEditModal(memoId, sheetName) {
+            console.log('Membuka modal edit untuk memo ID:', memoId, 'di sheet:', sheetName);
             
-            if (status === 'online') {
+            showNotification('Memuat data untuk diedit...', 'info');
+            
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    if (result.success) {
+                        console.log('Data dari server:', result.data);
+                        
+                        // Isi form edit
+                        document.getElementById('editMemoId').value = result.data.id;
+                        document.getElementById('editMemoSheet').value = sheetName;
+                        document.getElementById('editMemoJudul').value = result.data.judul || '';
+                        document.getElementById('editMemoIsi').value = result.data.isi || '';
+                        
+                        // Set subkategori
+                        let subcategoryValue = '';
+                        if (result.data.sheet) {
+                            subcategoryValue = `MEMO ${result.data.sheet}`;
+                        } else if (sheetName) {
+                            subcategoryValue = `MEMO ${sheetName}`;
+                        }
+                        
+                        document.getElementById('editMemoSubcategory').value = subcategoryValue;
+                        
+                        // Tampilkan modal
+                        document.getElementById('editModal').style.display = 'flex';
+                        
+                        showNotification('✓ Data siap diedit', 'success');
+                    } else {
+                        showNotification(result.message, 'error');
+                    }
+                })
+                .withFailureHandler(function(error) {
+                    console.error('Error loading memo for edit:', error);
+                    showNotification('❌ Gagal memuat data untuk diedit: ' + error.message, 'error');
+                })
+                .getMemoById(memoId, sheetName);
+        }
+
+        // Fungsi untuk menutup modal edit
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+            document.getElementById('editFormData').reset();
+            document.getElementById('editMemoId').value = '';
+            document.getElementById('editMemoSheet').value = '';
+        }
+
+        // Fungsi untuk menyimpan perubahan edit
+        function saveEditChanges(event) {
+            event.preventDefault();
+            
+            const memoId = document.getElementById('editMemoId').value;
+            const sheetName = document.getElementById('editMemoSheet').value;
+            const judul = document.getElementById('editMemoJudul').value.trim();
+            const isi = document.getElementById('editMemoIsi').value.trim();
+            const subcategory = document.getElementById('editMemoSubcategory').value;
+            
+            if (!judul || !isi) {
+                showNotification('❌ Judul dan isi memo harus diisi!', 'error');
+                return;
+            }
+            
+            const data = {
+                id: memoId,
+                subcategory: subcategory,
+                judul: judul,
+                isi: isi,
+                sheet: sheetName
+            };
+            
+            console.log('Mengupdate memo dengan data:', data);
+            
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    if (result.success) {
+                        showNotification(result.message, 'success');
+                        
+                        // Update cache lokal
+                        updateCacheAfterEdit(data);
+                        
+                        // Tutup modal
+                        closeEditModal();
+                        
+                        // Refresh data display
+                        if (!isMainPage && activeCategory === 'memo' && activeSubcategory === subcategory) {
+                            loadDataFromSheet(activeSubcategory, false);
+                        }
+                        
+                        // Update counters
+                        setTimeout(updateSheetCounts, 1000);
+                    } else {
+                        showNotification(result.message, 'error');
+                    }
+                })
+                .withFailureHandler(function(error) {
+                    console.error('Gagal mengupdate:', error);
+                    showNotification('❌ Error: ' + error.message, 'error');
+                })
+                .updateMemo(data);
+        }
+
+        // Fungsi edit memo - membuka modal edit
+        function editMemo(id, sheetName) {
+            openEditModal(id, sheetName);
+        }
+
+        // Fungsi untuk menyimpan atau mengupdate memo
+        function saveOrUpdateMemo(data) {
+            const googleSyncStatus = document.getElementById('googleSyncStatus');
+            const memoId = document.getElementById('memoId').value;
+            
+            const isEditing = memoId !== '';
+            
+            if (!data.judul || !data.isi) {
+                showNotification('❌ Judul dan isi memo harus diisi!', 'error');
+                return;
+            }
+            
+            if (isEditing) {
+                data.id = memoId;
+                
+                console.log('Mengupdate memo dengan data:', data);
+                
+                googleSyncStatus.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Memperbarui data...';
+                
+                google.script.run
+                    .withSuccessHandler(function(result) {
+                        if (result.success) {
+                            googleSyncStatus.innerHTML = '<i class="fas fa-check-circle"></i> Data berhasil diperbarui';
+                            showNotification(result.message, 'success');
+                            
+                            // Update cache lokal
+                            updateCacheAfterEdit(data);
+                            
+                            // Reset form
+                            cancelEdit();
+                            
+                            // Refresh data display
+                            if (!isMainPage && activeCategory === 'memo' && activeSubcategory === data.subcategory) {
+                                loadDataFromSheet(activeSubcategory, false);
+                            }
+                            
+                            // Update counters
+                            setTimeout(updateSheetCounts, 1000);
+                        } else {
+                            googleSyncStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Gagal memperbarui';
+                            showNotification(result.message, 'error');
+                        }
+                        
+                        setTimeout(() => {
+                            googleSyncStatus.innerHTML = '<i class="fas fa-sync-alt"></i> Data akan otomatis dikirim';
+                        }, 3000);
+                    })
+                    .withFailureHandler(function(error) {
+                        console.error('Gagal mengupdate:', error);
+                        googleSyncStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Gagal mengupdate';
+                        showNotification('❌ Error: ' + error.message, 'error');
+                        
+                        setTimeout(() => {
+                            googleSyncStatus.innerHTML = '<i class="fas fa-sync-alt"></i> Data akan otomatis dikirim';
+                        }, 5000);
+                    })
+                    .updateMemo(data);
+            } else {
+                googleSyncStatus.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Mengirim data...';
+                
+                google.script.run
+                    .withSuccessHandler(function(result) {
+                        if (result.success) {
+                            googleSyncStatus.innerHTML = '<i class="fas fa-check-circle"></i> Data berhasil disimpan';
+                            showNotification(result.message, 'success');
+                            
+                            // Reset form
+                            document.getElementById('memoFormData').reset();
+                            
+                            // Refresh counter
+                            setTimeout(updateSheetCounts, 1000);
+                            
+                            // Jika sedang melihat data di subkategori yang sama, refresh data
+                            if (!isMainPage && activeCategory === 'memo' && activeSubcategory === data.subcategory) {
+                                setTimeout(() => loadDataFromSheet(activeSubcategory), 1500);
+                            }
+                        } else {
+                            googleSyncStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Gagal menyimpan';
+                            showNotification(result.message, 'error');
+                        }
+                        
+                        setTimeout(() => {
+                            googleSyncStatus.innerHTML = '<i class="fas fa-sync-alt"></i> Data akan otomatis dikirim';
+                        }, 3000);
+                    })
+                    .withFailureHandler(function(error) {
+                        console.error('Gagal mengirim:', error);
+                        googleSyncStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Gagal mengirim';
+                        showNotification('❌ Error: ' + error.message, 'error');
+                        
+                        setTimeout(() => {
+                            googleSyncStatus.innerHTML = '<i class="fas fa-sync-alt"></i> Data akan otomatis dikirim';
+                        }, 5000);
+                    })
+                    .saveMemo(data);
+            }
+        }
+
+        // Fungsi untuk update cache setelah edit
+        function updateCacheAfterEdit(updatedData) {
+            const cacheKey = updatedData.subcategory;
+            const memoId = updatedData.id;
+            
+            if (sheetDataCache[cacheKey]) {
+                const index = sheetDataCache[cacheKey].findIndex(item => item.id === memoId);
+                
+                if (index !== -1) {
+                    const sheetName = updatedData.subcategory.replace('MEMO ', '');
+                    sheetDataCache[cacheKey][index] = {
+                        id: memoId,
+                        judul: updatedData.judul,
+                        isi: updatedData.isi,
+                        tanggal: new Date().toLocaleString('id-ID'),
+                        sheet: sheetName
+                    };
+                    
+                    console.log('Cache updated for memo ID:', memoId);
+                }
+            }
+        }
+
+        // Fungsi untuk membatalkan edit
+        function cancelEdit() {
+            // Reset form
+            document.getElementById('memoFormData').reset();
+            document.getElementById('memoId').value = '';
+            
+            // Kembalikan tampilan form ke mode tambah
+            document.getElementById('formTitle').textContent = 'Form Tambah Memo Baru';
+            document.getElementById('submitButtonText').textContent = 'Tambah Memo';
+            document.getElementById('submitMemo').innerHTML = '<i class="fas fa-plus"></i> Tambah Memo';
+            document.getElementById('cancelEdit').style.display = 'none';
+            
+            // Reset ID yang sedang diedit
+            editingMemoId = '';
+            
+            // Sembunyikan form jika sedang di halaman data
+            if (!isMainPage) {
+                document.getElementById('memoForm').style.display = 'none';
+            }
+            
+            showNotification('Edit dibatalkan.', 'info');
+        }
+
+        // Fungsi untuk menghapus memo
+        function deleteMemo(id, sheetName) {
+            if (confirm('Apakah Anda yakin ingin menghapus memo ini? Tindakan ini tidak dapat dibatalkan.')) {
+                google.script.run
+                    .withSuccessHandler(function(result) {
+                        if (result.success) {
+                            showNotification(result.message, 'success');
+                            
+                            // Hapus dari cache
+                            if (sheetDataCache[`MEMO ${sheetName}`]) {
+                                sheetDataCache[`MEMO ${sheetName}`] = sheetDataCache[`MEMO ${sheetName}`].filter(item => item.id !== id);
+                            }
+                            
+                            // Refresh tampilan
+                            if (!isMainPage && activeCategory === 'memo' && activeSubcategory === `MEMO ${sheetName}`) {
+                                renderDataFromCache(activeSubcategory, currentSearchKeyword);
+                            }
+                            
+                            // Update counters
+                            setTimeout(updateSheetCounts, 1500);
+                        } else {
+                            showNotification(result.message, 'error');
+                        }
+                    })
+                    .withFailureHandler(function(error) {
+                        console.error('Error deleting memo:', error);
+                        showNotification('❌ Gagal menghapus: ' + error.message, 'error');
+                    })
+                    .deleteMemo(id, sheetName);
+            }
+        }
+
+        // Fungsi untuk update counter di sidebar
+        function updateSheetCounts() {
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    if (result.success && result.counts) {
+                        document.getElementById('bonusCount').textContent = result.counts['PEMBAGIAN BONUS'] || 0;
+                        document.getElementById('bankCount').textContent = result.counts['INFORMASI BANK'] || 0;
+                        document.getElementById('permainanCount').textContent = result.counts['KENDALA PERMAINAN'] || 0;
+                        document.getElementById('sistemCount').textContent = result.counts['KENDALA SISTEM'] || 0;
+                    }
+                })
+                .withFailureHandler(function(error) {
+                    console.error('Error updating counts:', error);
+                })
+                .getSheetCounts();
+        }
+
+        // Fungsi untuk update counter subkategori tertentu
+        function updateSubcategoryCount(subcategory, count) {
+            const subcategoryName = subcategory.replace('MEMO ', '');
+            
+            switch(subcategoryName) {
+                case 'PEMBAGIAN BONUS':
+                    document.getElementById('bonusCount').textContent = count;
+                    break;
+                case 'INFORMASI BANK':
+                    document.getElementById('bankCount').textContent = count;
+                    break;
+                case 'KENDALA PERMAINAN':
+                    document.getElementById('permainanCount').textContent = count;
+                    break;
+                case 'KENDALA SISTEM':
+                    document.getElementById('sistemCount').textContent = count;
+                    break;
+            }
+        }
+
+        // Fungsi untuk uji koneksi
+        function testConnection() {
+            const googleSyncStatus = document.getElementById('googleSyncStatus');
+            googleSyncStatus.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Menguji koneksi...';
+            
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    if (result.success) {
+                        googleSyncStatus.innerHTML = '<i class="fas fa-check-circle"></i> Terhubung ke Google Spreadsheet';
+                        showNotification(result.message, 'success');
+                        
+                        setTimeout(updateSheetCounts, 500);
+                    } else {
+                        googleSyncStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Gagal terhubung';
+                        showNotification(result.message, 'error');
+                    }
+                    
+                    setTimeout(() => {
+                        googleSyncStatus.innerHTML = '<i class="fas fa-sync-alt"></i> Data akan otomatis dikirim';
+                    }, 3000);
+                })
+                .withFailureHandler(function(error) {
+                    console.error('Error testing connection:', error);
+                    googleSyncStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Gagal terhubung';
+                    showNotification('❌ Gagal menguji koneksi: ' + error.message, 'error');
+                    
+                    setTimeout(() => {
+                        googleSyncStatus.innerHTML = '<i class="fas fa-sync-alt"></i> Data akan otomatis dikirim';
+                    }, 5000);
+                })
+                .testConnection();
+        }
+
+        // ========== NETWORK CHECKER FUNCTIONS ==========
+        
+        // Fungsi untuk toggle tampilan network result
+        function toggleNetworkResult() {
+            const networkResult = document.getElementById('networkResult');
+            networkResultVisible = !networkResultVisible;
+            
+            if (networkResultVisible) {
+                networkResult.classList.add('show');
+                // Jalankan pengecekan jaringan saat popup dibuka
+                checkNetworkStatus();
+            } else {
+                networkResult.classList.remove('show');
+            }
+        }
+
+        // Fungsi untuk mengecek status jaringan
+        function checkNetworkStatus() {
+            const networkStatusDot = document.getElementById('networkStatusDot');
+            const networkPing = document.getElementById('networkPing');
+            const networkIcon = document.getElementById('networkIcon');
+            const networkLatency = document.getElementById('networkLatency');
+            const networkStatus = document.getElementById('networkStatus');
+            const networkLastChecked = document.getElementById('networkLastChecked');
+            
+            // Update waktu terakhir diperiksa
+            const now = new Date();
+            const formattedTime = now.toLocaleTimeString('id-ID', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            lastNetworkCheckTime = formattedTime;
+            
+            // Tampilkan status loading
+            networkStatusDot.className = 'network-status-dot network-loading';
+            networkPing.textContent = '...';
+            networkIcon.className = 'fas fa-wifi network-icon network-loading';
+            networkLatency.textContent = 'Memeriksa...';
+            networkStatus.innerHTML = '<span class="network-status network-loading">Memeriksa...</span>';
+            networkLastChecked.textContent = formattedTime;
+            
+            // Simpan waktu mulai
+            const startTime = performance.now();
+            
+            // Coba ping ke server Google (menggunakan fetch dengan timeout)
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+            
+            // URL yang akan di-test (Google Public DNS)
+            const testUrl = 'https://www.google.com';
+            
+            fetch(testUrl, { 
+                mode: 'no-cors',
+                signal: controller.signal,
+                cache: 'no-cache'
+            })
+            .then(response => {
+                clearTimeout(timeoutId);
+                const endTime = performance.now();
+                const latency = Math.round(endTime - startTime);
+                
+                // Update UI berdasarkan hasil
+                updateNetworkUI(latency, 'online');
+                
+                // Update data di network result
+                networkLatency.textContent = `${latency}ms`;
+                networkPing.textContent = `${latency}ms`;
+                
                 if (latency < 100) {
-                    networkStatusDot.classList.add('online');
+                    networkStatus.innerHTML = '<span class="network-status network-status-online">Sangat Cepat</span>';
+                } else if (latency < 500) {
+                    networkStatus.innerHTML = '<span class="network-status network-status-online">Cepat</span>';
+                } else if (latency < 1000) {
+                    networkStatus.innerHTML = '<span class="network-status network-status-slow">Sedang</span>';
+                } else {
+                    networkStatus.innerHTML = '<span class="network-status network-status-slow">Lambat</span>';
+                }
+                
+                networkLastChecked.textContent = formattedTime;
+            })
+            .catch(error => {
+                clearTimeout(timeoutId);
+                const endTime = performance.now();
+                const latency = Math.round(endTime - startTime);
+                
+                // Cek jenis error
+                if (error.name === 'AbortError') {
+                    // Timeout
+                    updateNetworkUI(9999, 'offline');
+                    networkLatency.textContent = 'Timeout';
+                    networkStatus.innerHTML = '<span class="network-status network-status-offline">Timeout</span>';
+                } else if (navigator.onLine === false) {
+                    // Offline
+                    updateNetworkUI(9999, 'offline');
+                    networkLatency.textContent = 'Offline';
+                    networkStatus.innerHTML = '<span class="network-status network-status-offline">Offline</span>';
+                } else {
+                    // Error lainnya
+                    updateNetworkUI(9999, 'slow');
+                    networkLatency.textContent = 'Error';
+                    networkStatus.innerHTML = '<span class="network-status network-status-slow">Error</span>';
+                }
+                
+                networkLastChecked.textContent = formattedTime;
+                console.log('Network check error:', error);
+            });
+        }
+
+        // Fungsi untuk update UI network checker
+        function updateNetworkUI(latency, status) {
+            const networkStatusDot = document.getElementById('networkStatusDot');
+            const networkPing = document.getElementById('networkPing');
+            const networkIcon = document.getElementById('networkIcon');
+            
+            // Hapus class loading
+            networkStatusDot.classList.remove('network-loading');
+            networkIcon.classList.remove('network-loading');
+            
+            // Update berdasarkan status
+            switch(status) {
+                case 'online':
+                    networkStatusDot.className = 'network-status-dot online';
+                    networkIcon.className = 'fas fa-wifi network-icon';
                     networkPing.textContent = `${latency}ms`;
                     networkPing.style.color = '#2ecc71';
-                    networkLatency.textContent = `${latency} ms`;
-                    networkStatus.textContent = 'Online Stabil';
-                    networkStatus.classList.add('network-status-online');
-                } else if (latency < 300) {
-                    networkStatusDot.classList.add('slow');
+                    break;
+                    
+                case 'slow':
+                    networkStatusDot.className = 'network-status-dot slow';
+                    networkIcon.className = 'fas fa-wifi network-icon';
                     networkPing.textContent = `${latency}ms`;
                     networkPing.style.color = '#f39c12';
-                    networkLatency.textContent = `${latency} ms`;
-                    networkStatus.textContent = 'Online Lambat';
-                    networkStatus.classList.add('network-status-slow');
-                } else {
-                    networkStatusDot.classList.add('offline');
-                    networkPing.textContent = `${latency}ms`;
+                    break;
+                    
+                case 'offline':
+                    networkStatusDot.className = 'network-status-dot offline';
+                    networkIcon.className = 'fas fa-wifi-slash network-icon';
+                    networkPing.textContent = 'Offline';
                     networkPing.style.color = '#e74c3c';
-                    networkLatency.textContent = `${latency} ms`;
-                    networkStatus.textContent = 'Sangat Lambat';
-                    networkStatus.classList.add('network-status-offline');
-                }
-            } else {
-                networkStatusDot.classList.add('offline');
-                networkPing.textContent = 'Offline';
-                networkPing.style.color = '#e74c3c';
-                networkLatency.textContent = '∞';
-                networkStatus.textContent = 'Offline';
-                networkStatus.classList.add('network-status-offline');
+                    break;
             }
         }
-        
-        // Tampilkan hasil network
-        function showNetworkResult() {
-            networkResult.classList.add('show');
-            networkResultVisible = true;
-            
+
+        // Fungsi untuk pengecekan jaringan berkala (setiap 30 detik)
+        function startPeriodicNetworkCheck() {
+            // Jalankan pengecekan pertama kali
             setTimeout(() => {
-                if (networkResultVisible) {
-                    networkResult.classList.remove('show');
-                    networkResultVisible = false;
-                }
-            }, 5000);
+                checkNetworkStatus();
+            }, 2000);
+            
+            // Jalankan pengecekan berkala setiap 30 detik
+            setInterval(() => {
+                checkNetworkStatus();
+            }, 30000);
         }
-        
-        // Sembunyikan hasil network
-        function hideNetworkResult() {
-            networkResult.classList.remove('show');
-            networkResultVisible = false;
-        }
-        
-        // ========== FUNGSI HALAMAN ==========
-        
-        // Set tampilan untuk halaman utama (Menu Depan)
+
+        // Set tampilan untuk halaman utama
         function setMainPage() {
             isMainPage = true;
             activeCategory = 'memo';
             activeSubcategory = '';
             currentSearchKeyword = '';
             
-            menuItems.forEach(item => {
-                if (item === mainMenuMemo) {
+            document.querySelectorAll('.menu-item').forEach(item => {
+                if (item.id === 'mainMenuMemo') {
                     item.classList.add('active');
                 } else {
                     item.classList.remove('active');
                 }
             });
             
-            submenuItems.forEach(item => {
+            document.querySelectorAll('.submenu-item').forEach(item => {
                 item.classList.remove('active');
             });
             
-            if (isMemoSubmenuExpanded) {
-                memoSubmenu.classList.add('expanded');
-                memoArrow.classList.remove('rotated');
-            } else {
-                memoSubmenu.classList.remove('expanded');
-                memoArrow.classList.add('rotated');
-            }
+            document.getElementById('headerIcon').className = 'fas fa-sticky-note';
+            document.getElementById('pageTitle').textContent = 'MEMO LINE';
+            document.getElementById('pageSubtitle').textContent = 'Sistem Manajemen Memo & Reportan';
             
-            headerIcon.className = 'fas fa-sticky-note';
-            pageTitle.textContent = 'MEMO LINE';
-            pageSubtitle.textContent = 'Database Cloud - Data Tersimpan di Spreadsheet Anda';
-            dataContainer.classList.remove('active');
-            memoForm.style.display = 'block';
-            searchInput.value = '';
-            hideNetworkResult();
+            document.getElementById('dataContainer').classList.remove('active');
+            document.getElementById('memoForm').style.display = 'block';
+            document.getElementById('searchInput').value = '';
+            
+            // Reset edit mode jika aktif
+            if (isEditMode) {
+                toggleEditMode();
+            }
         }
-        
+
         // Set tampilan untuk subkategori memo
         function setMemoSubcategoryPage(subcategory) {
             isMainPage = false;
@@ -2952,7 +2881,7 @@
             activeSubcategory = subcategory;
             currentSearchKeyword = '';
             
-            menuItems.forEach(item => {
+            document.querySelectorAll('.menu-item').forEach(item => {
                 if (item.dataset.category === 'memo') {
                     item.classList.add('active');
                 } else {
@@ -2960,21 +2889,13 @@
                 }
             });
             
-            submenuItems.forEach(item => {
+            document.querySelectorAll('.submenu-item').forEach(item => {
                 if (item.dataset.subcategory === subcategory) {
                     item.classList.add('active');
                 } else {
                     item.classList.remove('active');
                 }
             });
-            
-            if (isMemoSubmenuExpanded) {
-                memoSubmenu.classList.add('expanded');
-                memoArrow.classList.remove('rotated');
-            } else {
-                memoSubmenu.classList.remove('expanded');
-                memoArrow.classList.add('rotated');
-            }
             
             let iconClass = 'fas fa-sticky-note';
             if (subcategory === 'MEMO PEMBAGIAN BONUS') {
@@ -2986,19 +2907,20 @@
             } else if (subcategory === 'MEMO KENDALA SISTEM') {
                 iconClass = 'fas fa-server';
             }
-            headerIcon.className = iconClass;
             
+            document.getElementById('headerIcon').className = iconClass;
             const subcategoryName = subcategory.replace('MEMO ', '');
-            pageTitle.textContent = subcategory;
-            pageSubtitle.textContent = `Data tersimpan untuk ${subcategoryName}`;
-            dataTitle.innerHTML = `<i class="${iconClass}"></i> ${subcategory}`;
-            memoForm.style.display = 'none';
-            dataContainer.classList.add('active');
-            searchInput.value = '';
-            renderSavedData('memo', subcategory, '');
-            hideNetworkResult();
+            document.getElementById('pageTitle').textContent = subcategory;
+            document.getElementById('pageSubtitle').textContent = `Data tersimpan untuk ${subcategoryName}`;
+            document.getElementById('dataTitle').innerHTML = `<i class="${iconClass}"></i> ${subcategory}`;
+            
+            document.getElementById('memoForm').style.display = 'none';
+            document.getElementById('dataContainer').classList.add('active');
+            document.getElementById('searchInput').value = '';
+            
+            loadDataFromSheet(subcategory);
         }
-        
+
         // Set tampilan untuk reportan
         function setReportanPage() {
             isMainPage = false;
@@ -3006,7 +2928,7 @@
             activeSubcategory = '';
             currentSearchKeyword = '';
             
-            menuItems.forEach(item => {
+            document.querySelectorAll('.menu-item').forEach(item => {
                 if (item.dataset.category === 'reportan') {
                     item.classList.add('active');
                 } else {
@@ -3014,254 +2936,261 @@
                 }
             });
             
-            submenuItems.forEach(item => {
+            document.querySelectorAll('.submenu-item').forEach(item => {
                 item.classList.remove('active');
             });
             
-            headerIcon.className = 'fas fa-file-alt';
-            pageTitle.textContent = 'REPORTAN';
-            pageSubtitle.textContent = 'Data reportan yang tersimpan';
-            dataTitle.innerHTML = '<i class="fas fa-file-alt"></i> Data Reportan';
-            memoForm.style.display = 'none';
-            dataContainer.classList.add('active');
-            searchInput.value = '';
-            renderSavedData('reportan', '', '');
-            hideNetworkResult();
+            document.getElementById('headerIcon').className = 'fas fa-file-alt';
+            document.getElementById('pageTitle').textContent = 'REPORTAN';
+            document.getElementById('pageSubtitle').textContent = 'Data reportan yang tersimpan';
+            document.getElementById('dataTitle').innerHTML = '<i class="fas fa-file-alt"></i> Data Reportan';
+            
+            document.getElementById('memoForm').style.display = 'none';
+            document.getElementById('dataContainer').classList.add('active');
+            document.getElementById('searchInput').value = '';
+            
+            document.getElementById('dataGrid').innerHTML = `
+            <div class="empty-data">
+                <i class="fas fa-tools"></i>
+                <h3>Fitur Reportan</h3>
+                <p>Fitur reportan akan segera hadir dalam versi mendatang</p>
+            </div>
+            `;
         }
-        
-        // ========== EVENT LISTENERS ==========
-        
-        // Event Listeners untuk menu item utama (MEMO)
-        mainMenuMemo.addEventListener('click', (e) => {
-            if (e.target.closest('.menu-item-arrow')) {
-                toggleMemoSubmenu();
+
+        // Fungsi untuk toggle minimize sidebar
+        function toggleSidebarMinimize() {
+            const sidebar = document.getElementById('sidebar');
+            const minimizeBtn = document.getElementById('minimizeBtn');
+            
+            isSidebarMinimized = !isSidebarMinimized;
+            
+            if (isSidebarMinimized) {
+                sidebar.classList.add('minimized');
+                minimizeBtn.style.transform = 'rotate(180deg) scale(1.2)';
+                setTimeout(() => {
+                    minimizeBtn.style.transform = 'rotate(180deg) scale(1)';
+                }, 300);
             } else {
-                setMainPage();
-                if (window.innerWidth <= 992) {
-                    sidebar.classList.remove('show');
-                }
+                sidebar.classList.remove('minimized');
+                minimizeBtn.style.transform = 'rotate(0deg) scale(1.2)';
+                setTimeout(() => {
+                    minimizeBtn.style.transform = 'rotate(0deg) scale(1)';
+                }, 300);
             }
-        });
-        
-        // Event Listeners untuk submenu item memo
-        submenuItems.forEach(item => {
-            item.addEventListener('click', () => {
-                const subcategory = item.dataset.subcategory;
-                setMemoSubcategoryPage(subcategory);
+            
+            localStorage.setItem('sidebarMinimized', isSidebarMinimized);
+        }
+
+        // Inisialisasi event listeners
+        function initEventListeners() {
+            // Menu utama MEMO
+            document.getElementById('mainMenuMemo').addEventListener('click', (e) => {
+                if (e.target.closest('.menu-item-arrow')) {
+                    const memoSubmenu = document.getElementById('memoSubmenu');
+                    const memoArrow = document.getElementById('memoArrow');
+                    isMemoSubmenuExpanded = !isMemoSubmenuExpanded;
+                    
+                    if (isMemoSubmenuExpanded) {
+                        memoSubmenu.classList.add('expanded');
+                        memoArrow.classList.remove('rotated');
+                    } else {
+                        memoSubmenu.classList.remove('expanded');
+                        memoArrow.classList.add('rotated');
+                    }
+                } else {
+                    setMainPage();
+                    if (window.innerWidth <= 992) {
+                        document.getElementById('sidebar').classList.remove('show');
+                    }
+                }
+            });
+            
+            // Submenu items
+            document.querySelectorAll('.submenu-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const subcategory = item.dataset.subcategory;
+                    setMemoSubcategoryPage(subcategory);
+                    
+                    if (window.innerWidth <= 992) {
+                        document.getElementById('sidebar').classList.remove('show');
+                    }
+                });
+            });
+            
+            // Menu reportan
+            document.querySelector('.menu-item[data-category="reportan"]').addEventListener('click', () => {
+                setReportanPage();
+                
                 if (window.innerWidth <= 992) {
+                    document.getElementById('sidebar').classList.remove('show');
+                }
+            });
+            
+            // Form memo
+            document.getElementById('memoFormData').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const subcategory = document.getElementById('memoSubcategory').value;
+                const judul = document.getElementById('memoJudul').value.trim();
+                const isi = document.getElementById('memoIsi').value.trim();
+                
+                if (!subcategory) {
+                    showNotification('Silakan pilih subkategori memo!', 'error');
+                    return;
+                }
+                
+                if (!judul || !isi) {
+                    showNotification('Judul dan isi memo harus diisi!', 'error');
+                    return;
+                }
+                
+                const data = {
+                    subcategory: subcategory,
+                    judul: judul,
+                    isi: isi
+                };
+                
+                saveOrUpdateMemo(data);
+            });
+            
+            // Tombol batal edit
+            document.getElementById('cancelEdit').addEventListener('click', () => {
+                cancelEdit();
+            });
+            
+            // Toggle edit mode button
+            document.getElementById('toggleEditMode').addEventListener('click', () => {
+                toggleEditMode();
+            });
+            
+            // Refresh data button
+            document.getElementById('refreshData').addEventListener('click', () => {
+                if (!isMainPage && activeCategory === 'memo' && activeSubcategory) {
+                    loadDataFromSheet(activeSubcategory);
+                    showNotification('Memperbarui data...', 'info');
+                }
+            });
+            
+            // Refresh connection button
+            document.getElementById('refreshConnection').addEventListener('click', () => {
+                testConnection();
+            });
+            
+            // NETWORK CHECKER EVENT LISTENERS
+            const networkChecker = document.getElementById('networkChecker');
+            const networkResult = document.getElementById('networkResult');
+            
+            // Klik pada network checker untuk toggle popup
+            if (networkChecker) {
+                networkChecker.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleNetworkResult();
+                });
+            }
+            
+            // Tutup popup saat klik di luar
+            document.addEventListener('click', (e) => {
+                if (networkResultVisible && 
+                    !networkChecker.contains(e.target) && 
+                    !networkResult.contains(e.target)) {
+                    networkResult.classList.remove('show');
+                    networkResultVisible = false;
+                }
+            });
+            
+            // Mencegah popup tertutup saat klik di dalam popup
+            if (networkResult) {
+                networkResult.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                });
+            }
+            
+            // Modal edit event listeners
+            document.getElementById('editFormData').addEventListener('submit', saveEditChanges);
+            document.getElementById('cancelEditModal').addEventListener('click', closeEditModal);
+            
+            // Tutup modal saat klik di luar konten modal
+            document.getElementById('editModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeEditModal();
+                }
+            });
+            
+            // Search input
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                currentSearchKeyword = e.target.value.trim();
+                
+                if (!isMainPage && activeCategory === 'memo' && activeSubcategory) {
+                    renderDataFromCache(activeSubcategory, currentSearchKeyword);
+                }
+            });
+            
+            // Clear search button
+            document.getElementById('clearSearch').addEventListener('click', () => {
+                document.getElementById('searchInput').value = '';
+                currentSearchKeyword = '';
+                
+                if (!isMainPage && activeCategory === 'memo' && activeSubcategory) {
+                    renderDataFromCache(activeSubcategory, '');
+                }
+            });
+            
+            // Toggle sidebar di mobile
+            document.getElementById('toggleSidebar').addEventListener('click', () => {
+                document.getElementById('sidebar').classList.toggle('show');
+            });
+            
+            // Minimize sidebar
+            document.getElementById('minimizeBtn').addEventListener('click', () => {
+                toggleSidebarMinimize();
+            });
+            
+            // Tutup sidebar saat klik di luar pada mobile
+            document.addEventListener('click', (e) => {
+                const sidebar = document.getElementById('sidebar');
+                const toggleSidebarBtn = document.getElementById('toggleSidebar');
+                
+                if (window.innerWidth <= 992 && 
+                    !sidebar.contains(e.target) && 
+                    e.target !== toggleSidebarBtn && 
+                    !toggleSidebarBtn.contains(e.target)) {
                     sidebar.classList.remove('show');
                 }
             });
-        });
-        
-        // Event Listener untuk menu reportan
-        menuItems.forEach(item => {
-            if (item.dataset.category === 'reportan') {
-                item.addEventListener('click', () => {
-                    setReportanPage();
-                    if (window.innerWidth <= 992) {
-                        sidebar.classList.remove('show');
-                    }
-                });
-            }
-        });
-        
-        // Event Listener untuk form memo
-        memoFormData.addEventListener('submit', async (e) => {
-            e.preventDefault();
+        }
+
+        // Inisialisasi
+        function init() {
+            console.log('Aplikasi Memo diinisialisasi');
             
-            const subcategory = memoSubcategorySelect.value;
-            const judul = memoJudulInput.value.trim();
-            const isi = memoIsiInput.value.trim();
-            
-            if (!subcategory) {
-                showNotification('Silakan pilih subkategori memo!', 'error');
-                return;
-            }
-            
-            if (!judul || !isi) {
-                showNotification('Judul dan isi memo harus diisi!', 'error');
-                return;
-            }
-            
-            const data = {
-                category: 'memo',
-                subcategory: subcategory,
-                judul: judul,
-                isi: isi
-            };
-            
-            const result = await saveDataToSheets(data);
-            if (result && !result.error) {
-                resetForm();
-            }
-        });
-        
-        // Event Listener untuk hapus semua data
-        clearDataBtn.addEventListener('click', () => {
-            clearAllData();
-        });
-        
-        // Event Listener untuk refresh data
-        refreshDataBtn.addEventListener('click', async () => {
-            showNotification('Memperbarui data dari Spreadsheet...', 'info');
-            await fetchDataFromSheets();
-            
-            if (!isMainPage) {
-                if (activeCategory === 'memo' && activeSubcategory) {
-                    renderSavedData('memo', activeSubcategory, currentSearchKeyword);
-                } else if (activeCategory === 'reportan') {
-                    renderSavedData('reportan', '', currentSearchKeyword);
-                }
-            }
-            
-            showNotification('Data berhasil diperbarui', 'success');
-        });
-        
-        // Event Listener untuk pencarian
-        searchInput.addEventListener('input', (e) => {
-            currentSearchKeyword = e.target.value.trim();
-            
-            if (!isMainPage) {
-                if (activeCategory === 'memo' && activeSubcategory) {
-                    renderSavedData('memo', activeSubcategory, currentSearchKeyword);
-                } else if (activeCategory === 'reportan') {
-                    renderSavedData('reportan', '', currentSearchKeyword);
-                }
-            }
-        });
-        
-        // Event Listener untuk hapus pencarian
-        clearSearchBtn.addEventListener('click', () => {
-            searchInput.value = '';
-            currentSearchKeyword = '';
-            
-            if (!isMainPage) {
-                if (activeCategory === 'memo' && activeSubcategory) {
-                    renderSavedData('memo', activeSubcategory, '');
-                } else if (activeCategory === 'reportan') {
-                    renderSavedData('reportan', '', '');
-                }
-            }
-        });
-        
-        // Event Listener untuk network checker
-        networkChecker.addEventListener('click', () => {
-            performNetworkTest();
-        });
-        
-        // Event listener untuk menyembunyikan hasil network saat klik di luar
-        document.addEventListener('click', (e) => {
-            if (!networkChecker.contains(e.target) && !networkResult.contains(e.target)) {
-                hideNetworkResult();
-            }
-        });
-        
-        // Event Listener untuk toggle sidebar di mobile
-        toggleSidebarBtn.addEventListener('click', () => {
-            sidebar.classList.toggle('show');
-        });
-        
-        // Event Listener untuk minimize sidebar
-        minimizeBtn.addEventListener('click', () => {
-            toggleSidebarMinimize();
-        });
-        
-        // Event Listener untuk lihat spreadsheet
-        viewSpreadsheetBtn.addEventListener('click', () => {
-            window.open(`https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/edit`, '_blank');
-        });
-        
-        // Tutup sidebar saat klik di luar pada mobile
-        document.addEventListener('click', (e) => {
-            if (window.innerWidth <= 992 && 
-                !sidebar.contains(e.target) && 
-                e.target !== toggleSidebarBtn && 
-                !toggleSidebarBtn.contains(e.target)) {
-                sidebar.classList.remove('show');
-            }
-        });
-        
-        // ========== INISIALISASI ==========
-        
-        async function init() {
-            // Set status minimize sidebar dari localStorage
             if (isSidebarMinimized) {
-                sidebar.classList.add('minimized');
+                document.getElementById('sidebar').classList.add('minimized');
             }
             
-            // Set halaman utama saat pertama kali dibuka
             setMainPage();
+            initEventListeners();
             
-            // Perbarui tanggal dan jam
             updateDateDisplay();
             updateClock();
             
-            // Update jam setiap detik
             setInterval(updateClock, 1000);
+            setInterval(updateDateDisplay, 60000);
             
-            // Load data dari Google Sheets
-            showNotification('Memulai koneksi ke Spreadsheet...', 'info');
+            // Mulai pengecekan jaringan berkala
+            startPeriodicNetworkCheck();
             
-            // Coba koneksi terlebih dahulu
-            try {
-                // Test koneksi cepat
-                const testResponse = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}?key=${API_KEY}&fields=spreadsheetId`, {
-                    method: 'HEAD',
-                    cache: 'no-cache'
-                });
-                
-                if (testResponse.ok) {
-                    updateApiStatus(true, 'Terhubung ke Spreadsheet...');
-                    await fetchDataFromSheets();
-                } else {
-                    throw new Error('Test connection failed');
-                }
-            } catch (error) {
-                console.log('Test connection failed, trying with full fetch...');
-                await fetchDataFromSheets();
-            }
-            
-            // Update counters
-            updateCounters();
-            
-            // Lakukan tes network otomatis
             setTimeout(() => {
-                performNetworkTest();
+                testConnection();
             }, 1000);
             
-            // Jadwalkan tes network otomatis setiap 2 menit
             setInterval(() => {
-                performNetworkTest();
-            }, 120000);
-            
-            // Perbarui tanggal setiap menit
-            setInterval(() => {
-                updateDateDisplay();
-            }, 60000);
-            
-            // Coba reconnect setiap 5 menit jika offline
-            setInterval(async () => {
-                if (!apiStatus.classList.contains('online')) {
-                    console.log('Mencoba reconnect...');
-                    await fetchDataFromSheets();
-                }
-            }, 300000);
+                updateSheetCounts();
+            }, 30000);
         }
-        
-        // Jalankan inisialisasi saat halaman dimuat
+
+        // Jalankan inisialisasi saat halaman siap
         document.addEventListener('DOMContentLoaded', init);
-        
-        // Tambahkan event listener untuk online/offline detection
-        window.addEventListener('online', async () => {
-            showNotification('Koneksi internet kembali', 'success');
-            await fetchDataFromSheets();
-        });
-        
-        window.addEventListener('offline', () => {
-            updateApiStatus(false, 'Tidak ada koneksi internet');
-            showNotification('Koneksi internet terputus', 'error');
-        });
     </script>
 </body>
 </html>
