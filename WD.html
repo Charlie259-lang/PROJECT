@@ -570,14 +570,10 @@ KIRIM KE USER"></textarea>
 <div class="common-panel">
 <div class="extract-h-title">📤 EXTRACT 100 DATA WITHDRAW (HORIZONTAL)</div>
 <textarea id="bulkExtractInput" class="extract-h-input" placeholder="Tempel data. Setiap entri dimulai dengan angka. Contoh:
-1
-Withdraw
-G2
-BRI, 486001013589536, MOCHAMMAD BAHA UDIN MAKY
-2
-Withdraw
+3		45454545
+Withdraw	2026-01-10 13:43:31	370,000 	215.50
 G13
-DANA, 085784480822, Edi hariyanto"></textarea>
+DANA, 081367683555, fimi"></textarea>
 <div class="extract-h-buttons">
 <button class="neon-btn" onclick="clearBulkExtract()">
 <i>🗑️</i> Hapus Semua
@@ -900,10 +896,10 @@ document.getElementById('hasilDepoWd').innerHTML = html;
 
 // === EXTRACTOR LOGIC ===
 const E_WALLET_CODES = {
-DANA': '3901',
-OVO': '39358',
-LINKAJA': '09110',
-GOPAY': '70001'
+'DANA': '3901',
+'OVO': '39358',
+'LINKAJA': '09110',
+'GOPAY': '70001'
 };
 
 function clearBulkExtract() {
@@ -933,7 +929,6 @@ showToast("❌ Gagal menyalin ke clipboard.", "error");
 });
 }
 
-// === PERBAIKAN BUG: Fungsi splitIntoBlocks tetap seperti semula ===
 function splitIntoBlocks(text) {
 const lines = text.split('\n').map(l => l.trim()).filter(l => l !== '');
 const blocks = [];
@@ -955,128 +950,126 @@ blocks.push(currentBlock);
 return blocks;
 }
 
-// === PERBAIKAN BUG: Fungsi parseSingleWithdrawBlock yang diperbaiki ===
+// === PERBAIKAN BUG: Fungsi parseSingleWithdrawBlock untuk ekstraksi data sesuai format baru ===
 function parseSingleWithdrawBlock(lines) {
-const fullText = lines.join(' ').toUpperCase();
-let username = '', nominal = '', account = '', name = '';
-
-// 1. Ekstraksi username dari baris pertama setelah nomor urut
-// Cari baris yang mungkin berisi username (biasanya baris ke-1 atau ke-2 setelah baris pertama)
-for (let i = 1; i < Math.min(3, lines.length); i++) {
-const line = lines[i].trim();
-// Jika baris ini mengandung kata "Withdraw", lewati
-if (line.toUpperCase().includes('WITHDRAW')) continue;
-
-// Ambil sebagai username (bisa berupa angka atau huruf)
-username = line;
-break;
-}
-
-// 2. Cari nominal dengan pola yang lebih spesifik, hindari mengambil dari username
-// Pola untuk nominal: Rp diikuti angka, atau angka dengan pemisah ribuan
-const nominalPatterns = [
-/Rp\.?\s*[\d,.]+\b/i,  // Rp 100.000 atau Rp.100.000
-/\b\d{1,3}(?:\.\d{3})+(?:,\d{2})?\b/,  // 1.000.000,00
-/\b\d{1,3}(?:,\d{3})+(?:\.\d{2})?\b/,  // 1,000,000.00
-/\b\d{4,}\b/  // Angka dengan 4 digit atau lebih (tapi bukan nomor telepon)
-];
-
-// Cari nominal di semua baris kecuali baris pertama (nomor urut) dan baris username
-for (let i = 0; i < lines.length; i++) {
-const line = lines[i].trim();
-
-// Lewati baris yang kemungkinan berisi username
-if (line === username) continue;
-
-// Coba setiap pola
-for (const pattern of nominalPatterns) {
-const match = line.match(pattern);
-if (match) {
-const numStr = match[0].replace(/[^\d]/g, '');
-// Validasi: pastikan ini benar-benar nominal (bukan nomor telepon/ID pendek)
-if (numStr.length >= 4 && parseInt(numStr) > 1000) {
-nominal = match[0].trim();
-break;
-}
-}
-}
-if (nominal) break;
-}
-
-// 3. Jika nominal tidak ditemukan, coba cari pola angka yang mengandung titik atau koma
-if (!nominal) {
-const numRegex = /[\d.,]{5,}/;
-for (let i = 0; i < lines.length; i++) {
-const line = lines[i];
-if (line === username) continue;
-
-const m = line.match(numRegex);
-if (m) {
-const numStr = m[0].replace(/[^\d]/g, '');
-if (numStr.length >= 4) {
-nominal = m[0].replace(/\./g, '').replace(/,/g, ',');
-break;
-}
-}
-}
-}
-
-// 4. Ekstraksi informasi bank/ewallet (sama seperti sebelumnya)
-let isEWallet = false;
-let eWalletType = '';
-let extractedNumber = '';
-
-for (let i = lines.length - 1; i >= 0; i--) {
-const line = lines[i].trim();
-if (!line) continue;
-
-// Deteksi e-wallet
-const ewalletKeywords = ['DANA', 'OVO', 'LINKAJA', 'GOPAY'];
-for (const keyword of ewalletKeywords) {
-if (line.toUpperCase().includes(keyword)) {
-isEWallet = true;
-eWalletType = keyword;
-
-const parts = line.split(',').map(p => p.trim());
-if (parts.length >= 2) {
-extractedNumber = parts[1].replace(/\D/g, '');
-if (parts.length >= 3) {
-name = parts[2].toUpperCase();
-}
-}
-break;
-}
-}
-if (isEWallet) break;
-
-// Deteksi bank konvensional
-if (line.includes(',') && !line.toUpperCase().includes('WITHDRAW')) {
-const parts = line.split(',').map(p => p.trim());
-if (parts.length >= 3) {
-account = parts[1].replace(/\D/g, '');
-name = parts[2].toUpperCase();
-} else if (parts.length === 2) {
-account = parts[0].replace(/\D/g, '');
-name = parts[1].toUpperCase();
-}
-break;
-}
-}
-
-let finalAccount = '–';
-if (isEWallet && extractedNumber) {
-const code = E_WALLET_CODES[eWalletType] || '';
-finalAccount = code + extractedNumber;
-} else if (account) {
-finalAccount = account;
-}
-
-return {
-account: finalAccount,
-username: username || '–',
-name: name || '–',
-nominal: nominal || '–'
-};
+    // Bersihkan baris dari spasi yang tidak perlu
+    lines = lines.map(l => l.trim()).filter(l => l !== '');
+    
+    let account = '–';     // Kolom 1: Nomor Rekening
+    let username = '–';    // Kolom 2: User ID
+    let name = '–';        // Kolom 3: Nama Rekening
+    let nominal = '–';     // Kolom 4: Nominal
+    
+    // === 1. CARI USER ID (Kolom 2) ===
+    // User ID biasanya di baris kedua setelah nomor urut
+    // Format: "3		45454545" atau "3\t\t45454545"
+    if (lines.length > 0) {
+        const firstLine = lines[0];
+        // Cek apakah baris pertama mengandung tab dan ada teks setelah tab
+        if (firstLine.includes('\t')) {
+            const parts = firstLine.split('\t').filter(p => p.trim() !== '');
+            if (parts.length >= 2) {
+                // Bagian pertama adalah nomor urut, bagian kedua adalah User ID
+                username = parts[1].trim();
+            }
+        } else {
+            // Jika tidak ada tab, coba split berdasarkan spasi
+            const parts = firstLine.split(/\s+/);
+            if (parts.length >= 2) {
+                username = parts[1].trim();
+            }
+        }
+    }
+    
+    // === 2. CARI NOMINAL (Kolom 4) ===
+    // Cari baris yang mengandung "Withdraw"
+    for (let i = 0; i < lines.length; i++) {
+        if (lines[i].toUpperCase().includes('WITHDRAW')) {
+            const withdrawLine = lines[i];
+            // Split berdasarkan tab untuk mendapatkan kolom
+            const parts = withdrawLine.split('\t').filter(p => p.trim() !== '');
+            
+            // Format: "Withdraw\t2026-01-10 13:43:31\t370,000 \t215.50"
+            // Kolom: 0=Withdraw, 1=tanggal, 2=nominal, 3=biaya admin
+            if (parts.length >= 3) {
+                // Ambil kolom ke-3 sebagai nominal (indeks 2)
+                nominal = parts[2].trim();
+                // Hapus spasi berlebih dan pastikan format konsisten
+                nominal = nominal.replace(/\s+/g, '');
+            }
+            break;
+        }
+    }
+    
+    // === 3. CARI INFORMASI REKENING (Kolom 1 & 3) ===
+    // Cari baris yang mengandung koma (untuk info rekening/bank)
+    for (let i = lines.length - 1; i >= 0; i--) {
+        const line = lines[i];
+        if (line.includes(',')) {
+            // Format: "DANA, 081367683555, fimi"
+            const parts = line.split(',').map(p => p.trim());
+            
+            // === Kolom 3: NAMA REKENING ===
+            if (parts.length >= 3) {
+                name = parts[2].toUpperCase();
+            } else if (parts.length === 2) {
+                name = parts[1].toUpperCase();
+            }
+            
+            // === Kolom 1: NOMOR REKENING ===
+            const bankType = parts[0].toUpperCase();
+            let accountNumber = '';
+            
+            // Cari nomor rekening/telepon
+            if (parts.length >= 2) {
+                accountNumber = parts[1].replace(/\D/g, ''); // Hanya angka
+            }
+            
+            // Untuk e-wallet, gabungkan kode dengan nomor
+            if (E_WALLET_CODES.hasOwnProperty(bankType)) {
+                account = E_WALLET_CODES[bankType] + accountNumber;
+            } else {
+                // Untuk bank biasa, gunakan nomor rekening
+                account = accountNumber || '–';
+            }
+            break;
+        }
+    }
+    
+    // === FALLBACK: Jika tidak menemukan info rekening, coba cari pola lain ===
+    if (account === '–') {
+        // Coba cari baris yang mengandung nomor telepon/rekening panjang
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            // Cari pola nomor telepon (10-13 digit) atau nomor rekening
+            const phoneMatch = line.match(/\b\d{10,13}\b/);
+            if (phoneMatch) {
+                account = phoneMatch[0];
+                break;
+            }
+        }
+    }
+    
+    // === VALIDASI AKHIR ===
+    // Pastikan nominal dalam format yang benar
+    if (nominal !== '–') {
+        // Hapus karakter non-digit kecuali koma dan titik
+        nominal = nominal.replace(/[^\d,.]/g, '');
+        // Jika tidak mengandung koma, tambahkan pemisah ribuan jika panjang > 3
+        if (!nominal.includes(',') && !nominal.includes('.')) {
+            const num = parseInt(nominal.replace(/\D/g, ''));
+            if (!isNaN(num) && num > 0) {
+                nominal = formatRupiah(num);
+            }
+        }
+    }
+    
+    return {
+        account: account || '–',
+        username: username || '–',
+        name: name || '–',
+        nominal: nominal || '–'
+    };
 }
 
 function processBulkExtract() {
@@ -1096,13 +1089,13 @@ const data = parseSingleWithdrawBlock(block);
 const card = document.createElement('div');
 card.className = 'extract-h-card';
 card.innerHTML = `
-<div class="label">Kolom 1</div>
+<div class="label">Kolom 1 (Rekening)</div>
 <div class="value">${data.account}</div>
-<div class="label">Kolom 2</div>
+<div class="label">Kolom 2 (User ID)</div>
 <div class="value">${data.username}</div>
-<div class="label">Kolom 3</div>
+<div class="label">Kolom 3 (Nama)</div>
 <div class="value">${data.name}</div>
-<div class="label">Kolom 4</div>
+<div class="label">Kolom 4 (Nominal)</div>
 <div class="value">${data.nominal}</div>
 `;
 container.appendChild(card);
