@@ -911,28 +911,197 @@ document.getElementById('bulkExtractInput').value = '';
 document.getElementById('bulkResultsContainer').innerHTML = '';
 }
 
+// === PERBAIKAN FUNGSI COPY ===
 function copyBulkExtracted() {
-const container = document.getElementById('bulkResultsContainer');
-if (!container.children.length) {
-showToast("⚠️ Tidak ada data untuk disalin!", "warning");
-return;
+    const container = document.getElementById('bulkResultsContainer');
+    if (!container || !container.children.length) {
+        showToast("⚠️ Tidak ada data untuk disalin!", "warning");
+        return;
+    }
+
+    const items = Array.from(container.querySelectorAll('.extract-h-card'));
+    let text = '';
+    
+    items.forEach(card => {
+        const vals = card.querySelectorAll('.value');
+        if (vals.length >= 4) {
+            // Format: Kolom1[TAB]Kolom2[TAB]Kolom3[TAB]Kolom4
+            text += `${vals[0].textContent.trim()}\t${vals[1].textContent.trim()}\t${vals[2].textContent.trim()}\t${vals[3].textContent.trim()}\n`;
+        }
+    });
+    
+    const textToCopy = text.trim();
+    
+    if (!textToCopy) {
+        showToast("⚠️ Tidak ada data valid untuk disalin!", "warning");
+        return;
+    }
+    
+    // Gunakan Clipboard API modern dengan fallback
+    if (navigator.clipboard && window.isSecureContext) {
+        // Untuk HTTPS/localhost
+        navigator.clipboard.writeText(textToCopy)
+            .then(() => {
+                showToast("✅ Data berhasil disalin ke clipboard!", "success");
+            })
+            .catch(err => {
+                // Fallback ke metode lama jika Clipboard API gagal
+                console.error('Clipboard API failed:', err);
+                copyUsingTextarea(textToCopy);
+            });
+    } else {
+        // Untuk HTTP atau browser lama
+        copyUsingTextarea(textToCopy);
+    }
 }
 
-const items = Array.from(container.querySelectorAll('.extract-h-card'));
-let text = '';
-items.forEach(card => {
-const vals = card.querySelectorAll('.value');
-if (vals.length >= 4) {
-text += `${vals[0].textContent.trim()}\t${vals[1].textContent.trim()}\t${vals[2].textContent.trim()}\t${vals[3].textContent.trim()}\n`;
-}
-});
-navigator.clipboard.writeText(text.trim()).then(() => {
-showToast("✅ Data berhasil disalin!", "success");
-}, () => {
-showToast("❌ Gagal menyalin ke clipboard.", "error");
-});
+// Fungsi fallback menggunakan textarea
+function copyUsingTextarea(text) {
+    try {
+        // Buat elemen textarea sementara
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.left = '-999999px';
+        textarea.style.top = '-999999px';
+        document.body.appendChild(textarea);
+        
+        // Pilih teks
+        textarea.select();
+        textarea.setSelectionRange(0, 99999); // Untuk mobile
+        
+        // Salin menggunakan execCommand
+        const successful = document.execCommand('copy');
+        
+        // Hapus textarea
+        document.body.removeChild(textarea);
+        
+        if (successful) {
+            showToast("✅ Data berhasil disalin ke clipboard!", "success");
+        } else {
+            showToast("❌ Gagal menyalin ke clipboard. Coba salin manual.", "error");
+        }
+    } catch (err) {
+        console.error('Fallback copy failed:', err);
+        showToast("❌ Gagal menyalin ke clipboard.", "error");
+        
+        // Alternatif: tampilkan data untuk copy manual
+        showCopyManualOption(text);
+    }
 }
 
+// Alternatif: tampilkan modal untuk copy manual
+function showCopyManualOption(text) {
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10001;
+    `;
+    
+    const modalContent = document.createElement('div');
+    modalContent.style.cssText = `
+        background: var(--panel-bg);
+        border: 2px solid var(--neon-blue);
+        border-radius: 10px;
+        padding: 20px;
+        max-width: 500px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+    `;
+    
+    modalContent.innerHTML = `
+        <h3 style="color: var(--neon-blue); margin-bottom: 10px;">📋 Salin Data Manual</h3>
+        <p style="color: var(--text-main); margin-bottom: 15px;">
+            Clipboard tidak dapat diakses. Silakan salin teks di bawah ini secara manual:
+        </p>
+        <textarea id="manualCopyText" style="
+            width: 100%;
+            height: 200px;
+            background: rgba(0,5,15,0.9);
+            color: var(--text-main);
+            border: 1px solid var(--neon-blue);
+            border-radius: 6px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            resize: vertical;
+            margin-bottom: 15px;
+        ">${text}</textarea>
+        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+            <button onclick="this.closest('.modal-parent').remove()" 
+                style="
+                    padding: 8px 16px;
+                    background: transparent;
+                    border: 1px solid var(--neon-red);
+                    color: var(--neon-red);
+                    border-radius: 6px;
+                    cursor: pointer;
+                ">
+                Tutup
+            </button>
+            <button onclick="copyManualText()" 
+                style="
+                    padding: 8px 16px;
+                    background: rgba(0, 255, 255, 0.1);
+                    border: 1px solid var(--neon-blue);
+                    color: var(--neon-blue);
+                    border-radius: 6px;
+                    cursor: pointer;
+                ">
+                Coba Salin Lagi
+            </button>
+        </div>
+    `;
+    
+    modal.appendChild(modalContent);
+    modal.classList.add('modal-parent');
+    document.body.appendChild(modal);
+    
+    // Fokus ke textarea dan pilih semua teks
+    setTimeout(() => {
+        const textarea = modal.querySelector('#manualCopyText');
+        if (textarea) {
+            textarea.select();
+            textarea.focus();
+        }
+    }, 100);
+}
+
+// Fungsi untuk mencoba salin lagi dari modal
+function copyManualText() {
+    const textarea = document.querySelector('#manualCopyText');
+    if (!textarea) return;
+    
+    const text = textarea.value;
+    
+    try {
+        // Coba dengan metode textarea
+        textarea.select();
+        textarea.setSelectionRange(0, 99999);
+        
+        if (document.execCommand('copy')) {
+            showToast("✅ Berhasil disalin dari modal!", "success");
+            // Tutup modal setelah beberapa detik
+            setTimeout(() => {
+                const modal = document.querySelector('.modal-parent');
+                if (modal) modal.remove();
+            }, 1500);
+        } else {
+            showToast("⚠️ Pilih dan salin manual dari textarea", "warning");
+        }
+    } catch (err) {
+        showToast("❌ Gagal menyalin. Salin manual dengan Ctrl+C", "error");
+    }
+    
 // === PERBAIKAN BUG: Fungsi splitIntoBlocks tetap seperti semula ===
 function splitIntoBlocks(text) {
 const lines = text.split('\n').map(l => l.trim()).filter(l => l !== '');
@@ -1353,3 +1522,4 @@ showToast("✅ Sistem siap digunakan!", "success");
 </script>
 </body>
 </html>
+
