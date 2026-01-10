@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Multi-Tool Analyzer — Neon</title>
+<style>
+* {
+box-sizing: border-box;
+margin: 0;
+padding: 0;
+}
+
+body {
+background-image: url('https://linetogel.hokibgs.com/uploads/photos/linetogel/6853e648ad2ee.jpg');
+background-color: #0a0f1d;
+background-size: cover;
+background-position: center;
+background-attachment: fixed;
+color: #e0f0ff;
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+padding: 10px;
+line-height: 1.3;
+min-height: 100vh;
+position: relative;
+}
+
+body::before {
+content: "";
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: rgba(0, 0, 0, 0.65);
+z-index: -1;
+}
+
+:root {
+--neon-blue: #00ffff;
+--neon-green: #66ff66;
+--neon-yellow: #ffff00;
+--neon-red: #ff5555;
+--panel-bg: rgba(0, 10, 20, 0.75);
+--panel-border: rgba(0, 200, 255, 0.5);
+--panel-shadow: rgba(0, 255, 255, 0.4);
+--text-main: #b0f0ff;
+--text-title: #e0f0ff;
+}
+
+/* === NEON TEXT UNTUK JUDUL === */
+h1,
+.section-title,
+.col-title,
+.card-header,
+.total-label,
+.total-value,
+.nominal,
+.extract-h-title,
+.label,
+.mode-text,
+.toggle-label {
+color: var(--neon-blue) !important;
+font-weight: bold !important;
+text-shadow: 0 0 10px rgba(0, 255, 255, 0.9) !important;
+}
+
+/* === TEKS UTAMA === */
+.entry-item,
+.withdraw-note,
+.summary-box,
+.extract-h-card,
+.value,
+textarea,
+.tab-btn {
+color: var(--text-main) !important;
+}
+
+.deposit-color { color: var(--neon-blue); }
+.withdraw-color { color: var(--neon-yellow); }
+
+/* === ANIMASI SELISIH === */
+.selisih-besar {
+font-size: 16px;
+font-weight: bold;
+text-align: center;
+padding: 6px 0 4px;
+margin: 10px 0 4px;
+animation: neonBlink 1.6s infinite;
+text-shadow: 0 0 12px currentColor;
+}
+
+.selisih-jumlah {
+font-size: 18px;
+font-weight: bold;
+text-align: center;
+margin-bottom: 10px;
+text-shadow: 0 0 10px currentColor;
+}
+
+.selisih-cocok { color: var(--neon-green); }
+.selisih-lebih { color: var(--neon-yellow); }
+.selisih-kurang { color: var(--neon-red); }
+
+@keyframes neonBlink {
+0%, 100% { opacity: 1; text-shadow: 0 0 12px currentColor; }
+50% { opacity: 0.4; text-shadow: 0 0 6px currentColor; }
+}
+
+h1 {
+text-align: center;
+margin: 6px 0 12px;
+font-size: 24px;
+letter-spacing: 1px;
+text-shadow: 0 0 14px var(--neon-blue);
+}
+
+/* === PANEL UMUM === */
+.common-panel {
+max-width: 1100px;
+margin: 0 auto 20px;
+background: var(--panel-bg);
+border: 1px solid var(--panel-border);
+border-radius: 8px;
+padding: 15px;
+box-shadow: 0 0 8px var(--panel-shadow);
+}
+
+/* === BUTTON NEON === */
+.neon-btn {
+display: inline-flex;
+align-items: center;
+gap: 6px;
+padding: 8px 16px;
+border: 2px solid var(--neon-blue);
+background: transparent;
+color: var(--neon-blue);
+border-radius: 12px;
+font-weight: bold;
+cursor: pointer;
+font-size: 12px;
+transition: all 0.25s ease;
+text-shadow: 0 0 6px rgba(0, 255, 255, 0.8);
+box-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
+}
+
+.neon-btn:hover {
+background: rgba(0, 255, 255, 0.15);
+box-shadow: 0 0 16px rgba(0, 255, 255, 0.9);
+transform: translateY(-2px);
+}
+
+textarea {
+width: 100%;
+height: 140px;
+background: rgba(0, 5, 15, 0.9);
+color: var(--text-main);
+border: 1px solid var(--neon-blue);
+border-radius: 6px;
+padding: 8px;
+font-family: 'Consolas', monospace;
+font-size: 11px;
+resize: vertical;
+outline: none;
+}
+
+textarea:focus {
+border-color: var(--neon-blue);
+box-shadow: 0 0 12px rgba(0, 255, 255, 0.8);
+}
+
+.buttons {
+display: flex;
+gap: 10px;
+margin-top: 10px;
+flex-wrap: wrap;
+}
+
+/* === INPUT SECTION (2 Kolom) === */
+.input-section {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 16px;
+}
+
+@media (max-width: 768px) {
+.input-section {
+grid-template-columns: 1fr;
+}
+}
+
+.section {
+background: var(--panel-bg);
+border: 1px solid var(--panel-border);
+border-radius: 8px;
+padding: 12px;
+box-shadow: 0 0 8px var(--panel-shadow);
+}
+
+/* === CARD === */
+.user-card, .bank-card {
+background: rgba(0, 10, 20, 0.85);
+border-radius: 10px;
+margin-bottom: 14px;
+overflow: hidden;
+box-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+border: 2px solid var(--neon-blue);
+position: relative;
+min-width: 300px;
+resize: both;
+overflow: auto;
+max-width: 100%;
+max-height: 500px;
+}
+
+.card-header {
+padding: 10px;
+font-size: 14px;
+background: rgba(0, 30, 60, 0.6);
+border-bottom: 1px solid rgba(0, 200, 255, 0.4);
+}
+
+.card-body {
+display: flex;
+flex-wrap: wrap;
+padding: 10px;
+gap: 12px;
+}
+
+.col {
+flex: 1;
+min-width: 160px;
+display: flex;
+flex-direction: column;
+}
+
+.col-title {
+display: flex;
+justify-content: space-between;
+font-size: 13px;
+margin-bottom: 6px;
+padding-bottom: 3px;
+border-bottom: 1px solid rgba(0, 200, 255, 0.5);
+}
+
+.entry-list {
+list-style: none;
+max-height: 80px;
+overflow-y: auto;
+font-size: 11px;
+}
+
+.entry-item {
+background: rgba(0, 20, 40, 0.7);
+padding: 5px;
+margin-bottom: 4px;
+border-radius: 4px;
+border: 1px solid rgba(0, 180, 255, 0.1);
+}
+
+.entry-item.empty {
+color: #555;
+font-style: italic;
+text-align: center;
+font-size: 9px;
+}
+
+.nominal {
+font-size: 11px;
+}
+
+.withdraw-note {
+margin-top: 1px;
+font-size: 8px;
+padding-left: 2px;
+border-left: 1px solid #4caf50;
+}
+
+.total-row {
+display: flex;
+justify-content: space-between;
+margin-top: 6px;
+padding-top: 6px;
+border-top: 1px dashed rgba(0, 180, 255, 0.4);
+}
+
+.total-label {
+font-size: 12px;
+}
+
+.total-value {
+font-family: 'Consolas', monospace;
+font-size: 13px;
+}
+
+/* === MODE TOGGLE === */
+.mode-toggle {
+text-align: center;
+background: var(--panel-bg);
+padding: 10px;
+border-radius: 8px;
+border: 1px solid var(--panel-border);
+margin-bottom: 16px;
+}
+
+.switch {
+position: relative;
+display: inline-block;
+width: 56px;
+height: 28px;
+}
+
+.switch input { opacity: 0; width: 0; height: 0; }
+
+.slider {
+position: absolute;
+cursor: pointer;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background-color: #001122;
+transition: .3s;
+border-radius: 34px;
+border: 2px solid var(--neon-blue);
+}
+
+.slider:before {
+position: absolute;
+content: "";
+height: 20px;
+width: 20px;
+left: 3px;
+bottom: 3px;
+background-color: var(--neon-blue);
+transition: .3s;
+border-radius: 50%;
+}
+
+input:checked + .slider {
+background-color: transparent;
+}
+
+input:checked + .slider:before {
+transform: translateX(28px);
+background-color: var(--neon-green);
+}
+
+/* === TAB SWITCH DI KANAN === */
+.tab-switch {
+position: fixed;
+top: 12px;
+right: 12px;
+z-index: 1000;
+display: flex;
+gap: 6px;
+}
+
+.tab-btn {
+padding: 6px 12px;
+background: rgba(0, 10, 20, 0.7);
+border: 1px solid var(--neon-blue);
+color: var(--neon-blue);
+border-radius: 20px;
+font-size: 11px;
+font-weight: bold;
+cursor: pointer;
+transition: all 0.2s;
+text-shadow: 0 0 6px rgba(0, 255, 255, 0.7);
+}
+
+.tab-btn.active {
+background: rgba(0, 255, 255, 0.15);
+box-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
+}
+
+.tab-btn:not(.active):hover {
+background: rgba(0, 50, 80, 0.6);
+}
+
+.tab-btn[data-tab="trycari"] {
+color: var(--neon-yellow);
+border-color: var(--neon-yellow);
+text-shadow: 0 0 6px rgba(255, 255, 0, 0.7);
+}
+.tab-btn[data-tab="trycari"].active {
+background: rgba(255, 255, 0, 0.1);
+box-shadow: 0 0 10px rgba(255, 255, 0, 0.6);
+}
+
+/* === EXTRACTOR HORIZONTAL === */
+.extract-h-input {
+height: 100px !important;
+margin-bottom: 12px;
+}
+
+.extract-h-buttons {
+display: flex;
+gap: 10px;
+margin-bottom: 14px;
+flex-wrap: wrap;
+}
+
+.extract-h-container {
+display: flex;
+gap: 10px;
+overflow-x: auto;
+padding: 8px 0;
+max-height: 140px;
+background: rgba(0, 5, 15, 0.3);
+border-radius: 6px;
+padding: 10px;
+scrollbar-width: thin;
+scrollbar-color: var(--neon-blue) rgba(0,0,0,0.2);
+}
+
+.extract-h-container::-webkit-scrollbar {
+height: 8px;
+}
+
+.extract-h-container::-webkit-scrollbar-thumb {
+background: var(--neon-blue);
+border-radius: 4px;
+}
+
+.extract-h-card {
+min-width: 260px;
+background: rgba(0, 20, 40, 0.85);
+border: 1px solid rgba(0, 200, 255, 0.4);
+border-radius: 6px;
+padding: 8px;
+flex-shrink: 0;
+font-size: 11px;
+display: flex;
+flex-direction: column;
+gap: 4px;
+}
+
+.extract-h-card .label {
+font-size: 9px;
+opacity: 0.8;
+text-transform: uppercase;
+letter-spacing: 0.5px;
+}
+
+.extract-h-card .value {
+font-family: 'Consolas', monospace;
+font-size: 12px;
+word-break: break-all;
+line-height: 1.3;
+}
+
+/* === ERROR MSG === */
+.error-msg {
+color: var(--neon-red);
+text-align: center;
+padding: 12px;
+font-weight: bold;
+font-size: 14px;
+}
+
+.tab-panel { display: block; }
+
+/* === TOAST NOTIFIKASI === */
+#toast-container {
+position: fixed;
+bottom: 20px;
+right: 20px;
+z-index: 10000;
+display: flex;
+flex-direction: column;
+gap: 10px;
+}
+
+.toast {
+padding: 12px 16px;
+border-radius: 8px;
+font-weight: bold;
+font-size: 14px;
+box-shadow: 0 0 12px rgba(0,0,0,0.5);
+backdrop-filter: blur(4px);
+max-width: 300px;
+animation: toastSlideIn 0.3s ease forwards;
+display: flex;
+align-items: center;
+gap: 8px;
+}
+
+@keyframes toastSlideIn {
+from { transform: translateX(120%); opacity: 0; }
+to { transform: translateX(0); opacity: 1; }
+}
+
+.toast.success { background: rgba(0, 100, 0, 0.8); color: var(--neon-green); border-left: 4px solid var(--neon-green); }
+.toast.warning { background: rgba(100, 80, 0, 0.8); color: var(--neon-yellow); border-left: 4px solid var(--neon-yellow); }
+.toast.error   { background: rgba(100, 0, 0, 0.8); color: var(--neon-red); border-left: 4px solid var(--neon-red); }
+
+.toast .icon { font-size: 18px; }
+</style>
+</head>
+<body>
+
+<!-- TOAST CONTAINER -->
+<div id="toast-container"></div>
+
+<!-- SWITCH DI KANAN ATAS -->
+<div class="tab-switch">
+<div class="tab-btn active" data-tab="analyzer">📊BUANG DANA</div>
+<div class="tab-btn" data-tab="extractor">📤WITHDRAW MANUAL</div>
+<div class="tab-btn" data-tab="trycari">🔍 DEPOSIT MANUAL</div>
+</div>
+
+<!-- PANEL 1: ANALYZER -->
+<div id="panel-analyzer" class="tab-panel">
+<h1>💰 Deposit vs Withdraw</h1>
+
+<div class="mode-toggle">
+<span class="toggle-label">Mode Analisis:</span>
+<label class="switch">
+<input type="checkbox" id="modeToggle">
+<span class="slider"></span>
+</label>
+<div class="mode-text" id="modeText">Saat ini: Per Pengguna</div>
+</div>
+
+<div class="input-section">
+<div class="section">
+<div class="section-title">📥 DATA DEPOSIT</div>
+<textarea id="dataDeposit" placeholder="Contoh:
+Depo BCA / ADIV ARYA ATMAJA
+DEPO MYBCA / MIA
+<div class="buttons">
+<button class="neon-btn" onclick="clearDeposit()">
+<i>🗑️</i> Hapus Semua
+</button>
+<button class="neon-btn" onclick="loadDeposit()">
+<i>📥</i> Ambil Data
+</button>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">📤 DATA WITHDRAW</div>
+<textarea id="dataWithdraw" placeholder="Format: [Keterangan] [Nominal] [Sumber Deposit]
+Contoh:
+PENGIRIMAN DANA...
+KIRIM KE USER
+<div class="buttons">
+<button class="neon-btn" onclick="clearWithdraw()">
+<i>🗑️</i> Hapus Semua
+</button>
+<button class="neon-btn" onclick="loadWithdraw()">
+<i>📤</i> Ambil Data
+</button>
+</div>
+</div>
+</div>
+
+<div style="text-align:center; margin:0 auto 20px; max-width:1100px;">
+<button class="neon-btn" id="btnProses" onclick="prosesDepositWithdraw()">
+<i>⚡</i> PROSES ANALISIS
+</button>
+</div>
+
+<div id="hasilDepoWd"></div>
+</div>
+
+<!-- PANEL 2: EXTRACTOR -->
+<div id="panel-extractor" class="tab-panel" style="display:none;">
+<div class="common-panel">
+<div class="extract-h-title">📤 EXTRACT 100 DATA WITHDRAW (HORIZONTAL)</div>
+<textarea id="bulkExtractInput" class="extract-h-input" placeholder="Tempel data. Setiap entri dimulai dengan angka. Contoh:
+1
+Withdraw
+G2
+BRI, 486001013589536, MOCHAMMAD BAHA UDIN MAKY
+2
+Withdraw
+G13
+DANA, 085784480822, Edi hariyanto"></textarea>
+<div class="extract-h-buttons">
+<button class="neon-btn" onclick="clearBulkExtract()">
+<i>🗑️</i> Hapus Semua
+</button>
+<button class="neon-btn" onclick="processBulkExtract()">
+<i>🔍</i> Ambil Data
+</button>
+<button class="neon-btn" onclick="copyBulkExtracted()">
+<i>📋</i> Copy Semua
+</button>
+</div>
+<div class="extract-h-container" id="bulkResultsContainer"></div>
+</div>
+</div>
+
+<!-- PANEL 3: TRY CARI -->
+<div id="panel-trycari" class="tab-panel" style="display:none;">
+<div class="common-panel">
+<div style="display:flex; gap:20px; flex-wrap:wrap;">
+<div style="flex:1; min-width:300px;">
+<div style="display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap;">
+<button onclick="clearField('dataDocs'); prosesData_TRYCARI()"
+class="neon-btn" style="padding:5px 10px; font-size:12px;">🗑️ Hapus</button>
+<button onclick="prosesData_TRYCARI()"
+class="neon-btn" style="padding:5px 10px; font-size:12px;">🔄 Refresh</button>
+</div>
+<label style="display:block; margin-bottom:8px; font-weight:bold;">📄 Data dari DOCS</label>
+<textarea id="dataDocs" placeholder="Paste data DOCS (4 kolom dipisah TAB)..."></textarea>
+</div>
+
+<div style="flex:1; min-width:300px;">
+<div style="display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap;">
+<button onclick="clearField('dataAdmin'); prosesData_TRYCARI()"
+class="neon-btn" style="padding:5px 10px; font-size:12px;">🗑️ Hapus</button>
+<button onclick="prosesData_TRYCARI()"
+class="neon-btn" style="padding:5px 10px; font-size:12px;">🔄 Refresh</button>
+</div>
+<label style="display:block; margin-bottom:8px; font-weight:bold;">📊 Data dari ADMIN</label>
+<textarea id="dataAdmin" placeholder="Paste data ADMIN (4 kolom dipisah TAB)..."></textarea>
+</div>
+</div>
+
+<button onclick="prosesData_TRYCARI()"
+style="background:linear-gradient(145deg, #0288d1, #0277bd); color:white; border:none; padding:12px 24px; font-size:16px; border-radius:6px; cursor:pointer; display:block; margin:20px auto; font-weight:bold; box-shadow:0 0 8px #00b0ff; transition:all 0.3s;">
+🔍 BANDINGKAN DATA
+</button>
+<div id="hasil_TRYCARI"></div>
+</div>
+</div>
+
+<script>
+// === TOAST SYSTEM ===
+function showToast(message, type = 'info') {
+const types = { success: '✅', warning: '⚠️', error: '❌', info: 'ℹ️' };
+const toast = document.createElement('div');
+toast.className = `toast ${type}`;
+toast.innerHTML = `<span class="icon">${types[type] || 'ℹ️'}</span> ${message}`;
+document.getElementById('toast-container').appendChild(toast);
+setTimeout(() => {
+toast.style.opacity = '0';
+toast.style.transform = 'translateX(120%)';
+setTimeout(() => toast.remove(), 300);
+}, 3000);
+}
+
+// === UTILS ===
+function clearField(id) {
+const el = document.getElementById(id);
+if (el) el.value = '';
+}
+
+// === ANALYZER LOGIC ===
+const SHEET_ID = '1JF1Mp58d4q6m3D0BLAxaQxxEUduXLFsp5em8Ww6MaNo';
+const GID_DEPOSIT = '1211507274';
+const GID_WITHDRAW = '1194549454';
+const BANK_LIST = ['BCA','BRI','BNI','CIMB','DANAMON','BSI','DANA','OVO','LINKAJA','GOPAY','JAGO','MAYBANK','SEABANK','MANDIRI','QRIS'];
+let modePerBank = false;
+
+document.getElementById('modeToggle').addEventListener('change', e => {
+modePerBank = e.target.checked;
+document.getElementById('modeText').textContent = modePerBank ? 'Saat ini: Per Bank' : 'Saat ini: Per Pengguna';
+});
+
+function formatRupiah(n) {
+if (n == null || n === 0) return '0';
+return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+function clearDeposit() { document.getElementById('dataDeposit').value = ''; }
+function clearWithdraw() { document.getElementById('dataWithdraw').value = ''; }
+
+function parseSheetResponse(text) {
+try {
+const s = text.indexOf('{'), e = text.lastIndexOf('}') + 1;
+const data = JSON.parse(text.substring(s, e));
+return data.table?.rows?.map(r => r.c?.map(c => c?.v ?? '').join('\t') || '') || [];
+} catch { return []; }
+}
+
+async function loadDeposit() {
+try {
+const res = await fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?gid=${GID_DEPOSIT}&range=A102:B250`);
+const text = await res.text();
+const data = parseSheetResponse(text)
+.filter(l => l.split('\t').filter(x => x.trim()).length >= 2)
+.map(l => {
+const [d, n] = l.split('\t');
+const num = parseInt(n.replace(/[^0-9]/g, '')) || 0;
+return `${d}\t${formatRupiah(num)}`;
+}).join('\n');
+document.getElementById('dataDeposit').value = data;
+} catch (err) {}
+}
+
+async function loadWithdraw() {
+try {
+const res = await fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?gid=${GID_WITHDRAW}&range=I8:K1809`);
+const text = await res.text();
+const data = parseSheetResponse(text)
+.filter(l => l.split('\t').filter(x => x.trim()).length >= 2)
+.map(l => {
+const [k, n, s] = l.split('\t');
+const num = parseInt(n.replace(/[^0-9]/g, '')) || 0;
+return `${k}\t${formatRupiah(num)}\t${s || ''}`;
+}).join('\n');
+document.getElementById('dataWithdraw').value = data;
+} catch (err) {}
+}
+
+function detectBank(t) {
+const u = (t || '').toUpperCase();
+return BANK_LIST.find(b => u.includes(b)) || 'LAINNYA';
+}
+
+function extractName(t) {
+let c = t.trim(), i = c.toUpperCase().indexOf('DEPO ');
+if (i !== -1) c = c.substring(i + 5).trim();
+const s = c.lastIndexOf('/');
+return s !== -1 ? c.substring(s + 1).trim() : c;
+}
+
+function parseLine(l, isWd = false) {
+l = l.trim();
+if (!l) return null;
+const p = l.split('\t').map(x => x.trim()).filter(x => x);
+if (p.length < 2) return null;
+if (isWd) {
+const [k, nRaw, src] = p;
+const num = parseInt(nRaw.replace(/[^0-9]/g, '')) || 0;
+return { nama: extractName(src || k), bank: detectBank(src || k), nominalRaw: formatRupiah(num), nominalClean: num, asli: l, note: k };
+} else {
+const [desc, nRaw] = p;
+const num = parseInt(nRaw.replace(/[^0-9]/g, '')) || 0;
+return { nama: extractName(desc), bank: detectBank(desc), nominalRaw: formatRupiah(num), nominalClean: num, asli: l, note: '' };
+}
+}
+
+function prosesDepositWithdraw() {
+const d = document.getElementById('dataDeposit').value.trim();
+const w = document.getElementById('dataWithdraw').value.trim();
+if (!d || !w) {
+showToast("⚠️ Harap isi kedua kolom!", "warning");
+return;
+}
+
+const depo = d.split('\n').map(l => parseLine(l, false)).filter(Boolean);
+const wd = w.split('\n').map(l => parseLine(l, true)).filter(Boolean);
+if (!depo.length || !wd.length) {
+showToast("❌ Format data tidak valid!", "error");
+return;
+}
+
+modePerBank ? analisisPerBank(depo, wd) : analisisPerPengguna(depo, wd);
+}
+
+function analisisPerPengguna(depo, wd) {
+const dTot = {}, wTot = {}, dDet = {}, wDet = {};
+depo.forEach(i => {
+const k = i.nama.toLowerCase().trim();
+dTot[k] = (dTot[k] || 0) + i.nominalClean;
+(dDet[k] = dDet[k] || []).push(i);
+});
+wd.forEach(i => {
+const k = i.nama.toLowerCase().trim();
+wTot[k] = (wTot[k] || 0) + i.nominalClean;
+(wDet[k] = wDet[k] || []).push(i);
+});
+
+const names = [...new Set([...Object.keys(dTot), ...Object.keys(wTot)])];
+const results = names.map(k => {
+const n = dDet[k] ? depo.find(x => x.nama.toLowerCase() === k)?.nama : wd.find(x => x.nama.toLowerCase() === k)?.nama || k;
+const d = dTot[k] || 0, w = wTot[k] || 0, diff = d - w;
+let selisihKet, selisihClass;
+if (d > 0 && w > 0) {
+if (diff === 0) { selisihKet = "✅ COCOK"; selisihClass = "selisih-cocok"; }
+else if (diff > 0) { selisihKet = "⚠️ KELEBIHAN DEPOSIT"; selisihClass = "selisih-lebih"; }
+else { selisihKet = "⚠️ KEKURANGAN DEPOSIT"; selisihClass = "selisih-kurang"; }
+} else {
+selisihKet = "❌ TIDAK LENGKAP"; selisihClass = "selisih-kurang";
+}
+return { nama: n, depo: d, wd: w, diff, selisihKet, selisihClass, dEntries: dDet[k] || [], wEntries: wDet[k] || [] };
+});
+
+renderPerPengguna(results);
+}
+
+function analisisPerBank(depo, wd) {
+const dByBank = {}, wByBank = {}, dEntries = {}, wEntries = {};
+[...BANK_LIST, 'LAINNYA'].forEach(b => {
+dByBank[b] = 0; wByBank[b] = 0; dEntries[b] = []; wEntries[b] = [];
+});
+depo.forEach(i => { dByBank[i.bank] += i.nominalClean; dEntries[i.bank].push(i); });
+wd.forEach(i => { wByBank[i.bank] += i.nominalClean; wEntries[i.bank].push(i); });
+
+const results = [...BANK_LIST, 'LAINNYA']
+.map(bank => {
+const d = dByBank[bank], w = wByBank[bank], diff = d - w;
+if (d === 0 && w === 0) return null;
+let selisihKet, selisihClass;
+if (d > 0 && w > 0) {
+if (diff === 0) { selisihKet = "✅ COCOK"; selisihClass = "selisih-cocok"; }
+else if (diff > 0) { selisihKet = "⚠️ KELEBIHAN DEPOSIT"; selisihClass = "selisih-lebih"; }
+else { selisihKet = "⚠️ KEKURANGAN DEPOSIT"; selisihClass = "selisih-kurang"; }
+} else {
+selisihKet = "❌ TIDAK LENGKAP"; selisihClass = "selisih-kurang";
+}
+return { bank, depo: d, wd: w, diff, selisihKet, selisihClass, dEntries: dEntries[bank], wEntries: wEntries[bank] };
+})
+.filter(Boolean);
+renderPerBank(results);
+}
+
+function renderPerPengguna(results) {
+let html = `<div class="depo-wd-container"><div class="summary-box"><strong>📊 Total Pengguna:</strong> ${results.length}</div>`;
+results.forEach(r => {
+const depoFmt = r.depo > 0 ? formatRupiah(r.depo) : '–';
+const wdFmt = r.wd > 0 ? formatRupiah(r.wd) : '–';
+const selisihNum = r.diff === 0 ? '0' : (r.diff > 0 ? `+${formatRupiah(r.diff)}` : `-${formatRupiah(Math.abs(r.diff))}`);
+html += `
+<div class="user-card">
+<div class="card-header">${r.nama}</div>
+<div class="card-body">
+<div class="col">
+<div class="col-title"><span>📥 DEPOSIT</span></div>
+<ul class="entry-list">
+${r.dEntries.length ? r.dEntries.map(e => `<li class="entry-item">${e.nominalRaw}</li>`).join('') : '<li class="entry-item">–</li>'}
+</ul>
+<div class="total-row">
+<span class="total-label">TOTAL:</span>
+<span class="total-value deposit-color">${depoFmt}</span>
+</div>
+</div>
+<div class="col">
+<div class="col-title"><span>📤 WITHDRAW</span></div>
+<ul class="entry-list">
+${r.wEntries.length ? r.wEntries.map(e => `
+<li class="entry-item">
+<span class="nominal">${e.nominalRaw}</span>
+${e.note ? `<div class="withdraw-note">${e.note}</div>` : ''}
+</li>
+`).join('') : '<li class="entry-item">–</li>'}
+</ul>
+<div class="total-row">
+<span class="total-label">TOTAL:</span>
+<span class="total-value withdraw-color">${wdFmt}</span>
+</div>
+</div>
+</div>
+<div class="selisih-besar ${r.selisihClass}">${r.selisihKet}</div>
+<div class="selisih-jumlah ${r.selisihClass}">${selisihNum}</div>
+</div>`;
+});
+html += '</div>';
+document.getElementById('hasilDepoWd').innerHTML = html;
+}
+
+function renderPerBank(results) {
+let html = `<div class="depo-wd-container"><div class="summary-box"><strong>📊 Total Bank/Sumber:</strong> ${results.length}</div>`;
+results.forEach(r => {
+const depoFmt = r.depo > 0 ? formatRupiah(r.depo) : '–';
+const wdFmt = r.wd > 0 ? formatRupiah(r.wd) : '–';
+const selisihNum = r.diff === 0 ? '0' : (r.diff > 0 ? `+${formatRupiah(r.diff)}` : `-${formatRupiah(Math.abs(r.diff))}`);
+html += `
+<div class="bank-card">
+<div class="card-header">🏦 ${r.bank}</div>
+<div class="card-body">
+<div class="col">
+<div class="col-title"><span>📥 DEPOSIT</span></div>
+<ul class="entry-list">
+${r.dEntries.length ? r.dEntries.map(e => `<li class="entry-item">${e.nominalRaw}</li>`).join('') : '<li class="entry-item">–</li>'}
+</ul>
+<div class="total-row">
+<span class="total-label">TOTAL:</span>
+<span class="total-value deposit-color">${depoFmt}</span>
+</div>
+</div>
+<div class="col">
+<div class="col-title"><span>📤 WITHDRAW</span></div>
+<ul class="entry-list">
+${r.wEntries.length ? r.wEntries.map(e => `
+<li class="entry-item">
+<span class="nominal">${e.nominalRaw}</span>
+${e.note ? `<div class="withdraw-note">${e.note}</div>` : ''}
+</li>
+`).join('') : '<li class="entry-item">–</li>'}
+</ul>
+<div class="total-row">
+<span class="total-label">TOTAL:</span>
+<span class="total-value withdraw-color">${wdFmt}</span>
+</div>
+</div>
+</div>
+<div class="selisih-besar ${r.selisihClass}">${r.selisihKet}</div>
+<div class="selisih-jumlah ${r.selisihClass}">${selisihNum}</div>
+</div>`;
+});
+html += '</div>';
+document.getElementById('hasilDepoWd').innerHTML = html;
+}
+
+// === EXTRACTOR LOGIC ===
+const E_WALLET_CODES = {
+'DANA': '3901',
+'OVO': '39358',
+'LINKAJA': '09110',
+'GOPAY': '70001'
+};
+
+function clearBulkExtract() {
+document.getElementById('bulkExtractInput').value = '';
+document.getElementById('bulkResultsContainer').innerHTML = '';
+}
+
+function copyBulkExtracted() {
+const container = document.getElementById('bulkResultsContainer');
+if (!container.children.length) {
+showToast("⚠️ Tidak ada data untuk disalin!", "warning");
+return;
+}
+
+const items = Array.from(container.querySelectorAll('.extract-h-card'));
+let text = '';
+items.forEach(card => {
+const vals = card.querySelectorAll('.value');
+if (vals.length >= 4) {
+text += `${vals[0].textContent.trim()}\t${vals[1].textContent.trim()}\t${vals[2].textContent.trim()}\t${vals[3].textContent.trim()}\n`;
+}
+});
+navigator.clipboard.writeText(text.trim()).then(() => {
+showToast("✅ Data berhasil disalin!", "success");
+}, () => {
+showToast("❌ Gagal menyalin ke clipboard.", "error");
+});
+}
+
+// FUNGSI YANG DIPERBAIKI: parseSingleWithdrawBlock
+function parseSingleWithdrawBlock(lines) {
+const fullText = lines.join(' ').toUpperCase();
+let username = '', nominal = '', account = '', name = '';
+
+// 1. Ekstraksi username dengan regex yang lebih akurat
+if (lines[0]) {
+const first = lines[0].trim();
+// Regex: mencari pola "angka spasi username" atau "angka.username"
+const userMatch = first.match(/^\d+[\s\.\-_]+(\S+)/);
+if (userMatch) {
+username = userMatch[1];
+} else {
+// Jika tidak match pola, ambil semua setelah angka pertama
+const parts = first.split(/\s+/);
+if (parts.length >= 2) {
+username = parts.slice(1).join(' ');
+} else {
+username = first.replace(/^\d+/, '').trim();
+}
+}
+}
+
+// 2. Cari nominal dengan approach yang tidak mengambil dari username
+// Buat array lines tanpa baris pertama (username)
+const linesWithoutFirst = lines.slice(1);
+
+// Pola untuk mendeteksi nominal (angka dengan pemisah ribuan)
+const nominalPatterns = [
+/Rp\.?\s*[\d.,]+\b/,  // Rp 100.000 atau Rp.100.000
+/[\d.,]{4,}/,         // minimal 4 digit/karakter untuk nominal
+/\b\d{1,3}(?:\.\d{3})+(?:,\d{2})?\b/,  // 1.000.000,00
+/\b\d{1,3}(?:,\d{3})+(?:\.\d{2})?\b/   // 1,000,000.00
+];
+
+// Cari di semua baris kecuali baris pertama
+for (const line of linesWithoutFirst) {
+for (const pattern of nominalPatterns) {
+const m = line.match(pattern);
+if (m) {
+// Validasi: pastikan bukan angka yang terlalu kecil untuk nominal
+const numStr = m[0].replace(/[^\d]/g, '');
+if (numStr.length >= 4 && parseInt(numStr) > 1000) {
+nominal = m[0].trim();
+break;
+}
+}
+}
+if (nominal) break;
+}
+
+// 3. Jika nominal tidak ditemukan, coba dengan regex sederhana
+if (!nominal) {
+const numRegex = /[\d,\.]{5,}/;
+for (let i = 1; i < lines.length; i++) {
+const m = lines[i].match(numRegex);
+if (m) {
+const numStr = m[0].replace(/[^\d]/g, '');
+if (numStr.length >= 4) {
+nominal = m[0].replace(/\./g, '').replace(/,/g, ',');
+break;
+}
+}
+}
+}
+
+// 4. Ekstraksi informasi bank/ewallet
+let isEWallet = false;
+let eWalletType = '';
+let extractedNumber = '';
+
+for (let i = lines.length - 1; i >= 0; i--) {
+const line = lines[i].trim();
+if (!line) continue;
+
+// Deteksi e-wallet
+const ewalletKeywords = ['DANA', 'OVO', 'LINKAJA', 'GOPAY'];
+for (const keyword of ewalletKeywords) {
+if (line.toUpperCase().includes(keyword)) {
+isEWallet = true;
+eWalletType = keyword;
+
+const parts = line.split(',').map(p => p.trim());
+if (parts.length >= 2) {
+extractedNumber = parts[1].replace(/\D/g, '');
+if (parts.length >= 3) {
+name = parts[2].toUpperCase();
+}
+}
+break;
+}
+}
+if (isEWallet) break;
+
+// Deteksi bank konvensional
+if (line.includes(',') && !line.toUpperCase().includes('WITHDR')) {
+const parts = line.split(',').map(p => p.trim());
+if (parts.length >= 3) {
+account = parts[1].replace(/\D/g, '');
+name = parts[2].toUpperCase();
+} else if (parts.length === 2) {
+account = parts[0].replace(/\D/g, '');
+name = parts[1].toUpperCase();
+}
+break;
+}
+}
+
+let finalAccount = '–';
+if (isEWallet && extractedNumber) {
+const code = E_WALLET_CODES[eWalletType] || '';
+finalAccount = code + extractedNumber;
+} else if (account) {
+finalAccount = account;
+}
+
+return {
+account: finalAccount,
+username: username || '–',
+name: name || '–',
+nominal: nominal || '–'
+};
+}
+
+// FUNGSI YANG DIPERBAIKI: splitIntoBlocks
+function splitIntoBlocks(text) {
+const lines = text.split('\n').map(l => l.trim()).filter(l => l !== '');
+const blocks = [];
+let currentBlock = [];
+
+for (const line of lines) {
+// Deteksi awal blok: baris yang dimulai dengan angka diikuti spasi atau titik
+if (/^\d+[\s\.]/.test(line)) {
+if (currentBlock.length > 0) {
+blocks.push(currentBlock);
+}
+currentBlock = [line];
+} else {
+currentBlock.push(line);
+}
+}
+if (currentBlock.length > 0) {
+blocks.push(currentBlock);
+}
+return blocks;
+}
+
+function processBulkExtract() {
+const input = document.getElementById('bulkExtractInput').value;
+if (!input.trim()) {
+clearBulkExtract();
+return;
+}
+
+const blocks = splitIntoBlocks(input);
+const container = document.getElementById('bulkResultsContainer');
+container.innerHTML = '';
+
+const limitedBlocks = blocks.slice(0, 100);
+limitedBlocks.forEach(block => {
+const data = parseSingleWithdrawBlock(block);
+const card = document.createElement('div');
+card.className = 'extract-h-card';
+card.innerHTML = `
+<div class="label">Kolom 1</div>
+<div class="value">${data.account}</div>
+<div class="label">Kolom 2</div>
+<div class="value">${data.username}</div>
+<div class="label">Kolom 3</div>
+<div class="value">${data.name}</div>
+<div class="label">Kolom 4</div>
+<div class="value">${data.nominal}</div>
+`;
+container.appendChild(card);
+});
+showToast(`✅ ${limitedBlocks.length} data berhasil diekstraksi.`, "success");
+}
+
+// === TRY CARI LOGIC ===
+function parseData_TRYCARI(raw) {
+return raw
+.split('\n')
+.map(line => line.trim())
+.filter(line => line)
+.map(line => {
+const parts = line.split('\t').map(p => p.trim());
+if (parts.length >= 4) {
+return {
+jam: parts[0],
+userID: parts[1],
+nama: parts[2],
+nominal: parts[3]
+};
+}
+return null;
+})
+.filter(row => row !== null);
+}
+
+function prosesData_TRYCARI() {
+const rawDataDocs = document.getElementById('dataDocs').value;
+const rawDataAdmin = document.getElementById('dataAdmin').value;
+
+if (!rawDataDocs.trim() || !rawDataAdmin.trim()) {
+document.getElementById('hasil_TRYCARI').innerHTML = '';
+showToast("⚠️ Harap paste data di kedua kolom!", "warning");
+return;
+}
+
+const dataDocs = parseData_TRYCARI(rawDataDocs);
+const dataAdmin = parseData_TRYCARI(rawDataAdmin);
+
+if (dataDocs.length === 0 || dataAdmin.length === 0) {
+document.getElementById('hasil_TRYCARI').innerHTML = '';
+showToast("❌ Format data tidak valid! Pastikan tiap baris punya 4 kolom (dipisah TAB).", "error");
+return;
+}
+
+const adminKeyList = dataAdmin.map(row => {
+const userIDClean = String(row.userID).toLowerCase().trim();
+const nominalClean = String(row.nominal).replace(/[^0-9]/g, '');
+return `${userIDClean}|${nominalClean}`;
+});
+
+const adminCountMap = {};
+adminKeyList.forEach(key => {
+adminCountMap[key] = (adminCountMap[key] || 0) + 1;
+});
+
+const adminNominalMap = {};
+dataAdmin.forEach(row => {
+const userIDClean = String(row.userID).toLowerCase().trim();
+const nominalClean = String(row.nominal).replace(/[^0-9]/g, '');
+const key = `${userIDClean}|${nominalClean}`;
+if (!adminNominalMap[key]) {
+adminNominalMap[key] = row.nominal;
+}
+});
+
+const results = [];
+dataDocs.forEach(row => {
+const { jam, userID, nama, nominal } = row;
+const userIDClean = String(userID).toLowerCase().trim();
+const nominalClean = String(nominal).replace(/[^0-9]/g, '');
+const key = `${userIDClean}|${nominalClean}`;
+
+let status, kelas, nominalDiAdmin = '–';
+
+if (adminCountMap[key] > 0) {
+adminCountMap[key]--;
+status = '✅ COCOK';
+kelas = 'background-color:#2e7d32;color:white;';
+nominalDiAdmin = adminNominalMap[key] || nominal;
+} else {
+status = '❌ TIDAK COCOK';
+kelas = 'background-color:#b71c1c;color:white;';
+}
+
+results.push({ jam, userID, nama, nominal, nominalDiAdmin, status, kelas });
+});
+
+const usageCount = {};
+adminKeyList.forEach(key => {
+usageCount[key] = (usageCount[key] || 0) + 1;
+});
+
+for (const key in adminCountMap) {
+const used = (usageCount[key] || 0) - adminCountMap[key];
+usageCount[key] = used;
+}
+
+const adminRowsWithStatus = dataAdmin.map(row => {
+const userIDClean = String(row.userID).toLowerCase().trim();
+const nominalClean = String(row.nominal).replace(/[^0-9]/g, '');
+const key = `${userIDClean}|${nominalClean}`;
+const isUsed = usageCount[key] > 0;
+if (isUsed) usageCount[key]--;
+return { ...row, isUsed };
+});
+
+const unusedNotesAdmin = [];
+for (const key in adminCountMap) {
+if (adminCountMap[key] > 0) {
+const [userID, cleanNom] = key.split('|');
+const nominalAsli = adminNominalMap[key] || new Intl.NumberFormat('id-ID').format(parseInt(cleanNom));
+unusedNotesAdmin.push(`User <strong>${userID}</strong> dengan nominal <strong>${nominalAsli}</strong> → ${adminCountMap[key]} entri tidak digunakan.`);
+}
+}
+
+const unusedNotesDocs = results
+.filter(row => row.status === '❌ TIDAK COCOK')
+.map(row => `User <strong>${row.userID}</strong> dengan nominal <strong>${row.nominal}</strong> (${row.jam})`);
+
+const totalDocs = dataDocs.length;
+const totalAdmin = dataAdmin.length;
+const totalCocok = results.filter(r => r.status === '✅ COCOK').length;
+const totalTidakCocok = totalDocs - totalCocok;
+
+let html = `<div style="display:flex; gap:20px; flex-wrap:wrap;">`;
+
+html += `
+<div style="flex:1; min-width:300px; background:var(--panel-bg); padding:15px; border-radius:8px; border:1px solid var(--panel-border); box-shadow:0 0 8px var(--panel-shadow);">
+<h3 style="color:var(--neon-blue); text-align:center; margin-top:0; padding-bottom:8px; border-bottom:1px solid var(--panel-border); text-shadow:0 0 10px rgba(0,255,255,0.9);">
+📄 DATA DOCS (Dengan Analisis)
+</h3>
+<table style="width:100%; border-collapse:collapse; font-size:13px;">
+<thead>
+<tr>
+<th style="padding:8px; text-align:left; border:1px solid var(--panel-border); background:rgba(0,30,60,0.6); color:var(--text-title);">JAM</th>
+<th style="padding:8px; text-align:left; border:1px solid var(--panel-border); background:rgba(0,30,60,0.6); color:var(--text-title);">USER ID</th>
+<th style="padding:8px; text-align:left; border:1px solid var(--panel-border); background:rgba(0,30,60,0.6); color:var(--text-title);">NOMINAL</th>
+<th style="padding:8px; text-align:left; border:1px solid var(--panel-border); background:rgba(0,30,60,0.6); color:var(--text-title);">NOMINAL DI ADMIN</th>
+<th style="padding:8px; text-align:left; border:1px solid var(--panel-border); background:rgba(0,30,60,0.6); color:var(--text-title);">STATUS</th>
+</tr>
+</thead>
+<tbody>
+`;
+
+results.forEach(row => {
+html += `
+<tr style="${row.kelas}">
+<td style="padding:8px; text-align:left; border:1px solid var(--panel-border); font-family:monospace; color:var(--text-main);">${row.jam}</td>
+<td style="padding:8px; text-align:left; border:1px solid var(--panel-border); font-weight:bold;">${row.userID}</td>
+<td style="padding:8px; text-align:left; border:1px solid var(--panel-border); font-family:monospace;">${row.nominal}</td>
+<td style="padding:8px; text-align:left; border:1px solid var(--panel-border); font-family:monospace;">${row.nominalDiAdmin}</td>
+<td style="padding:8px; text-align:left; border:1px solid var(--panel-border);">${row.status}</td>
+</tr>
+`;
+});
+
+html += `</tbody></table>`;
+
+html += `
+<div style="margin-top:14px; padding:12px; background:rgba(0,15,30,0.7); border-radius:6px; color:var(--text-main); font-size:13px; line-height:1.5;">
+<strong>📊 Ringkasan:</strong><br>
+• Total entri DOCS: <strong>${totalDocs}</strong><br>
+• Total entri ADMIN: <strong>${totalAdmin}</strong><br>
+• <span style="color:var(--neon-green);">✅ COCOK: ${totalCocok}</span><br>
+• <span style="color:var(--neon-red);">❌ TIDAK COCOK: ${totalTidakCocok}</span>
+</div>`;
+
+if (unusedNotesDocs.length > 0) {
+html += `
+<div style="margin-top:12px; padding:12px; background:rgba(0,20,40,0.7); border-left:4px solid var(--neon-red); border-radius:4px; color:#ffebee; font-size:13px; line-height:1.5;">
+<strong>⚠️ Entri DOCS yang Tidak Terpakai:</strong><br>
+${unusedNotesDocs.map(n => `• ${n}`).join('<br>')}
+</div>`;
+}
+
+if (unusedNotesAdmin.length > 0) {
+html += `
+<div style="margin-top:12px; padding:12px; background:rgba(0,20,40,0.7); border-left:4px solid var(--neon-yellow); border-radius:4px; color:var(--text-main); font-size:13px; line-height:1.5;">
+<strong>ℹ️ Entri ADMIN yang Tidak Terpakai:</strong><br>
+${unusedNotesAdmin.map(n => `• ${n}`).join('<br>')}
+</div>`;
+}
+
+html += `</div>`;
+
+html += `
+<div style="flex:1; min-width:300px; background:var(--panel-bg); padding:15px; border-radius:8px; border:1px solid var(--panel-border); box-shadow:0 0 8px var(--panel-shadow);">
+<h3 style="color:var(--neon-blue); text-align:center; margin-top:0; padding-bottom:8px; border-bottom:1px solid var(--panel-border); text-shadow:0 0 10px rgba(0,255,255,0.9);">
+📊 DATA ADMIN (Referensi)
+</h3>
+<table style="width:100%; border-collapse:collapse; font-size:13px;">
+<thead>
+<tr>
+<th style="padding:8px; text-align:left; border:1px solid var(--panel-border); background:rgba(0,30,60,0.6); color:var(--text-title);">JAM</th>
+<th style="padding:8px; text-align:left; border:1px solid var(--panel-border); background:rgba(0,30,60,0.6); color:var(--text-title);">USER ID</th>
+<th style="padding:8px; text-align:left; border:1px solid var(--panel-border); background:rgba(0,30,60,0.6); color:var(--text-title);">NAMA</th>
+<th style="padding:8px; text-align:left; border:1px solid var(--panel-border); background:rgba(0,30,60,0.6); color:var(--text-title);">NOMINAL</th>
+<th style="padding:8px; text-align:left; border:1px solid var(--panel-border); background:rgba(0,30,60,0.6); color:var(--text-title);">STATUS</th>
+</tr>
+</thead>
+<tbody>
+`;
+
+adminRowsWithStatus.forEach(row => {
+const bgColor = row.isUsed
+? 'rgba(46, 125, 50, 0.2)'
+: 'rgba(227, 242, 253, 0.2)';
+const textColor = row.isUsed ? 'var(--text-title)' : '#81d4fa';
+const statusText = row.isUsed ? '✅ Dipakai' : '⚪ Tidak terpakai';
+
+html += `
+<tr style="background-color:${bgColor}; color:${textColor};">
+<td style="padding:8px; text-align:left; border:1px solid var(--panel-border); font-family:monospace;">${row.jam}</td>
+<td style="padding:8px; text-align:left; border:1px solid var(--panel-border); font-weight:bold;">${row.userID}</td>
+<td style="padding:8px; text-align:left; border:1px solid var(--panel-border);">${row.nama}</td>
+<td style="padding:8px; text-align:left; border:1px solid var(--panel-border); font-family:monospace;">${row.nominal}</td>
+<td style="padding:8px; text-align:left; border:1px solid var(--panel-border);">${statusText}</td>
+</tr>
+`;
+});
+
+html += `</tbody></table></div></div>`;
+
+document.getElementById('hasil_TRYCARI').innerHTML = html;
+showToast(`✅ Analisis selesai: ${totalCocok} cocok dari ${totalDocs} entri.`, "success");
+}
+
+// === TAB SWITCH ===
+document.querySelectorAll('.tab-btn').forEach(btn => {
+btn.addEventListener('click', () => {
+document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+btn.classList.add('active');
+const target = btn.dataset.tab;
+
+document.getElementById('panel-analyzer').style.display = target === 'analyzer' ? 'block' : 'none';
+document.getElementById('panel-extractor').style.display = target === 'extractor' ? 'block' : 'none';
+document.getElementById('panel-trycari').style.display = target === 'trycari' ? 'block' : 'none';
+});
+});
+
+// Inisialisasi
+document.addEventListener('DOMContentLoaded', () => {
+showToast("✅ Sistem siap digunakan!", "success");
+});
+</script>
+</body>
+</html>
