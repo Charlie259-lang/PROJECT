@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MEMO FORM</title>
+    <title>MEMO & REPORTAN FORM</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700&family=Share+Tech+Mono&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
@@ -16,18 +16,15 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            /* BACKGROUND IMAGE UPDATE: Menggunakan gambar tema Natal */
             background: url('https://cdn.areabermain.club/assets/cdn/az6/2025/12/10/20251210/7f0bdc56062fceb10a05b6412f5ce6e2/linetogel-bg-natal2025.webp') no-repeat center center fixed;
             background-size: cover;
-            background-color: #2c3e50; /* Warna cadangan jika gambar gagal dimuat */
+            background-color: #2c3e50;
             color: #333;
             min-height: 100vh;
             overflow-x: hidden;
-            position: relative; /* Penting untuk positioning overlay shadow */
+            position: relative;
         }
 
-        /* Efek Shadow / Overlay Gelap pada Background */
-        /* Ini membuat background terlihat ada bayangan/gelapnya agar konten lebih fokus */
         body::before {
             content: '';
             position: fixed;
@@ -35,9 +32,9 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5); /* Overlay gelap 50% */
+            background: rgba(0, 0, 0, 0.5);
             z-index: -1;
-            pointer-events: none; /* Agar klik tembus */
+            pointer-events: none;
         }
 
         /* SIDEBAR */
@@ -50,8 +47,7 @@
             overflow-y: auto;
             transition: all 0.3s ease;
             z-index: 100;
-            /* UPDATE SHADOW: Bayangan lebih tegas dan gelap agar menonjol dari background */
-            box-shadow: 10px 0 25px rgba(0, 0, 0, 0.4); 
+            box-shadow: 10px 0 25px rgba(0, 0, 0, 0.4);
             border-right: 1px solid rgba(255, 255, 255, 0.1);
         }
 
@@ -256,14 +252,13 @@
             width: calc(100% - 80px);
         }
 
-        /* HEADER - TATA LETAK TERBARU (TERPUSAT) */
+        /* HEADER */
         .header {
             background: linear-gradient(135deg, #6a4fdb 0%, #4a2fa8 100%);
             color: white;
             padding: 30px;
             border-radius: 15px;
             margin-bottom: 30px;
-            /* UPDATE SHADOW: Bayangan hitam tegas agar melayang di atas background */
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
             min-height: 200px;
             display: flex;
@@ -359,13 +354,11 @@
             position: relative;
             min-width: 240px;
             z-index: 1;
-            /* UPDATE SHADOW: Bayangan lebih tegas pada info bar */
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
             transition: all 0.3s ease;
             overflow: hidden;
         }
 
-        /* Gradient background yang berputar di dalam */
         .date-container::before, .clock-container::before, .network-checker::before {
             content: '';
             position: absolute;
@@ -382,7 +375,6 @@
             border-radius: 15px;
         }
 
-        /* Konten di atas gradient */
         .date-content, .clock-content, .network-content {
             position: relative;
             background: white;
@@ -397,7 +389,6 @@
             z-index: 2;
         }
 
-        /* Animasi untuk gradient berputar */
         @keyframes gradientRotate {
             0% {
                 background-position: 0% 50%;
@@ -412,13 +403,11 @@
             }
         }
 
-        /* Efek hover */
         .date-container:hover, .clock-container:hover, .network-checker:hover {
             transform: translateY(-5px) scale(1.02);
             box-shadow: 0 12px 25px rgba(0, 0, 0, 0.25);
         }
 
-        /* Style untuk teks di dalam (rata tengah) */
         .date-text, .clock-text {
             font-weight: 600;
             text-align: center;
@@ -429,7 +418,6 @@
             flex: 1;
         }
 
-        /* Font khusus untuk tanggal - Orbitron */
         .date-text {
             font-family: 'Orbitron', sans-serif;
             color: #2c3e50;
@@ -438,7 +426,6 @@
             text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
         }
 
-        /* Font khusus untuk jam digital - Share Tech Mono dengan efek kedip halus */
         .clock-text {
             font-family: 'Share Tech Mono', monospace;
             font-size: clamp(22px, 2.4vw, 32px);
@@ -449,7 +436,6 @@
             animation: gentleBlink 4s infinite;
         }
 
-        /* Animasi kedip halus untuk jam */
         @keyframes gentleBlink {
             0%, 100% {
                 opacity: 1;
@@ -461,7 +447,6 @@
             }
         }
 
-        /* Icon juga diatur agar ikut rata tengah */
         .date-icon, .clock-icon, .network-icon {
             color: #5d3fd3;
             font-size: clamp(18px, 1.8vw, 24px);
@@ -473,7 +458,6 @@
             color: #3a1f8c;
         }
 
-        /* Network checker specific styles */
         .network-checker {
             cursor: pointer;
         }
@@ -512,7 +496,6 @@
             100% { opacity: 1; }
         }
 
-        /* Font khusus untuk ping - Share Tech Mono */
         .network-ping {
             font-family: 'Share Tech Mono', monospace;
             font-weight: 700;
@@ -631,8 +614,8 @@
             100% { opacity: 1; }
         }
 
-        /* TOMBOL COPY STYLES - DI SAMPING JUDUL DAN ISI */
-        .title-with-copy {
+        /* PERUBAHAN: Judul untuk MEMO dengan tombol copy */
+        .memo-title-with-copy {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -640,11 +623,159 @@
             gap: 10px;
         }
 
+        /* PERUBAHAN BARU: Judul untuk REPORTAN di tengah dengan warna sesuai subkategori - DIPERBAIKI */
+        .report-title-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            width: 100%;
+            margin-bottom: 15px;
+            padding: 0 5px;
+        }
+
+        .report-title-text {
+            font-weight: 700;
+            color: white;
+            font-size: 1.2rem;
+            line-height: 1.4;
+            padding: 10px 15px;
+            border-radius: 8px;
+            text-align: center;
+            width: auto;
+            max-width: 100%;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+            margin: 0;
+            display: inline-block;
+            border: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            word-break: break-word;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* WARNA MENARIK UNTUK SETIAP SUBCATEGORY */
+
+        /* MEMO PEMBAGIAN BONUS - Warna Emas/Gold dengan efek metalik */
+        .report-title-text[data-subcategory="MEMO PEMBAGIAN BONUS"] {
+            background: linear-gradient(135deg, #FFD700 0%, #FFB347 100%);
+            border-left: 4px solid #FF9800;
+            color: #5D4037;
+            text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
+        }
+
+        /* MEMO INFORMASI BANK - Warna Biru Elektrik */
+        .report-title-text[data-subcategory="MEMO INFORMASI BANK"] {
+            background: linear-gradient(135deg, #00B4DB 0%, #0083B0 100%);
+            border-left: 4px solid #005A8D;
+            color: white;
+        }
+
+        /* MEMO KENDALA PERMAINAN - Warna Hijau Neon */
+        .report-title-text[data-subcategory="MEMO KENDALA PERMAINAN"] {
+            background: linear-gradient(135deg, #00F260 0%, #0575E6 100%);
+            border-left: 4px solid #02AAB0;
+            color: white;
+        }
+
+        /* MEMO KENDALA SISTEM - Warna Ungu Elektrik */
+        .report-title-text[data-subcategory="MEMO KENDALA SISTEM"] {
+            background: linear-gradient(135deg, #8A2387 0%, #F27121 100%);
+            border-left: 4px solid #E94057;
+            color: white;
+        }
+
+        /* REPORT KENDALA BANK - Warna Merah Muda/Magenta */
+        .report-title-text[data-subcategory="REPORT KENDALA BANK"] {
+            background: linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%);
+            border-left: 4px solid #FF0000;
+            color: white;
+        }
+
+        /* REPORT KENDALA RESULT - Warna Cyan/Toska */
+        .report-title-text[data-subcategory="REPORT KENDALA RESULT"] {
+            background: linear-gradient(135deg, #00C9FF 0%, #92FE9D 100%);
+            border-left: 4px solid #00B09B;
+            color: #1A237E;
+            text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
+        }
+
+        /* REPORT KENDALA OPERASIONAL - Warna Oranye/Emas Gelap */
+        .report-title-text[data-subcategory="REPORT KENDALA OPERASIONAL"] {
+            background: linear-gradient(135deg, #FFA62E 0%, #FF4E00 100%);
+            border-left: 4px solid #FF3D00;
+            color: white;
+        }
+
+        /* Efek hover untuk judul reportan */
+        .report-title-text:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            filter: brightness(1.1);
+        }
+
+        /* Efek kilatan di sudut */
+        .report-title-text::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 30%,
+                rgba(255, 255, 255, 0.1) 50%,
+                transparent 70%
+            );
+            transform: rotate(45deg);
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .report-title-text:hover::before {
+            opacity: 1;
+            animation: shine 1.5s infinite;
+        }
+
+        @keyframes shine {
+            0% {
+                transform: translateX(-100%) translateY(-100%) rotate(45deg);
+            }
+            100% {
+                transform: translateX(100%) translateY(100%) rotate(45deg);
+            }
+        }
+
+        /* Efek border animasi */
+        .report-title-text::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.3);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s;
+        }
+
+        .report-title-text:hover::after {
+            transform: scaleX(1);
+        }
+
         .data-title {
             font-weight: 700;
             color: white;
             font-size: 1.2rem;
             flex: 1;
+            word-break: break-word;
+            overflow-wrap: break-word;
         }
 
         .btn-copy-title, .btn-copy-content {
@@ -661,6 +792,7 @@
             transition: all 0.3s;
             width: 40px;
             height: 36px;
+            flex-shrink: 0;
         }
 
         .btn-copy-title:hover, .btn-copy-content:hover {
@@ -686,6 +818,7 @@
             font-weight: 600;
         }
 
+        /* PERUBAHAN: Isi konten dengan baris baru tetap terbaca */
         .data-content {
             color: rgba(255, 255, 255, 0.9);
             line-height: 1.6;
@@ -695,6 +828,9 @@
             display: -webkit-box;
             -webkit-line-clamp: 4;
             -webkit-box-orient: vertical;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            word-break: break-word;
         }
 
         .copy-success {
@@ -740,7 +876,6 @@
             max-width: 90%;
             padding: 30px;
             border-radius: 15px;
-            /* UPDATE SHADOW: Modal dengan bayangan kuat */
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
@@ -784,6 +919,7 @@
         .edit-modal-content textarea {
             min-height: 150px;
             resize: vertical;
+            white-space: pre-wrap;
         }
 
         .edit-modal-buttons {
@@ -829,12 +965,11 @@
             box-shadow: 0 5px 15px rgba(138, 43, 226, 0.3);
         }
 
-        /* Form Container dengan tema biru keunguan */
+        /* Form Container */
         .form-container {
             background: linear-gradient(135deg, #6a4fdb 0%, #4a2fa8 100%);
             padding: 40px;
             border-radius: 15px;
-            /* UPDATE SHADOW: Form container dengan bayangan tegas */
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
             margin-bottom: 40px;
             animation: fadeIn 0.5s;
@@ -902,6 +1037,7 @@
             min-height: 220px;
             resize: vertical;
             line-height: 1.6;
+            white-space: pre-wrap;
         }
 
         select {
@@ -1000,12 +1136,11 @@
             background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
         }
 
-        /* Data Tersimpan dengan tema biru keunguan untuk semua subkategori */
+        /* Data Tersimpan */
         .data-container {
             background: linear-gradient(135deg, #6a4fdb 0%, #4a2fa8 100%);
             padding: 40px;
             border-radius: 15px;
-            /* UPDATE SHADOW: Data container dengan bayangan tegas */
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
             margin-top: 30px;
             animation: fadeIn 0.5s;
@@ -1040,7 +1175,7 @@
             gap: 12px;
         }
 
-        /* Search Container dengan tema biru keunguan */
+        /* Search Container */
         .search-container {
             display: flex;
             gap: 15px;
@@ -1145,13 +1280,11 @@
             padding: 25px;
             transition: all 0.3s;
             backdrop-filter: blur(10px);
-            /* UPDATE SHADOW: Data item dengan shadow saat hover */
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         .data-item:hover {
             background: rgba(255, 255, 255, 0.15);
-            /* UPDATE SHADOW: Shadow lebih besar saat di-hover */
             box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
             transform: translateY(-5px);
             border-color: rgba(255, 255, 255, 0.4);
@@ -1170,7 +1303,7 @@
             box-shadow: 0 2px 5px rgba(138, 43, 226, 0.3);
         }
 
-        /* Subkategori dengan variasi warna biru keunguan */
+        /* Subkategori dengan variasi warna MENARIK */
         .data-subcategory {
             display: inline-block;
             color: white;
@@ -1181,23 +1314,59 @@
             margin-bottom: 12px;
             margin-left: 8px;
             box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
         }
 
-        /* Warna berbeda untuk setiap subkategori memo */
+        /* WARNA MENARIK UNTUK SETIAP SUBCATEGORY - SAMA DENGAN JUDUL */
+
+        /* MEMO PEMBAGIAN BONUS - Warna Emas/Gold dengan efek metalik */
         .data-subcategory[data-subcategory="MEMO PEMBAGIAN BONUS"] {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            background: linear-gradient(135deg, #FFD700 0%, #FFB347 100%);
+            color: #5D4037;
+            text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
         }
 
+        /* MEMO INFORMASI BANK - Warna Biru Elektrik */
         .data-subcategory[data-subcategory="MEMO INFORMASI BANK"] {
-            background: linear-gradient(135deg, #48dbfb 0%, #0abde3 100%);
+            background: linear-gradient(135deg, #00B4DB 0%, #0083B0 100%);
+            color: white;
         }
 
+        /* MEMO KENDALA PERMAINAN - Warna Hijau Neon */
         .data-subcategory[data-subcategory="MEMO KENDALA PERMAINAN"] {
-            background: linear-gradient(135deg, #1dd1a1 0%, #10ac84 100%);
+            background: linear-gradient(135deg, #00F260 0%, #0575E6 100%);
+            color: white;
         }
 
+        /* MEMO KENDALA SISTEM - Warna Ungu Elektrik */
         .data-subcategory[data-subcategory="MEMO KENDALA SISTEM"] {
-            background: linear-gradient(135deg, #f368e0 0%, #ff9ff3 100%);
+            background: linear-gradient(135deg, #8A2387 0%, #F27121 100%);
+            color: white;
+        }
+
+        /* REPORT KENDALA BANK - Warna Merah Muda/Magenta */
+        .data-subcategory[data-subcategory="REPORT KENDALA BANK"] {
+            background: linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%);
+            color: white;
+        }
+
+        /* REPORT KENDALA RESULT - Warna Cyan/Toska */
+        .data-subcategory[data-subcategory="REPORT KENDALA RESULT"] {
+            background: linear-gradient(135deg, #00C9FF 0%, #92FE9D 100%);
+            color: #1A237E;
+            text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
+        }
+
+        /* REPORT KENDALA OPERASIONAL - Warna Oranye/Emas Gelap */
+        .data-subcategory[data-subcategory="REPORT KENDALA OPERASIONAL"] {
+            background: linear-gradient(135deg, #FFA62E 0%, #FF4E00 100%);
+            color: white;
+        }
+
+        /* Efek hover untuk subkategori */
+        .data-subcategory:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
         .data-date {
@@ -1301,6 +1470,11 @@
             .header p {
                 font-size: 1.1rem;
             }
+            
+            .report-title-text {
+                font-size: 1.15rem;
+                padding: 9px 12px;
+            }
         }
 
         /* Responsif */
@@ -1338,6 +1512,11 @@
             
             .sidebar.minimized ~ .main-content .data-grid {
                 grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+            
+            .report-title-text {
+                font-size: 1.15rem;
+                padding: 9px 12px;
             }
         }
         
@@ -1494,6 +1673,11 @@
                 width: 95%;
                 padding: 20px;
             }
+            
+            .report-title-text {
+                font-size: 1.1rem;
+                padding: 8px 10px;
+            }
         }
         
         @media (max-width: 768px) {
@@ -1574,7 +1758,8 @@
                 width: 100%;
             }
             
-            .title-with-copy {
+            /* PERUBAHAN: Hapus tombol copy judul di mobile untuk memo */
+            .memo-title-with-copy {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 8px;
@@ -1583,6 +1768,11 @@
             .btn-copy-title, .btn-copy-content {
                 width: 100%;
                 justify-content: center;
+            }
+            
+            .report-title-text {
+                font-size: 1.05rem;
+                padding: 7px 10px;
             }
         }
         
@@ -1662,38 +1852,53 @@
                 font-size: 16px;
                 min-width: 25px;
             }
+            
+            .report-title-text {
+                font-size: 1rem;
+                padding: 6px 8px;
+            }
+            
+            .data-content {
+                font-size: 0.95rem;
+                line-height: 1.5;
+                -webkit-line-clamp: 3;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Modal Edit Memo -->
+    <!-- Modal Edit -->
     <div class="edit-modal" id="editModal">
         <div class="edit-modal-content">
-            <h2><i class="fas fa-edit"></i> Edit Memo</h2>
+            <h2><i class="fas fa-edit"></i> Edit Data</h2>
             
             <form id="editFormData">
-                <input type="hidden" id="editMemoId" value="">
-                <input type="hidden" id="editMemoSheet" value="">
+                <input type="hidden" id="editDataId" value="">
+                <input type="hidden" id="editDataSheet" value="">
+                <input type="hidden" id="editDataType" value="">
                 
                 <div style="margin-bottom: 20px;">
-                    <label style="color: white; margin-bottom: 8px; display: block; font-weight: 600;">Subkategori Memo</label>
-                    <select id="editMemoSubcategory" disabled>
-                        <option value="">Pilih Subkategori</option>
+                    <label style="color: white; margin-bottom: 8px; display: block; font-weight: 600;">Kategori</label>
+                    <select id="editDataCategory" disabled>
+                        <option value="">Pilih Kategori</option>
                         <option value="MEMO PEMBAGIAN BONUS">MEMO PEMBAGIAN BONUS</option>
                         <option value="MEMO INFORMASI BANK">MEMO INFORMASI BANK</option>
                         <option value="MEMO KENDALA PERMAINAN">MEMO KENDALA PERMAINAN</option>
                         <option value="MEMO KENDALA SISTEM">MEMO KENDALA SISTEM</option>
+                        <option value="REPORT KENDALA BANK">REPORT KENDALA BANK</option>
+                        <option value="REPORT KENDALA RESULT">REPORT KENDALA RESULT</option>
+                        <option value="REPORT KENDALA OPERASIONAL">REPORT KENDALA OPERASIONAL</option>
                     </select>
                 </div>
                 
                 <div style="margin-bottom: 20px;">
-                    <label style="color: white; margin-bottom: 8px; display: block; font-weight: 600;">Judul Memo</label>
-                    <input type="text" id="editMemoJudul" required>
+                    <label style="color: white; margin-bottom: 8px; display: block; font-weight: 600;">Judul</label>
+                    <input type="text" id="editDataJudul" required>
                 </div>
                 
                 <div style="margin-bottom: 25px;">
-                    <label style="color: white; margin-bottom: 8px; display: block; font-weight: 600;">Isi / Memo</label>
-                    <textarea id="editMemoIsi" required></textarea>
+                    <label style="color: white; margin-bottom: 8px; display: block; font-weight: 600;">Isi</label>
+                    <textarea id="editDataIsi" required></textarea>
                 </div>
                 
                 <div class="edit-modal-buttons">
@@ -1713,7 +1918,7 @@
         <i class="fas fa-bars"></i>
     </button>
     
-    <!-- Sidebar Menu dengan warna biru keunguan -->
+    <!-- Sidebar Menu -->
     <div class="sidebar" id="sidebar">
         <div class="logo">
             <h2><i class="fas fa-sticky-note"></i> <span class="logo-text">Memo & Reportan</span></h2>
@@ -1764,18 +1969,37 @@
             </div>
         </div>
         
-        <div class="menu-item" data-category="reportan">
+        <!-- Menu REPORTAN dengan arrow untuk collapse/expand -->
+        <div class="menu-item" data-category="reportan" id="mainMenuReportan">
             <div class="menu-item-content">
                 <i class="fas fa-file-alt"></i>
-                <span>Reportan</span>
+                <span>REPORTAN</span>
             </div>
-            <div class="memo-count" id="reportanCount">0</div>
+            <div class="menu-item-arrow" id="reportanArrow">
+                <i class="fas fa-chevron-down"></i>
+            </div>
+        </div>
+        
+        <!-- Submenu untuk Reportan -->
+        <div class="submenu" id="reportanSubmenu">
+            <div class="submenu-item" data-subcategory="REPORT KENDALA BANK">
+                <span><i class="fas fa-university"></i> REPORT KENDALA BANK</span>
+                <div class="memo-count" id="bankReportCount">0</div>
+            </div>
+            <div class="submenu-item" data-subcategory="REPORT KENDALA RESULT">
+                <span><i class="fas fa-chart-bar"></i> REPORT KENDALA RESULT</span>
+                <div class="memo-count" id="resultReportCount">0</div>
+            </div>
+            <div class="submenu-item" data-subcategory="REPORT KENDALA OPERASIONAL">
+                <span><i class="fas fa-cogs"></i> REPORT KENDALA OPERASIONAL</span>
+                <div class="memo-count" id="operasionalReportCount">0</div>
+            </div>
         </div>
     </div>
     
     <!-- Konten Utama -->
     <div class="main-content">
-        <!-- HEADER dengan tema biru keunguan - TATA LETAK TERBARU (TERPUSAT) -->
+        <!-- HEADER -->
         <div class="header">
             <div class="header-content">
                 <div class="header-icon">
@@ -1786,9 +2010,8 @@
             </div>
         </div>
         
-        <!-- BAR INFORMASI DI BAWAH HEADER - GRID 3 KOLOM SAMA BESAR dengan animasi gradient di dalam -->
+        <!-- BAR INFORMASI -->
         <div class="info-bar">
-            <!-- Kolom Kiri - Tanggal (align-center) -->
             <div class="info-left">
                 <div class="date-container">
                     <div class="date-content">
@@ -1798,7 +2021,6 @@
                 </div>
             </div>
             
-            <!-- Kolom Tengah - Jam Digital (align-center) -->
             <div class="info-center">
                 <div class="clock-container">
                     <div class="clock-content">
@@ -1808,7 +2030,6 @@
                 </div>
             </div>
             
-            <!-- Kolom Kanan - Network Checker (align-center) -->
             <div class="info-right">
                 <div class="network-container">
                     <div class="network-checker" id="networkChecker">
@@ -1848,37 +2069,39 @@
             </div>
         </div>
         
-        <!-- Form Memo dengan tema biru keunguan -->
-        <div class="form-container" id="memoForm">
+        <!-- Form Input -->
+        <div class="form-container" id="inputForm">
             <h3 class="form-title"><i class="fas fa-edit"></i> <span id="formTitle">Form Tambah Memo Baru</span></h3>
-            <form id="memoFormData">
-                <!-- Input hidden untuk menyimpan ID saat edit -->
-                <input type="hidden" id="memoId" value="">
+            <form id="dataForm">
+                <input type="hidden" id="dataId" value="">
                 
                 <div class="form-group">
-                    <label for="memoJudul"><i class="fas fa-heading"></i> Judul Memo</label>
-                    <input type="text" id="memoJudul" placeholder="Contoh: INFORMASI BONUS CASHBACK KEKALAHAN 5% (SLOT GAMES & E-LOTTERY)" required>
+                    <label for="dataJudul"><i class="fas fa-heading"></i> Judul</label>
+                    <input type="text" id="dataJudul" placeholder="Contoh: INFORMASI BONUS CASHBACK KEKALAHAN 5% (SLOT GAMES & E-LOTTERY)" required>
                 </div>
                 
                 <div class="form-group">
-                    <label for="memoIsi"><i class="fas fa-edit"></i> Isi / Memo</label>
-                    <textarea id="memoIsi" placeholder="Tulis isi memo di sini..." required></textarea>
+                    <label for="dataIsi"><i class="fas fa-edit"></i> Isi</label>
+                    <textarea id="dataIsi" placeholder="Tulis isi di sini..." required></textarea>
                 </div>
                 
                 <div class="form-group">
-                    <label for="memoSubcategory"><i class="fas fa-tag"></i> Subkategori Memo</label>
-                    <select id="memoSubcategory" required>
+                    <label for="dataSubcategory"><i class="fas fa-tag"></i> Subkategori</label>
+                    <select id="dataSubcategory" required>
                         <option value="">Pilih Subkategori</option>
                         <option value="MEMO PEMBAGIAN BONUS">MEMO PEMBAGIAN BONUS</option>
                         <option value="MEMO INFORMASI BANK">MEMO INFORMASI BANK</option>
                         <option value="MEMO KENDALA PERMAINAN">MEMO KENDALA PERMAINAN</option>
                         <option value="MEMO KENDALA SISTEM">MEMO KENDALA SISTEM</option>
+                        <option value="REPORT KENDALA BANK">REPORT KENDALA BANK</option>
+                        <option value="REPORT KENDALA RESULT">REPORT KENDALA RESULT</option>
+                        <option value="REPORT KENDALA OPERASIONAL">REPORT KENDALA OPERASIONAL</option>
                     </select>
                 </div>
                 
                 <div class="form-group">
-                    <button type="submit" class="btn" id="submitMemo">
-                        <i class="fas fa-plus"></i> <span id="submitButtonText">Tambah Memo</span>
+                    <button type="submit" class="btn" id="submitData">
+                        <i class="fas fa-plus"></i> <span id="submitButtonText">Tambah Data</span>
                     </button>
                     <button type="button" class="btn btn-reset" id="cancelEdit" style="display: none;">
                         <i class="fas fa-times"></i> Batal Edit
@@ -1906,7 +2129,7 @@
             </form>
         </div>
         
-        <!-- Data Tersimpan - HANYA DITAMPILKAN DI SUBKATEGORI -->
+        <!-- Data Tersimpan -->
         <div class="data-container" id="dataContainer">
             <div class="data-header">
                 <h3 id="dataTitle"><i class="fas fa-database"></i> Data Tersimpan</h3>
@@ -1924,14 +2147,14 @@
             <div class="search-container" id="searchContainer">
                 <div class="search-box">
                     <i class="fas fa-search search-icon"></i>
-                    <input type="text" id="searchInput" class="search-input" placeholder="Cari memo berdasarkan kata kunci...">
+                    <input type="text" id="searchInput" class="search-input" placeholder="Cari berdasarkan kata kunci...">
                 </div>
                 <button class="search-clear" id="clearSearch">
                     <i class="fas fa-times"></i> Hapus Pencarian
                 </button>
                 <div class="search-info" id="searchInfo">
                     <i class="fas fa-info-circle"></i>
-                    <span>Cari di judul dan isi memo</span>
+                    <span>Cari di judul dan isi</span>
                 </div>
             </div>
             
@@ -1968,12 +2191,13 @@
         let isMainPage = true;
         let currentSearchKeyword = '';
         let isMemoSubmenuExpanded = true;
+        let isReportanSubmenuExpanded = false;
         let networkResultVisible = false;
         let lastNetworkCheckTime = null;
         let isSidebarMinimized = localStorage.getItem('sidebarMinimized') === 'true';
         let sheetDataCache = {};
         let isEditMode = false;
-        let editingMemoId = '';
+        let editingDataId = '';
 
         // ========== FUNGSI UTAMA ==========
 
@@ -2041,41 +2265,83 @@
                 `;
             }
             
-            let sheetName = subcategory.replace('MEMO ', '');
+            let sheetName = '';
+            let isMemo = false;
             
-            google.script.run
-                .withSuccessHandler(function(result) {
-                    if (result.success) {
-                        sheetDataCache[subcategory] = result.data;
-                        renderDataFromCache(subcategory, currentSearchKeyword);
-                        updateSubcategoryCount(subcategory, result.count);
-                    } else {
+            if (subcategory.startsWith('MEMO ')) {
+                sheetName = subcategory.replace('MEMO ', '');
+                isMemo = true;
+            } else if (subcategory.startsWith('REPORT ')) {
+                sheetName = subcategory.replace('REPORT ', '');
+                isMemo = false;
+            }
+            
+            if (isMemo) {
+                google.script.run
+                    .withSuccessHandler(function(result) {
+                        if (result.success) {
+                            sheetDataCache[subcategory] = result.data;
+                            renderDataFromCache(subcategory, currentSearchKeyword);
+                            updateSubcategoryCount(subcategory, result.count);
+                        } else {
+                            dataGrid.innerHTML = `
+                            <div class="empty-data">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <h3>Gagal memuat data</h3>
+                                <p>${result.message || 'Tidak ada data atau sheet belum dibuat'}</p>
+                                <button class="btn" onclick="loadDataFromSheet('${subcategory}')" style="margin-top: 15px;">
+                                <i class="fas fa-redo"></i> Coba Lagi
+                                </button>
+                            </div>
+                            `;
+                        }
+                    })
+                    .withFailureHandler(function(error) {
+                        console.error('Error loading data:', error);
                         dataGrid.innerHTML = `
                         <div class="empty-data">
                             <i class="fas fa-exclamation-triangle"></i>
                             <h3>Gagal memuat data</h3>
-                            <p>${result.message || 'Tidak ada data atau sheet belum dibuat'}</p>
-                            <button class="btn" onclick="loadDataFromSheet('${subcategory}')" style="margin-top: 15px;">
-                            <i class="fas fa-redo"></i> Coba Lagi
-                            </button>
+                            <p>${error.message || 'Terjadi kesalahan'}</p>
                         </div>
                         `;
-                    }
-                })
-                .withFailureHandler(function(error) {
-                    console.error('Error loading data:', error);
-                    dataGrid.innerHTML = `
-                    <div class="empty-data">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <h3>Gagal memuat data</h3>
-                        <p>${error.message || 'Terjadi kesalahan'}</p>
-                    </div>
-                    `;
-                })
-                .getDataFromSheet(sheetName);
+                    })
+                    .getDataFromSheet(sheetName);
+            } else {
+                google.script.run
+                    .withSuccessHandler(function(result) {
+                        if (result.success) {
+                            sheetDataCache[subcategory] = result.data;
+                            renderDataFromCache(subcategory, currentSearchKeyword);
+                            updateSubcategoryCount(subcategory, result.count);
+                        } else {
+                            dataGrid.innerHTML = `
+                            <div class="empty-data">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <h3>Gagal memuat data</h3>
+                                <p>${result.message || 'Tidak ada data atau sheet belum dibuat'}</p>
+                                <button class="btn" onclick="loadDataFromSheet('${subcategory}')" style="margin-top: 15px;">
+                                <i class="fas fa-redo"></i> Coba Lagi
+                                </button>
+                            </div>
+                            `;
+                        }
+                    })
+                    .withFailureHandler(function(error) {
+                        console.error('Error loading data:', error);
+                        dataGrid.innerHTML = `
+                        <div class="empty-data">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <h3>Gagal memuat data</h3>
+                            <p>${error.message || 'Terjadi kesalahan'}</p>
+                        </div>
+                        `;
+                    })
+                    .getReportanDataFromSheet(sheetName);
+            }
         }
 
-        // Fungsi untuk merender data dari cache
+        // PERUBAHAN: Fungsi untuk merender data dari cache dengan tampilan berbeda untuk REPORTAN dan MEMO
         function renderDataFromCache(subcategory, keyword = '') {
             const data = sheetDataCache[subcategory] || [];
             const dataGrid = document.getElementById('dataGrid');
@@ -2101,7 +2367,7 @@
                 let subMessage = 'Tambah data baru untuk melihatnya di sini';
                 
                 if (keyword.trim()) {
-                    const subcategoryName = subcategory.replace('MEMO ', '');
+                    const subcategoryName = subcategory.replace(/^(MEMO|REPORT) /, '');
                     message = `Tidak ditemukan hasil untuk "${keyword}"`;
                     subMessage = `Coba kata kunci lain di ${subcategoryName}`;
                 }
@@ -2125,27 +2391,59 @@
                 return dateB - dateA;
             });
             
+            // PERUBAHAN: Tentukan apakah ini reportan atau memo berdasarkan subcategory
+            // Semua subcategory yang dimulai dengan "REPORT" dianggap sebagai reportan
+            const isReport = subcategory.startsWith('REPORT');
+            
             sortedData.forEach((item) => {
                 const dataItem = document.createElement('div');
                 dataItem.className = 'data-item';
-                dataItem.id = `memo-${item.id}`;
+                dataItem.id = `data-${item.id}`;
                 
-                const subcategoryName = `MEMO ${item.sheet || ''}`;
                 const displayDate = item.tanggal || 'Tanggal tidak tersedia';
                 
-                // Escape HTML untuk mencegah XSS
+                // PERUBAHAN: Escape HTML dan pertahankan baris baru
                 const safeJudul = (item.judul || '(Tanpa Judul)').replace(/</g, '&lt;').replace(/>/g, '&gt;');
                 const safeIsi = (item.isi || '(Tanpa Isi)').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                
+                // PERUBAHAN BARU: Buat HTML judul berbeda untuk reportan dan memo
+                let judulHTML = '';
+                if (isReport) {
+                    // PERUBAHAN BARU: Untuk REPORTAN: Judul di tengah card dengan warna sesuai subkategori
+                    // Gunakan spasi normal agar teks tidak terpotong kecuali perlu
+                    const judulLines = safeJudul.split('\n');
+                    const displayJudul = judulLines.length > 1 ? 
+                        judulLines.map(line => line.trim()).join(' ') : safeJudul;
+                    
+                    judulHTML = `
+                        <div class="report-title-container">
+                            <div class="report-title-text" id="judul-${item.id}" data-subcategory="${subcategory}">
+                                ${displayJudul}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // Untuk MEMO: Judul dengan tombol copy di samping (tetap sama)
+                    judulHTML = `
+                        <div class="memo-title-with-copy">
+                            <div class="data-title" id="judul-${item.id}">${safeJudul}</div>
+                            <button class="btn-copy-title" onclick="copyJudul('${item.id}')" title="Salin Judul">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    `;
+                }
                 
                 // Tombol aksi (edit/hapus) - hanya tampil jika mode edit aktif
                 let actionButtons = '';
                 if (isEditMode) {
+                    const dataType = isReport ? 'report' : 'memo';
                     actionButtons = `
                     <div class="data-actions" style="margin-top: 15px; display: flex; gap: 10px;">
-                        <button class="btn-edit" onclick="editMemo('${item.id}', '${item.sheet}')" style="background: rgba(255, 255, 255, 0.15); color: white; border: 1px solid rgba(255, 255, 255, 0.3); padding: 8px 15px; border-radius: 6px; cursor: pointer; transition: all 0.3s; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; font-weight: 600; flex: 1; justify-content: center;">
+                        <button class="btn-edit" onclick="editData('${item.id}', '${item.sheet}', '${dataType}')" style="background: rgba(255, 255, 255, 0.15); color: white; border: 1px solid rgba(255, 255, 255, 0.3); padding: 8px 15px; border-radius: 6px; cursor: pointer; transition: all 0.3s; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; font-weight: 600; flex: 1; justify-content: center;">
                             <i class="fas fa-edit"></i> Edit
                         </button>
-                        <button class="btn-delete" onclick="deleteMemo('${item.id}', '${item.sheet}')" style="background: rgba(231, 76, 60, 0.2); color: #e74c3c; border: 1px solid #e74c3c; padding: 8px 15px; border-radius: 6px; cursor: pointer; transition: all 0.3s; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; font-weight: 600; flex: 1; justify-content: center;">
+                        <button class="btn-delete" onclick="deleteData('${item.id}', '${item.sheet}', '${dataType}')" style="background: rgba(231, 76, 60, 0.2); color: #e74c3c; border: 1px solid #e74c3c; padding: 8px 15px; border-radius: 6px; cursor: pointer; transition: all 0.3s; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; font-weight: 600; flex: 1; justify-content: center;">
                             <i class="fas fa-trash"></i> Hapus
                         </button>
                     </div>
@@ -2155,29 +2453,24 @@
                 dataItem.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                         <div>
-                            <span class="data-category">MEMO</span>
-                            <span class="data-subcategory" data-subcategory="${subcategoryName}">${subcategoryName}</span>
+                            <span class="data-category">${isReport ? 'REPORT' : 'MEMO'}</span>
+                            <span class="data-subcategory" data-subcategory="${subcategory}">${subcategory}</span>
                         </div>
                         ${isEditMode ? '<div class="edit-badge" style="background: rgba(255, 167, 38, 0.2); color: #ffa726; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; border: 1px solid rgba(255, 167, 38, 0.5);"><i class="fas fa-pencil-alt"></i> Edit</div>' : ''}
                     </div>
                     
-                    <!-- Judul dengan tombol copy di samping -->
-                    <div class="title-with-copy">
-                        <div class="data-title" id="judul-${item.id}">${safeJudul}</div>
-                        <button class="btn-copy-title" onclick="copyJudul('${item.id}')" title="Salin Judul">
-                            <i class="fas fa-copy"></i>
-                        </button>
-                    </div>
+                    <!-- PERUBAHAN BARU: Judul berbeda untuk reportan dan memo -->
+                    ${judulHTML}
                     
-                    <!-- Isi memo dengan tombol copy di samping -->
+                    <!-- Isi dengan tombol copy di samping (sama untuk keduanya) -->
                     <div class="content-with-copy">
                         <div class="content-header">
-                            <span>Isi Memo:</span>
+                            <span>Isi:</span>
                             <button class="btn-copy-content" onclick="copyIsi('${item.id}')" title="Salin Isi">
                                 <i class="fas fa-copy"></i>
                             </button>
                         </div>
-                        <div class="data-content" id="isi-${item.id}">${safeIsi}</div>
+                        <div class="data-content" id="isi-${item.id}" style="white-space: pre-wrap;">${safeIsi}</div>
                     </div>
                     
                     <div class="data-date">
@@ -2192,9 +2485,20 @@
 
         // ========== FUNGSI COPY ==========
         
-        // Fungsi untuk menyalin judul
-        function copyJudul(memoId) {
-            const judulElement = document.getElementById(`judul-${memoId}`);
+        // PERUBAHAN: Fungsi untuk menyalin judul (hanya untuk MEMO, untuk REPORTAN tidak aktif)
+        function copyJudul(dataId) {
+            // PERUBAHAN: Cek apakah ini reportan, jika ya, tidak perlu copy judul
+            const dataElement = document.getElementById(`data-${dataId}`);
+            if (dataElement) {
+                const categoryBadge = dataElement.querySelector('.data-category');
+                const isReport = categoryBadge && categoryBadge.textContent === 'REPORT';
+                if (isReport) {
+                    showNotification('❌ Fitur salin judul tidak tersedia untuk Reportan', 'error');
+                    return;
+                }
+            }
+            
+            const judulElement = document.getElementById(`judul-${dataId}`);
             if (!judulElement) {
                 showNotification('❌ Gagal menemukan judul', 'error');
                 return;
@@ -2234,11 +2538,11 @@
                 });
         }
 
-        // Fungsi untuk menyalin isi
-        function copyIsi(memoId) {
-            const isiElement = document.getElementById(`isi-${memoId}`);
+        // Fungsi untuk menyalin isi (untuk MEMO dan REPORTAN)
+        function copyIsi(dataId) {
+            const isiElement = document.getElementById(`isi-${dataId}`);
             if (!isiElement) {
-                showNotification('❌ Gagal menemukan isi memo', 'error');
+                showNotification('❌ Gagal menemukan isi', 'error');
                 return;
             }
             
@@ -2246,7 +2550,7 @@
             
             navigator.clipboard.writeText(isiText)
                 .then(() => {
-                    showCopySuccess('✓ Isi memo berhasil disalin ke clipboard!');
+                    showCopySuccess('✓ Isi berhasil disalin ke clipboard!');
                     
                     // Highlight effect
                     isiElement.style.transition = 'all 0.3s';
@@ -2270,9 +2574,9 @@
                     textArea.select();
                     try {
                         document.execCommand('copy');
-                        showCopySuccess('✓ Isi memo berhasil disalin ke clipboard!');
+                        showCopySuccess('✓ Isi berhasil disalin ke clipboard!');
                     } catch (fallbackErr) {
-                        showNotification('❌ Gagal menyalin isi memo', 'error');
+                        showNotification('❌ Gagal menyalin isi', 'error');
                     }
                     document.body.removeChild(textArea);
                 });
@@ -2280,7 +2584,6 @@
 
         // Fungsi untuk menampilkan notifikasi copy sukses
         function showCopySuccess(message) {
-            // Cek apakah sudah ada elemen copy-success
             let copySuccess = document.getElementById('copySuccess');
             if (!copySuccess) {
                 copySuccess = document.createElement('div');
@@ -2292,7 +2595,6 @@
             copySuccess.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
             copySuccess.classList.add('show');
             
-            // Auto hide setelah 2 detik
             setTimeout(() => {
                 copySuccess.classList.remove('show');
             }, 2000);
@@ -2316,7 +2618,7 @@
                 editModeInfo.style.display = 'none';
                 toggleEditBtn.style.background = 'linear-gradient(135deg, #ffa726 0%, #f57c00 100%)';
                 
-                if (editingMemoId) {
+                if (editingDataId) {
                     cancelEdit();
                 }
                 
@@ -2324,237 +2626,392 @@
             }
             
             // Render ulang data agar tombol edit/hapus muncul/hilang
-            if (!isMainPage && activeCategory === 'memo' && activeSubcategory) {
+            if (!isMainPage && activeCategory && activeSubcategory) {
                 renderDataFromCache(activeSubcategory, currentSearchKeyword);
             }
         }
 
         // Fungsi untuk membuka modal edit
-        function openEditModal(memoId, sheetName) {
-            console.log('Membuka modal edit untuk memo ID:', memoId, 'di sheet:', sheetName);
+        function openEditModal(dataId, sheetName, dataType) {
+            console.log('Membuka modal edit untuk ID:', dataId, 'di sheet:', sheetName, 'tipe:', dataType);
             
             showNotification('Memuat data untuk diedit...', 'info');
             
-            google.script.run
-                .withSuccessHandler(function(result) {
-                    if (result.success) {
-                        console.log('Data dari server:', result.data);
-                        
-                        // Isi form edit
-                        document.getElementById('editMemoId').value = result.data.id;
-                        document.getElementById('editMemoSheet').value = sheetName;
-                        document.getElementById('editMemoJudul').value = result.data.judul || '';
-                        document.getElementById('editMemoIsi').value = result.data.isi || '';
-                        
-                        // Set subkategori
-                        let subcategoryValue = '';
-                        if (result.data.sheet) {
-                            subcategoryValue = `MEMO ${result.data.sheet}`;
-                        } else if (sheetName) {
-                            subcategoryValue = `MEMO ${sheetName}`;
+            if (dataType === 'memo') {
+                google.script.run
+                    .withSuccessHandler(function(result) {
+                        if (result.success) {
+                            console.log('Data dari server:', result.data);
+                            
+                            // Isi form edit
+                            document.getElementById('editDataId').value = result.data.id;
+                            document.getElementById('editDataSheet').value = sheetName;
+                            document.getElementById('editDataType').value = dataType;
+                            document.getElementById('editDataJudul').value = result.data.judul || '';
+                            document.getElementById('editDataIsi').value = result.data.isi || '';
+                            
+                            // Set kategori
+                            let categoryValue = '';
+                            if (result.data.sheet) {
+                                categoryValue = `MEMO ${result.data.sheet}`;
+                            } else if (sheetName) {
+                                categoryValue = `MEMO ${sheetName}`;
+                            }
+                            
+                            document.getElementById('editDataCategory').value = categoryValue;
+                            
+                            // Tampilkan modal
+                            document.getElementById('editModal').style.display = 'flex';
+                            
+                            showNotification('✓ Data siap diedit', 'success');
+                        } else {
+                            showNotification(result.message, 'error');
                         }
-                        
-                        document.getElementById('editMemoSubcategory').value = subcategoryValue;
-                        
-                        // Tampilkan modal
-                        document.getElementById('editModal').style.display = 'flex';
-                        
-                        showNotification('✓ Data siap diedit', 'success');
-                    } else {
-                        showNotification(result.message, 'error');
-                    }
-                })
-                .withFailureHandler(function(error) {
-                    console.error('Error loading memo for edit:', error);
-                    showNotification('❌ Gagal memuat data untuk diedit: ' + error.message, 'error');
-                })
-                .getMemoById(memoId, sheetName);
+                    })
+                    .withFailureHandler(function(error) {
+                        console.error('Error loading data for edit:', error);
+                        showNotification('❌ Gagal memuat data untuk diedit: ' + error.message, 'error');
+                    })
+                    .getMemoById(dataId, sheetName);
+            } else {
+                google.script.run
+                    .withSuccessHandler(function(result) {
+                        if (result.success) {
+                            console.log('Data dari server:', result.data);
+                            
+                            // Isi form edit
+                            document.getElementById('editDataId').value = result.data.id;
+                            document.getElementById('editDataSheet').value = sheetName;
+                            document.getElementById('editDataType').value = dataType;
+                            document.getElementById('editDataJudul').value = result.data.judul || '';
+                            document.getElementById('editDataIsi').value = result.data.isi || '';
+                            
+                            // Set kategori
+                            let categoryValue = '';
+                            if (result.data.sheet) {
+                                categoryValue = `REPORT ${result.data.sheet}`;
+                            } else if (sheetName) {
+                                categoryValue = `REPORT ${sheetName}`;
+                            }
+                            
+                            document.getElementById('editDataCategory').value = categoryValue;
+                            
+                            // Tampilkan modal
+                            document.getElementById('editModal').style.display = 'flex';
+                            
+                            showNotification('✓ Data siap diedit', 'success');
+                        } else {
+                            showNotification(result.message, 'error');
+                        }
+                    })
+                    .withFailureHandler(function(error) {
+                        console.error('Error loading data for edit:', error);
+                        showNotification('❌ Gagal memuat data untuk diedit: ' + error.message, 'error');
+                    })
+                    .getReportanById(dataId, sheetName);
+            }
         }
 
         // Fungsi untuk menutup modal edit
         function closeEditModal() {
             document.getElementById('editModal').style.display = 'none';
             document.getElementById('editFormData').reset();
-            document.getElementById('editMemoId').value = '';
-            document.getElementById('editMemoSheet').value = '';
+            document.getElementById('editDataId').value = '';
+            document.getElementById('editDataSheet').value = '';
+            document.getElementById('editDataType').value = '';
         }
 
         // Fungsi untuk menyimpan perubahan edit
         function saveEditChanges(event) {
             event.preventDefault();
             
-            const memoId = document.getElementById('editMemoId').value;
-            const sheetName = document.getElementById('editMemoSheet').value;
-            const judul = document.getElementById('editMemoJudul').value.trim();
-            const isi = document.getElementById('editMemoIsi').value.trim();
-            const subcategory = document.getElementById('editMemoSubcategory').value;
+            const dataId = document.getElementById('editDataId').value;
+            const sheetName = document.getElementById('editDataSheet').value;
+            const dataType = document.getElementById('editDataType').value;
+            const judul = document.getElementById('editDataJudul').value.trim();
+            const isi = document.getElementById('editDataIsi').value.trim();
+            const category = document.getElementById('editDataCategory').value;
             
             if (!judul || !isi) {
-                showNotification('❌ Judul dan isi memo harus diisi!', 'error');
+                showNotification('❌ Judul dan isi harus diisi!', 'error');
                 return;
             }
             
             const data = {
-                id: memoId,
-                subcategory: subcategory,
+                id: dataId,
+                category: category,
                 judul: judul,
                 isi: isi,
                 sheet: sheetName
             };
             
-            console.log('Mengupdate memo dengan data:', data);
+            console.log('Mengupdate data:', data);
             
-            google.script.run
-                .withSuccessHandler(function(result) {
-                    if (result.success) {
-                        showNotification(result.message, 'success');
-                        
-                        // Update cache lokal
-                        updateCacheAfterEdit(data);
-                        
-                        // Tutup modal
-                        closeEditModal();
-                        
-                        // Refresh data display
-                        if (!isMainPage && activeCategory === 'memo' && activeSubcategory === subcategory) {
-                            loadDataFromSheet(activeSubcategory, false);
-                        }
-                        
-                        // Update counters
-                        setTimeout(updateSheetCounts, 1000);
-                    } else {
-                        showNotification(result.message, 'error');
-                    }
-                })
-                .withFailureHandler(function(error) {
-                    console.error('Gagal mengupdate:', error);
-                    showNotification('❌ Error: ' + error.message, 'error');
-                })
-                .updateMemo(data);
-        }
-
-        // Fungsi edit memo - membuka modal edit
-        function editMemo(id, sheetName) {
-            openEditModal(id, sheetName);
-        }
-
-        // Fungsi untuk menyimpan atau mengupdate memo
-        function saveOrUpdateMemo(data) {
-            const googleSyncStatus = document.getElementById('googleSyncStatus');
-            const memoId = document.getElementById('memoId').value;
-            
-            const isEditing = memoId !== '';
-            
-            if (!data.judul || !data.isi) {
-                showNotification('❌ Judul dan isi memo harus diisi!', 'error');
-                return;
-            }
-            
-            if (isEditing) {
-                data.id = memoId;
-                
-                console.log('Mengupdate memo dengan data:', data);
-                
-                googleSyncStatus.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Memperbarui data...';
-                
+            if (dataType === 'memo') {
                 google.script.run
                     .withSuccessHandler(function(result) {
                         if (result.success) {
-                            googleSyncStatus.innerHTML = '<i class="fas fa-check-circle"></i> Data berhasil diperbarui';
                             showNotification(result.message, 'success');
                             
                             // Update cache lokal
                             updateCacheAfterEdit(data);
                             
-                            // Reset form
-                            cancelEdit();
+                            // Tutup modal
+                            closeEditModal();
                             
                             // Refresh data display
-                            if (!isMainPage && activeCategory === 'memo' && activeSubcategory === data.subcategory) {
+                            if (!isMainPage && activeCategory === 'memo' && activeSubcategory === category) {
                                 loadDataFromSheet(activeSubcategory, false);
                             }
                             
                             // Update counters
-                            setTimeout(updateSheetCounts, 1000);
+                            setTimeout(updateAllCounts, 1000);
                         } else {
-                            googleSyncStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Gagal memperbarui';
                             showNotification(result.message, 'error');
                         }
-                        
-                        setTimeout(() => {
-                            googleSyncStatus.innerHTML = '<i class="fas fa-sync-alt"></i> Data akan otomatis dikirim';
-                        }, 3000);
                     })
                     .withFailureHandler(function(error) {
                         console.error('Gagal mengupdate:', error);
-                        googleSyncStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Gagal mengupdate';
                         showNotification('❌ Error: ' + error.message, 'error');
-                        
-                        setTimeout(() => {
-                            googleSyncStatus.innerHTML = '<i class="fas fa-sync-alt"></i> Data akan otomatis dikirim';
-                        }, 5000);
                     })
                     .updateMemo(data);
             } else {
-                googleSyncStatus.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Mengirim data...';
-                
                 google.script.run
                     .withSuccessHandler(function(result) {
                         if (result.success) {
-                            googleSyncStatus.innerHTML = '<i class="fas fa-check-circle"></i> Data berhasil disimpan';
                             showNotification(result.message, 'success');
                             
-                            // Reset form
-                            document.getElementById('memoFormData').reset();
+                            // Update cache lokal
+                            updateCacheAfterEdit(data);
                             
-                            // Refresh counter
-                            setTimeout(updateSheetCounts, 1000);
+                            // Tutup modal
+                            closeEditModal();
                             
-                            // Jika sedang melihat data di subkategori yang sama, refresh data
-                            if (!isMainPage && activeCategory === 'memo' && activeSubcategory === data.subcategory) {
-                                setTimeout(() => loadDataFromSheet(activeSubcategory), 1500);
+                            // Refresh data display
+                            if (!isMainPage && activeCategory === 'reportan' && activeSubcategory === category) {
+                                loadDataFromSheet(activeSubcategory, false);
                             }
+                            
+                            // Update counters
+                            setTimeout(updateAllCounts, 1000);
                         } else {
-                            googleSyncStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Gagal menyimpan';
                             showNotification(result.message, 'error');
                         }
-                        
-                        setTimeout(() => {
-                            googleSyncStatus.innerHTML = '<i class="fas fa-sync-alt"></i> Data akan otomatis dikirim';
-                        }, 3000);
                     })
                     .withFailureHandler(function(error) {
-                        console.error('Gagal mengirim:', error);
-                        googleSyncStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Gagal mengirim';
+                        console.error('Gagal mengupdate:', error);
                         showNotification('❌ Error: ' + error.message, 'error');
-                        
-                        setTimeout(() => {
-                            googleSyncStatus.innerHTML = '<i class="fas fa-sync-alt"></i> Data akan otomatis dikirim';
-                        }, 5000);
                     })
-                    .saveMemo(data);
+                    .updateReportan(data);
+            }
+        }
+
+        // Fungsi edit data - membuka modal edit
+        function editData(id, sheetName, dataType) {
+            openEditModal(id, sheetName, dataType);
+        }
+
+        // Fungsi untuk menyimpan atau mengupdate data
+        function saveOrUpdateData(data) {
+            const googleSyncStatus = document.getElementById('googleSyncStatus');
+            const dataId = document.getElementById('dataId').value;
+            
+            const isEditing = dataId !== '';
+            
+            if (!data.judul || !data.isi) {
+                showNotification('❌ Judul dan isi harus diisi!', 'error');
+                return;
+            }
+            
+            if (isEditing) {
+                data.id = dataId;
+                
+                console.log('Mengupdate data:', data);
+                
+                googleSyncStatus.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Memperbarui data...';
+                
+                const isMemo = data.subcategory.startsWith('MEMO ');
+                
+                if (isMemo) {
+                    google.script.run
+                        .withSuccessHandler(function(result) {
+                            if (result.success) {
+                                googleSyncStatus.innerHTML = '<i class="fas fa-check-circle"></i> Data berhasil diperbarui';
+                                showNotification(result.message, 'success');
+                                
+                                // Update cache lokal
+                                updateCacheAfterEdit(data);
+                                
+                                // Reset form
+                                cancelEdit();
+                                
+                                // Refresh data display
+                                if (!isMainPage && activeCategory === 'memo' && activeSubcategory === data.subcategory) {
+                                    loadDataFromSheet(activeSubcategory, false);
+                                }
+                                
+                                // Update counters
+                                setTimeout(updateAllCounts, 1000);
+                            } else {
+                                googleSyncStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Gagal memperbarui';
+                                showNotification(result.message, 'error');
+                            }
+                            
+                            setTimeout(() => {
+                                googleSyncStatus.innerHTML = '<i class="fas fa-sync-alt"></i> Data akan otomatis dikirim';
+                            }, 3000);
+                        })
+                        .withFailureHandler(function(error) {
+                            console.error('Gagal mengupdate:', error);
+                            googleSyncStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Gagal mengupdate';
+                            showNotification('❌ Error: ' + error.message, 'error');
+                            
+                            setTimeout(() => {
+                                googleSyncStatus.innerHTML = '<i class="fas fa-sync-alt"></i> Data akan otomatis dikirim';
+                            }, 5000);
+                        })
+                        .updateMemo(data);
+                } else {
+                    google.script.run
+                        .withSuccessHandler(function(result) {
+                            if (result.success) {
+                                googleSyncStatus.innerHTML = '<i class="fas fa-check-circle"></i> Data berhasil diperbarui';
+                                showNotification(result.message, 'success');
+                                
+                                // Update cache lokal
+                                updateCacheAfterEdit(data);
+                                
+                                // Reset form
+                                cancelEdit();
+                                
+                                // Refresh data display
+                                if (!isMainPage && activeCategory === 'reportan' && activeSubcategory === data.subcategory) {
+                                    loadDataFromSheet(activeSubcategory, false);
+                                }
+                                
+                                // Update counters
+                                setTimeout(updateAllCounts, 1000);
+                            } else {
+                                googleSyncStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Gagal memperbarui';
+                                showNotification(result.message, 'error');
+                            }
+                            
+                            setTimeout(() => {
+                                googleSyncStatus.innerHTML = '<i class="fas fa-sync-alt"></i> Data akan otomatis dikirim';
+                            }, 3000);
+                        })
+                        .withFailureHandler(function(error) {
+                            console.error('Gagal mengupdate:', error);
+                            googleSyncStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Gagal mengupdate';
+                            showNotification('❌ Error: ' + error.message, 'error');
+                            
+                            setTimeout(() => {
+                                googleSyncStatus.innerHTML = '<i class="fas fa-sync-alt"></i> Data akan otomatis dikirim';
+                            }, 5000);
+                        })
+                        .updateReportan(data);
+                }
+            } else {
+                googleSyncStatus.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Mengirim data...';
+                
+                const isMemo = data.subcategory.startsWith('MEMO ');
+                
+                if (isMemo) {
+                    google.script.run
+                        .withSuccessHandler(function(result) {
+                            if (result.success) {
+                                googleSyncStatus.innerHTML = '<i class="fas fa-check-circle"></i> Data berhasil disimpan';
+                                showNotification(result.message, 'success');
+                                
+                                // Reset form
+                                document.getElementById('dataForm').reset();
+                                
+                                // Refresh counter
+                                setTimeout(updateAllCounts, 1000);
+                                
+                                // Jika sedang melihat data di subkategori yang sama, refresh data
+                                if (!isMainPage && activeCategory === 'memo' && activeSubcategory === data.subcategory) {
+                                    setTimeout(() => loadDataFromSheet(activeSubcategory), 1500);
+                                }
+                            } else {
+                                googleSyncStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Gagal menyimpan';
+                                showNotification(result.message, 'error');
+                            }
+                            
+                            setTimeout(() => {
+                                googleSyncStatus.innerHTML = '<i class="fas fa-sync-alt"></i> Data akan otomatis dikirim';
+                            }, 3000);
+                        })
+                        .withFailureHandler(function(error) {
+                            console.error('Gagal mengirim:', error);
+                            googleSyncStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Gagal mengirim';
+                            showNotification('❌ Error: ' + error.message, 'error');
+                            
+                            setTimeout(() => {
+                                googleSyncStatus.innerHTML = '<i class="fas fa-sync-alt"></i> Data akan otomatis dikirim';
+                            }, 5000);
+                        })
+                        .saveMemo(data);
+                } else {
+                    google.script.run
+                        .withSuccessHandler(function(result) {
+                            if (result.success) {
+                                googleSyncStatus.innerHTML = '<i class="fas fa-check-circle"></i> Data berhasil disimpan';
+                                showNotification(result.message, 'success');
+                                
+                                // Reset form
+                                document.getElementById('dataForm').reset();
+                                
+                                // Refresh counter
+                                setTimeout(updateAllCounts, 1000);
+                                
+                                // Jika sedang melihat data di subkategori yang sama, refresh data
+                                if (!isMainPage && activeCategory === 'reportan' && activeSubcategory === data.subcategory) {
+                                    setTimeout(() => loadDataFromSheet(activeSubcategory), 1500);
+                                }
+                            } else {
+                                googleSyncStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Gagal menyimpan';
+                                showNotification(result.message, 'error');
+                            }
+                            
+                            setTimeout(() => {
+                                googleSyncStatus.innerHTML = '<i class="fas fa-sync-alt"></i> Data akan otomatis dikirim';
+                            }, 3000);
+                        })
+                        .withFailureHandler(function(error) {
+                            console.error('Gagal mengirim:', error);
+                            googleSyncStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Gagal mengirim';
+                            showNotification('❌ Error: ' + error.message, 'error');
+                            
+                            setTimeout(() => {
+                                googleSyncStatus.innerHTML = '<i class="fas fa-sync-alt"></i> Data akan otomatis dikirim';
+                            }, 5000);
+                        })
+                        .saveReportan(data);
+                }
             }
         }
 
         // Fungsi untuk update cache setelah edit
         function updateCacheAfterEdit(updatedData) {
-            const cacheKey = updatedData.subcategory;
-            const memoId = updatedData.id;
+            const cacheKey = updatedData.category;
+            const dataId = updatedData.id;
             
             if (sheetDataCache[cacheKey]) {
-                const index = sheetDataCache[cacheKey].findIndex(item => item.id === memoId);
+                const index = sheetDataCache[cacheKey].findIndex(item => item.id === dataId);
                 
                 if (index !== -1) {
-                    const sheetName = updatedData.subcategory.replace('MEMO ', '');
+                    const sheetName = updatedData.category.replace(/^(MEMO|REPORT) /, '');
                     sheetDataCache[cacheKey][index] = {
-                        id: memoId,
+                        id: dataId,
                         judul: updatedData.judul,
                         isi: updatedData.isi,
                         tanggal: new Date().toLocaleString('id-ID'),
-                        sheet: sheetName
+                        sheet: sheetName,
+                        subcategory: updatedData.category
                     };
                     
-                    console.log('Cache updated for memo ID:', memoId);
+                    console.log('Cache updated for data ID:', dataId);
                 }
             }
         }
@@ -2562,60 +3019,95 @@
         // Fungsi untuk membatalkan edit
         function cancelEdit() {
             // Reset form
-            document.getElementById('memoFormData').reset();
-            document.getElementById('memoId').value = '';
+            document.getElementById('dataForm').reset();
+            document.getElementById('dataId').value = '';
             
-            // Kembalikan tampilan form ke mode tambah
-            document.getElementById('formTitle').textContent = 'Form Tambah Memo Baru';
-            document.getElementById('submitButtonText').textContent = 'Tambah Memo';
-            document.getElementById('submitMemo').innerHTML = '<i class="fas fa-plus"></i> Tambah Memo';
+            // Kembalikan tampilan form
+            updateFormTitle();
+            document.getElementById('submitButtonText').textContent = 'Tambah Data';
+            document.getElementById('submitData').innerHTML = '<i class="fas fa-plus"></i> Tambah Data';
             document.getElementById('cancelEdit').style.display = 'none';
             
             // Reset ID yang sedang diedit
-            editingMemoId = '';
+            editingDataId = '';
             
             // Sembunyikan form jika sedang di halaman data
             if (!isMainPage) {
-                document.getElementById('memoForm').style.display = 'none';
+                document.getElementById('inputForm').style.display = 'none';
             }
             
             showNotification('Edit dibatalkan.', 'info');
         }
 
-        // Fungsi untuk menghapus memo
-        function deleteMemo(id, sheetName) {
-            if (confirm('Apakah Anda yakin ingin menghapus memo ini? Tindakan ini tidak dapat dibatalkan.')) {
-                google.script.run
-                    .withSuccessHandler(function(result) {
-                        if (result.success) {
-                            showNotification(result.message, 'success');
-                            
-                            // Hapus dari cache
-                            if (sheetDataCache[`MEMO ${sheetName}`]) {
-                                sheetDataCache[`MEMO ${sheetName}`] = sheetDataCache[`MEMO ${sheetName}`].filter(item => item.id !== id);
+        // Fungsi untuk menghapus data
+        function deleteData(id, sheetName, dataType) {
+            if (confirm('Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.')) {
+                if (dataType === 'memo') {
+                    google.script.run
+                        .withSuccessHandler(function(result) {
+                            if (result.success) {
+                                showNotification(result.message, 'success');
+                                
+                                // Hapus dari cache
+                                if (sheetDataCache[`MEMO ${sheetName}`]) {
+                                    sheetDataCache[`MEMO ${sheetName}`] = sheetDataCache[`MEMO ${sheetName}`].filter(item => item.id !== id);
+                                }
+                                
+                                // Refresh tampilan
+                                if (!isMainPage && activeCategory === 'memo' && activeSubcategory === `MEMO ${sheetName}`) {
+                                    renderDataFromCache(activeSubcategory, currentSearchKeyword);
+                                }
+                                
+                                // Update counters
+                                setTimeout(updateAllCounts, 1500);
+                            } else {
+                                showNotification(result.message, 'error');
                             }
-                            
-                            // Refresh tampilan
-                            if (!isMainPage && activeCategory === 'memo' && activeSubcategory === `MEMO ${sheetName}`) {
-                                renderDataFromCache(activeSubcategory, currentSearchKeyword);
+                        })
+                        .withFailureHandler(function(error) {
+                            console.error('Error deleting data:', error);
+                            showNotification('❌ Gagal menghapus: ' + error.message, 'error');
+                        })
+                        .deleteMemo(id, sheetName);
+                } else {
+                    google.script.run
+                        .withSuccessHandler(function(result) {
+                            if (result.success) {
+                                showNotification(result.message, 'success');
+                                
+                                // Hapus dari cache
+                                if (sheetDataCache[`REPORT ${sheetName}`]) {
+                                    sheetDataCache[`REPORT ${sheetName}`] = sheetDataCache[`REPORT ${sheetName}`].filter(item => item.id !== id);
+                                }
+                                
+                                // Refresh tampilan
+                                if (!isMainPage && activeCategory === 'reportan' && activeSubcategory === `REPORT ${sheetName}`) {
+                                    renderDataFromCache(activeSubcategory, currentSearchKeyword);
+                                }
+                                
+                                // Update counters
+                                setTimeout(updateAllCounts, 1500);
+                            } else {
+                                showNotification(result.message, 'error');
                             }
-                            
-                            // Update counters
-                            setTimeout(updateSheetCounts, 1500);
-                        } else {
-                            showNotification(result.message, 'error');
-                        }
-                    })
-                    .withFailureHandler(function(error) {
-                        console.error('Error deleting memo:', error);
-                        showNotification('❌ Gagal menghapus: ' + error.message, 'error');
-                    })
-                    .deleteMemo(id, sheetName);
+                        })
+                        .withFailureHandler(function(error) {
+                            console.error('Error deleting data:', error);
+                            showNotification('❌ Gagal menghapus: ' + error.message, 'error');
+                        })
+                        .deleteReportan(id, sheetName);
+                }
             }
         }
 
-        // Fungsi untuk update counter di sidebar
-        function updateSheetCounts() {
+        // Fungsi untuk update semua counter
+        function updateAllCounts() {
+            updateMemoCounts();
+            updateReportanCounts();
+        }
+
+        // Fungsi untuk update counter memo di sidebar
+        function updateMemoCounts() {
             google.script.run
                 .withSuccessHandler(function(result) {
                     if (result.success && result.counts) {
@@ -2626,28 +3118,58 @@
                     }
                 })
                 .withFailureHandler(function(error) {
-                    console.error('Error updating counts:', error);
+                    console.error('Error updating memo counts:', error);
                 })
                 .getSheetCounts();
         }
 
+        // Fungsi untuk update counter reportan di sidebar
+        function updateReportanCounts() {
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    if (result.success && result.counts) {
+                        document.getElementById('bankReportCount').textContent = result.counts['KENDALA BANK'] || 0;
+                        document.getElementById('resultReportCount').textContent = result.counts['KENDALA RESULT'] || 0;
+                        document.getElementById('operasionalReportCount').textContent = result.counts['KENDALA OPERASIONAL'] || 0;
+                    }
+                })
+                .withFailureHandler(function(error) {
+                    console.error('Error updating reportan counts:', error);
+                })
+                .getReportanSheetCounts();
+        }
+
         // Fungsi untuk update counter subkategori tertentu
         function updateSubcategoryCount(subcategory, count) {
-            const subcategoryName = subcategory.replace('MEMO ', '');
+            const subcategoryName = subcategory.replace(/^(MEMO|REPORT) /, '');
             
-            switch(subcategoryName) {
-                case 'PEMBAGIAN BONUS':
-                    document.getElementById('bonusCount').textContent = count;
-                    break;
-                case 'INFORMASI BANK':
-                    document.getElementById('bankCount').textContent = count;
-                    break;
-                case 'KENDALA PERMAINAN':
-                    document.getElementById('permainanCount').textContent = count;
-                    break;
-                case 'KENDALA SISTEM':
-                    document.getElementById('sistemCount').textContent = count;
-                    break;
+            if (subcategory.startsWith('MEMO ')) {
+                switch(subcategoryName) {
+                    case 'PEMBAGIAN BONUS':
+                        document.getElementById('bonusCount').textContent = count;
+                        break;
+                    case 'INFORMASI BANK':
+                        document.getElementById('bankCount').textContent = count;
+                        break;
+                    case 'KENDALA PERMAINAN':
+                        document.getElementById('permainanCount').textContent = count;
+                        break;
+                    case 'KENDALA SISTEM':
+                        document.getElementById('sistemCount').textContent = count;
+                        break;
+                }
+            } else if (subcategory.startsWith('REPORT ')) {
+                switch(subcategoryName) {
+                    case 'KENDALA BANK':
+                        document.getElementById('bankReportCount').textContent = count;
+                        break;
+                    case 'KENDALA RESULT':
+                        document.getElementById('resultReportCount').textContent = count;
+                        break;
+                    case 'KENDALA OPERASIONAL':
+                        document.getElementById('operasionalReportCount').textContent = count;
+                        break;
+                }
             }
         }
 
@@ -2662,7 +3184,7 @@
                         googleSyncStatus.innerHTML = '<i class="fas fa-check-circle"></i> Terhubung ke Google Spreadsheet';
                         showNotification(result.message, 'success');
                         
-                        setTimeout(updateSheetCounts, 500);
+                        setTimeout(updateAllCounts, 500);
                     } else {
                         googleSyncStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Gagal terhubung';
                         showNotification(result.message, 'error');
@@ -2841,8 +3363,53 @@
             }, 30000);
         }
 
-        // Set tampilan untuk halaman utama
-        function setMainPage() {
+        // Fungsi untuk update judul form berdasarkan kategori aktif
+        function updateFormTitle() {
+            const formTitle = document.getElementById('formTitle');
+            if (activeCategory === 'memo') {
+                formTitle.textContent = 'Form Tambah Memo Baru';
+            } else if (activeCategory === 'reportan') {
+                formTitle.textContent = 'Form Tambah Reportan Baru';
+            } else {
+                formTitle.textContent = 'Form Tambah Data Baru';
+            }
+        }
+
+        // Fungsi untuk update opsi subkategori berdasarkan kategori aktif
+        function updateSubcategoryOptions() {
+            const subcategorySelect = document.getElementById('dataSubcategory');
+            
+            if (activeCategory === 'memo') {
+                subcategorySelect.innerHTML = `
+                    <option value="">Pilih Subkategori Memo</option>
+                    <option value="MEMO PEMBAGIAN BONUS">MEMO PEMBAGIAN BONUS</option>
+                    <option value="MEMO INFORMASI BANK">MEMO INFORMASI BANK</option>
+                    <option value="MEMO KENDALA PERMAINAN">MEMO KENDALA PERMAINAN</option>
+                    <option value="MEMO KENDALA SISTEM">MEMO KENDALA SISTEM</option>
+                `;
+            } else if (activeCategory === 'reportan') {
+                subcategorySelect.innerHTML = `
+                    <option value="">Pilih Subkategori Reportan</option>
+                    <option value="REPORT KENDALA BANK">REPORT KENDALA BANK</option>
+                    <option value="REPORT KENDALA RESULT">REPORT KENDALA RESULT</option>
+                    <option value="REPORT KENDALA OPERASIONAL">REPORT KENDALA OPERASIONAL</option>
+                `;
+            } else {
+                subcategorySelect.innerHTML = `
+                    <option value="">Pilih Subkategori</option>
+                    <option value="MEMO PEMBAGIAN BONUS">MEMO PEMBAGIAN BONUS</option>
+                    <option value="MEMO INFORMASI BANK">MEMO INFORMASI BANK</option>
+                    <option value="MEMO KENDALA PERMAINAN">MEMO KENDALA PERMAINAN</option>
+                    <option value="MEMO KENDALA SISTEM">MEMO KENDALA SISTEM</option>
+                    <option value="REPORT KENDALA BANK">REPORT KENDALA BANK</option>
+                    <option value="REPORT KENDALA RESULT">REPORT KENDALA RESULT</option>
+                    <option value="REPORT KENDALA OPERASIONAL">REPORT KENDALA OPERASIONAL</option>
+                `;
+            }
+        }
+
+        // Set tampilan untuk halaman utama memo
+        function setMainPageMemo() {
             isMainPage = true;
             activeCategory = 'memo';
             activeSubcategory = '';
@@ -2865,8 +3432,49 @@
             document.getElementById('pageSubtitle').textContent = 'Sistem Manajemen Memo & Reportan';
             
             document.getElementById('dataContainer').classList.remove('active');
-            document.getElementById('memoForm').style.display = 'block';
+            document.getElementById('inputForm').style.display = 'block';
             document.getElementById('searchInput').value = '';
+            
+            // Update form untuk memo
+            updateFormTitle();
+            updateSubcategoryOptions();
+            
+            // Reset edit mode jika aktif
+            if (isEditMode) {
+                toggleEditMode();
+            }
+        }
+
+        // Set tampilan untuk halaman utama reportan
+        function setMainPageReportan() {
+            isMainPage = true;
+            activeCategory = 'reportan';
+            activeSubcategory = '';
+            currentSearchKeyword = '';
+            
+            document.querySelectorAll('.menu-item').forEach(item => {
+                if (item.id === 'mainMenuReportan') {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+            
+            document.querySelectorAll('.submenu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            document.getElementById('headerIcon').className = 'fas fa-file-alt';
+            document.getElementById('pageTitle').textContent = 'REPORTAN';
+            document.getElementById('pageSubtitle').textContent = 'Sistem Manajemen Reportan';
+            
+            document.getElementById('dataContainer').classList.remove('active');
+            document.getElementById('inputForm').style.display = 'block';
+            document.getElementById('searchInput').value = '';
+            
+            // Update form untuk reportan
+            updateFormTitle();
+            updateSubcategoryOptions();
             
             // Reset edit mode jika aktif
             if (isEditMode) {
@@ -2914,18 +3522,18 @@
             document.getElementById('pageSubtitle').textContent = `Data tersimpan untuk ${subcategoryName}`;
             document.getElementById('dataTitle').innerHTML = `<i class="${iconClass}"></i> ${subcategory}`;
             
-            document.getElementById('memoForm').style.display = 'none';
+            document.getElementById('inputForm').style.display = 'none';
             document.getElementById('dataContainer').classList.add('active');
             document.getElementById('searchInput').value = '';
             
             loadDataFromSheet(subcategory);
         }
 
-        // Set tampilan untuk reportan
-        function setReportanPage() {
+        // Set tampilan untuk subkategori reportan
+        function setReportanSubcategoryPage(subcategory) {
             isMainPage = false;
             activeCategory = 'reportan';
-            activeSubcategory = '';
+            activeSubcategory = subcategory;
             currentSearchKeyword = '';
             
             document.querySelectorAll('.menu-item').forEach(item => {
@@ -2937,25 +3545,33 @@
             });
             
             document.querySelectorAll('.submenu-item').forEach(item => {
-                item.classList.remove('active');
+                if (item.dataset.subcategory === subcategory) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
             });
             
-            document.getElementById('headerIcon').className = 'fas fa-file-alt';
-            document.getElementById('pageTitle').textContent = 'REPORTAN';
-            document.getElementById('pageSubtitle').textContent = 'Data reportan yang tersimpan';
-            document.getElementById('dataTitle').innerHTML = '<i class="fas fa-file-alt"></i> Data Reportan';
+            let iconClass = 'fas fa-file-alt';
+            if (subcategory === 'REPORT KENDALA BANK') {
+                iconClass = 'fas fa-university';
+            } else if (subcategory === 'REPORT KENDALA RESULT') {
+                iconClass = 'fas fa-chart-bar';
+            } else if (subcategory === 'REPORT KENDALA OPERASIONAL') {
+                iconClass = 'fas fa-cogs';
+            }
             
-            document.getElementById('memoForm').style.display = 'none';
+            document.getElementById('headerIcon').className = iconClass;
+            const subcategoryName = subcategory.replace('REPORT ', '');
+            document.getElementById('pageTitle').textContent = subcategory;
+            document.getElementById('pageSubtitle').textContent = `Data tersimpan untuk ${subcategoryName}`;
+            document.getElementById('dataTitle').innerHTML = `<i class="${iconClass}"></i> ${subcategory}`;
+            
+            document.getElementById('inputForm').style.display = 'none';
             document.getElementById('dataContainer').classList.add('active');
             document.getElementById('searchInput').value = '';
             
-            document.getElementById('dataGrid').innerHTML = `
-            <div class="empty-data">
-                <i class="fas fa-tools"></i>
-                <h3>Fitur Reportan</h3>
-                <p>Fitur reportan akan segera hadir dalam versi mendatang</p>
-            </div>
-            `;
+            loadDataFromSheet(subcategory);
         }
 
         // Fungsi untuk toggle minimize sidebar
@@ -2999,15 +3615,37 @@
                         memoArrow.classList.add('rotated');
                     }
                 } else {
-                    setMainPage();
+                    setMainPageMemo();
                     if (window.innerWidth <= 992) {
                         document.getElementById('sidebar').classList.remove('show');
                     }
                 }
             });
             
-            // Submenu items
-            document.querySelectorAll('.submenu-item').forEach(item => {
+            // Menu utama REPORTAN
+            document.getElementById('mainMenuReportan').addEventListener('click', (e) => {
+                if (e.target.closest('.menu-item-arrow')) {
+                    const reportanSubmenu = document.getElementById('reportanSubmenu');
+                    const reportanArrow = document.getElementById('reportanArrow');
+                    isReportanSubmenuExpanded = !isReportanSubmenuExpanded;
+                    
+                    if (isReportanSubmenuExpanded) {
+                        reportanSubmenu.classList.add('expanded');
+                        reportanArrow.classList.remove('rotated');
+                    } else {
+                        reportanSubmenu.classList.remove('expanded');
+                        reportanArrow.classList.add('rotated');
+                    }
+                } else {
+                    setMainPageReportan();
+                    if (window.innerWidth <= 992) {
+                        document.getElementById('sidebar').classList.remove('show');
+                    }
+                }
+            });
+            
+            // Submenu items memo
+            document.querySelectorAll('#memoSubmenu .submenu-item').forEach(item => {
                 item.addEventListener('click', () => {
                     const subcategory = item.dataset.subcategory;
                     setMemoSubcategoryPage(subcategory);
@@ -3018,30 +3656,33 @@
                 });
             });
             
-            // Menu reportan
-            document.querySelector('.menu-item[data-category="reportan"]').addEventListener('click', () => {
-                setReportanPage();
-                
-                if (window.innerWidth <= 992) {
-                    document.getElementById('sidebar').classList.remove('show');
-                }
+            // Submenu items reportan
+            document.querySelectorAll('#reportanSubmenu .submenu-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const subcategory = item.dataset.subcategory;
+                    setReportanSubcategoryPage(subcategory);
+                    
+                    if (window.innerWidth <= 992) {
+                        document.getElementById('sidebar').classList.remove('show');
+                    }
+                });
             });
             
-            // Form memo
-            document.getElementById('memoFormData').addEventListener('submit', function(e) {
+            // Form data
+            document.getElementById('dataForm').addEventListener('submit', function(e) {
                 e.preventDefault();
                 
-                const subcategory = document.getElementById('memoSubcategory').value;
-                const judul = document.getElementById('memoJudul').value.trim();
-                const isi = document.getElementById('memoIsi').value.trim();
+                const subcategory = document.getElementById('dataSubcategory').value;
+                const judul = document.getElementById('dataJudul').value.trim();
+                const isi = document.getElementById('dataIsi').value.trim();
                 
                 if (!subcategory) {
-                    showNotification('Silakan pilih subkategori memo!', 'error');
+                    showNotification('Silakan pilih subkategori!', 'error');
                     return;
                 }
                 
                 if (!judul || !isi) {
-                    showNotification('Judul dan isi memo harus diisi!', 'error');
+                    showNotification('Judul dan isi harus diisi!', 'error');
                     return;
                 }
                 
@@ -3051,7 +3692,7 @@
                     isi: isi
                 };
                 
-                saveOrUpdateMemo(data);
+                saveOrUpdateData(data);
             });
             
             // Tombol batal edit
@@ -3066,7 +3707,7 @@
             
             // Refresh data button
             document.getElementById('refreshData').addEventListener('click', () => {
-                if (!isMainPage && activeCategory === 'memo' && activeSubcategory) {
+                if (!isMainPage && activeCategory && activeSubcategory) {
                     loadDataFromSheet(activeSubcategory);
                     showNotification('Memperbarui data...', 'info');
                 }
@@ -3121,7 +3762,7 @@
             document.getElementById('searchInput').addEventListener('input', (e) => {
                 currentSearchKeyword = e.target.value.trim();
                 
-                if (!isMainPage && activeCategory === 'memo' && activeSubcategory) {
+                if (!isMainPage && activeCategory && activeSubcategory) {
                     renderDataFromCache(activeSubcategory, currentSearchKeyword);
                 }
             });
@@ -3131,7 +3772,7 @@
                 document.getElementById('searchInput').value = '';
                 currentSearchKeyword = '';
                 
-                if (!isMainPage && activeCategory === 'memo' && activeSubcategory) {
+                if (!isMainPage && activeCategory && activeSubcategory) {
                     renderDataFromCache(activeSubcategory, '');
                 }
             });
@@ -3162,13 +3803,13 @@
 
         // Inisialisasi
         function init() {
-            console.log('Aplikasi Memo diinisialisasi');
+            console.log('Aplikasi Memo & Reportan diinisialisasi');
             
             if (isSidebarMinimized) {
                 document.getElementById('sidebar').classList.add('minimized');
             }
             
-            setMainPage();
+            setMainPageMemo();
             initEventListeners();
             
             updateDateDisplay();
@@ -3185,7 +3826,7 @@
             }, 1000);
             
             setInterval(() => {
-                updateSheetCounts();
+                updateAllCounts();
             }, 30000);
         }
 
