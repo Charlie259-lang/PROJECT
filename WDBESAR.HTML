@@ -7,22 +7,26 @@
     <!-- Font Awesome untuk Ikon -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
             --primary-color: #4361ee;
             --primary-hover: #3a53d0;
-            --success-color: #2ec4b6;
-            --success-hover: #25a096;
+            --primary-light: #eef2ff;
+            --success-color: #10b981;
+            --success-hover: #059669;
             --warning-color: #f59e0b;
             --warning-hover: #d97706;
-            --card-bg: rgba(255, 255, 255, 0.95);
-            --text-main: #1f2937;
-            --text-secondary: #6b7280;
-            --border-color: #e5e7eb;
+            --card-bg: rgba(255, 255, 255, 0.97);
+            --text-main: #1e293b;
+            --text-secondary: #64748b;
+            --text-light: #94a3b8;
+            --border-color: #e2e8f0;
             --radius: 16px;
-            --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+            --radius-sm: 8px;
+            --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         }
 
         * {
@@ -43,93 +47,121 @@
             align-items: flex-start;
             min-height: 100vh;
             padding: 40px 20px;
+            line-height: 1.6;
         }
 
         body::before {
             content: '';
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.4);
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.4) 100%);
             z-index: -1;
         }
 
         .container {
             background-color: var(--card-bg);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(12px);
             padding: 40px;
             border-radius: var(--radius);
-            box-shadow: var(--shadow);
+            box-shadow: var(--shadow-lg);
             width: 100%;
-            max-width: 900px;
+            max-width: 1000px;
             animation: fadeIn 0.6s ease-out;
-            border: 1px solid rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         header {
             text-align: center;
-            margin-bottom: 35px;
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 20px;
+            margin-bottom: 40px;
+            padding-bottom: 25px;
+            position: relative;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 25%;
+            width: 50%;
+            height: 3px;
+            background: linear-gradient(to right, transparent, var(--primary-color), transparent);
+            border-radius: 3px;
         }
 
         h1 {
-            font-size: 26px;
+            font-size: 32px;
             font-weight: 800;
             color: var(--text-main);
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, #3a0ca3 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .subtitle {
             color: var(--text-secondary);
-            font-size: 14px;
+            font-size: 15px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
         }
 
         .paste-section {
-            margin-bottom: 30px;
-            padding: 20px;
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            border-radius: 12px;
+            margin-bottom: 35px;
+            padding: 25px;
+            background: var(--primary-light);
+            border-radius: var(--radius);
             border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
 
-        .paste-section label {
+        .section-label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
             font-weight: 600;
-            font-size: 13px;
+            font-size: 14px;
             color: var(--text-main);
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-label i {
+            color: var(--primary-color);
         }
 
         #rawData {
             width: 100%;
-            padding: 12px;
+            padding: 16px;
             border: 2px solid var(--border-color);
-            border-radius: 10px;
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
-            line-height: 1.5;
+            border-radius: var(--radius-sm);
+            font-family: 'Inter', monospace;
+            font-size: 14px;
+            line-height: 1.6;
             resize: vertical;
-            min-height: 120px;
-            margin-bottom: 15px;
+            min-height: 130px;
+            margin-bottom: 20px;
             background: white;
+            transition: all 0.3s ease;
         }
 
         #rawData:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.1);
+            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.15);
         }
 
         .input-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            gap: 25px;
+            margin-bottom: 20px;
         }
 
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
             .input-grid {
                 grid-template-columns: 1fr;
             }
@@ -141,12 +173,20 @@
         }
 
         .input-group label {
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             font-weight: 600;
             font-size: 13px;
             color: var(--text-main);
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .input-group label i {
+            color: var(--text-secondary);
+            font-size: 12px;
         }
 
         .input-wrapper {
@@ -155,29 +195,36 @@
 
         .input-wrapper i {
             position: absolute;
-            left: 15px;
+            left: 16px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--text-secondary);
-            font-size: 14px;
+            color: var(--text-light);
+            font-size: 15px;
+            transition: color 0.3s ease;
         }
 
         input[type="text"], input[type="number"] {
             width: 100%;
-            padding: 12px 12px 12px 40px;
+            padding: 15px 15px 15px 45px;
             border: 2px solid var(--border-color);
-            border-radius: 10px;
+            border-radius: var(--radius-sm);
             font-size: 15px;
             font-family: inherit;
+            font-weight: 500;
             transition: all 0.3s ease;
-            background-color: #ffffff;
+            background-color: white;
+            color: var(--text-main);
         }
 
         input:focus {
             outline: none;
             border-color: var(--primary-color);
-            background-color: #fff;
-            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.1);
+            background-color: white;
+            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.15);
+        }
+
+        input:focus + i {
+            color: var(--primary-color);
         }
 
         .input-full {
@@ -188,59 +235,61 @@
             display: flex;
             gap: 15px;
             justify-content: center;
-            margin-top: 30px;
+            margin-top: 35px;
             flex-wrap: wrap;
         }
 
         button {
-            padding: 14px 32px;
+            padding: 16px 36px;
             font-size: 16px;
             font-weight: 700;
-            color: #fff;
+            color: white;
             border: none;
-            border-radius: 10px;
+            border-radius: var(--radius-sm);
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             gap: 10px;
+            letter-spacing: 0.3px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
         #processButton {
-            background-color: var(--primary-color);
-            box-shadow: 0 4px 14px rgba(67, 97, 238, 0.3);
+            background: linear-gradient(135deg, var(--primary-color) 0%, #3a0ca3 100%);
+            box-shadow: 0 4px 14px rgba(67, 97, 238, 0.4);
         }
 
         #processButton:hover {
-            background-color: var(--primary-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(67, 97, 238, 0.4);
+            background: linear-gradient(135deg, var(--primary-hover) 0%, #2a0977 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(67, 97, 238, 0.3);
         }
 
         #parseButton {
-            background-color: var(--warning-color);
-            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
+            background: linear-gradient(135deg, var(--warning-color) 0%, #ea580c 100%);
+            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
         }
 
         #parseButton:hover {
-            background-color: var(--warning-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+            background: linear-gradient(135deg, var(--warning-hover) 0%, #c2410c 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(245, 158, 11, 0.3);
         }
 
         #copyButton {
-            background-color: var(--success-color);
-            box-shadow: 0 4px 14px rgba(46, 196, 182, 0.3);
+            background: linear-gradient(135deg, var(--success-color) 0%, #059669 100%);
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
         }
 
         #copyButton:hover {
-            background-color: var(--success-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(46, 196, 182, 0.4);
+            background: linear-gradient(135deg, var(--success-hover) 0%, #047857 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
         }
 
         #copyButton:disabled {
-            background-color: #cbd5e1;
+            background: linear-gradient(135deg, #cbd5e1 0%, #94a3b8 100%);
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
@@ -249,116 +298,185 @@
         .output-section {
             margin-top: 40px;
             display: none;
-            border-top: 1px solid var(--border-color);
-            padding-top: 30px;
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+            padding-top: 35px;
         }
 
         .crosscheck-card {
-            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
-            border: 1px solid #a7f3d0;
-            border-radius: 12px;
-            padding: 20px;
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border: 1px solid #6ee7b7;
+            border-radius: var(--radius);
+            padding: 25px;
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .crosscheck-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 6px;
+            height: 100%;
+            background: linear-gradient(to bottom, #10b981, #059669);
         }
 
         .crosscheck-label {
             color: #065f46;
-            font-weight: 600;
+            font-weight: 700;
             font-size: 13px;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             display: block;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .crosscheck-value {
             color: #047857;
-            font-size: 28px;
-            font-weight: 800;
+            font-size: 32px;
+            font-weight: 900;
             letter-spacing: -1px;
+            font-feature-settings: "tnum";
+            font-variant-numeric: tabular-nums;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text-main);
+            position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+            padding-bottom: 10px;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(to right, transparent, var(--primary-color), transparent);
+            border-radius: 3px;
         }
 
         .table-container {
             overflow-x: auto;
-            border-radius: 12px;
+            border-radius: var(--radius);
             border: 1px solid var(--border-color);
-            background: #fff;
+            background: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
         }
 
         table {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 0;
             font-size: 14px;
         }
 
         thead {
-            background-color: #f8fafc;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-bottom: 2px solid var(--border-color);
         }
 
         th {
-            padding: 16px;
+            padding: 18px 20px;
             text-align: left;
-            font-weight: 600;
+            font-weight: 700;
             color: var(--text-secondary);
             font-size: 12px;
             text-transform: uppercase;
-            border-bottom: 2px solid var(--border-color);
+            letter-spacing: 0.5px;
             white-space: nowrap;
+            position: relative;
+        }
+
+        th:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 20%;
+            height: 60%;
+            width: 1px;
+            background: var(--border-color);
         }
 
         td {
-            padding: 14px 16px;
+            padding: 16px 20px;
             border-bottom: 1px solid var(--border-color);
             color: var(--text-main);
             white-space: nowrap;
+            font-weight: 500;
+            transition: background-color 0.2s ease;
         }
 
         tbody tr:last-child td {
             border-bottom: none;
         }
 
+        tbody tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
         tbody tr:hover {
             background-color: #f1f5f9;
         }
 
+        tbody tr:hover td {
+            background-color: #f1f5f9;
+        }
+
         td:last-child {
-            font-family: 'Courier New', monospace;
+            font-family: 'Inter', 'Courier New', monospace;
             font-weight: 700;
             color: var(--primary-color);
-            background-color: rgba(67, 97, 238, 0.03);
+            background-color: rgba(67, 97, 238, 0.05);
+            font-size: 15px;
+            text-align: right;
         }
 
         td.col-empty {
-            background-color: #f3f4f6;
-            width: 20px;
+            background-color: #f1f5f9;
+            width: 30px;
             text-align: center;
-            color: #ccc;
-            font-size: 10px;
+            color: #cbd5e1;
+            font-size: 12px;
+            font-weight: 700;
         }
 
+        /* Toast Notification */
         #toast {
             visibility: hidden;
-            min-width: 280px;
-            background-color: #1e293b;
-            color: #fff;
+            min-width: 300px;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: white;
             text-align: center;
-            border-radius: 10px;
-            padding: 16px;
+            border-radius: var(--radius-sm);
+            padding: 18px 24px;
             position: fixed;
-            z-index: 100;
+            z-index: 1000;
             left: 50%;
             bottom: 30px;
             transform: translateX(-50%);
             font-size: 14px;
-            font-weight: 500;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            font-weight: 600;
+            box-shadow: var(--shadow-lg);
             opacity: 0;
             transition: opacity 0.3s, bottom 0.3s;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 12px;
+            border-left: 4px solid var(--success-color);
         }
 
         #toast.show {
@@ -367,9 +485,54 @@
             bottom: 50px;
         }
         
+        #toast.error {
+            border-left-color: #ef4444;
+        }
+
+        #toast i {
+            font-size: 18px;
+        }
+
+        .toast-success i {
+            color: var(--success-color);
+        }
+
+        .toast-error i {
+            color: #ef4444;
+        }
+        
+        /* Animasi Masuk */
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInRow {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Badge untuk status */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            color: var(--primary-color);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            margin-left: 10px;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-light);
+            font-size: 13px;
         }
     </style>
 </head>
@@ -379,12 +542,14 @@
     <div class="container">
         <header>
             <h1>Withdraw Besar Pro</h1>
-            <p class="subtitle">Auto Split 35 Juta / Transaksi</p>
+            <p class="subtitle">Auto Split 35 Juta / Transaksi <span class="status-badge">PRO</span></p>
         </header>
 
         <!-- Paste Area untuk Data Mentah -->
         <div class="paste-section">
-            <label for="rawData">Tempel Data Lengkap (Auto Parse)</label>
+            <label class="section-label">
+                <i class="fa-solid fa-paste"></i> Tempel Data Lengkap (Auto Parse)
+            </label>
             <textarea id="rawData" placeholder="Tempel data lengkap di sini, contoh:
 1		vikakumala
 Withdraw	2026-01-22 18:44:42	66,000 	145.30
@@ -400,7 +565,9 @@ SEABANK, 901635944310, TURNOVER X1 APRILIA FIKA KUMALA"></textarea>
         <div class="input-grid">
             <!-- Nominal Full Width -->
             <div class="input-group input-full">
-                <label for="nominal">Nominal Total (Rupiah)</label>
+                <label for="nominal">
+                    <i class="fa-solid fa-money-bill-wave"></i> Nominal Total (Rupiah)
+                </label>
                 <div class="input-wrapper">
                     <i class="fa-solid fa-money-bill-wave"></i>
                     <input type="text" id="nominal" placeholder="Contoh: 150000000" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
@@ -409,28 +576,36 @@ SEABANK, 901635944310, TURNOVER X1 APRILIA FIKA KUMALA"></textarea>
 
             <!-- Kolom Data Baru -->
             <div class="input-group">
-                <label for="id">User ID</label>
+                <label for="id">
+                    <i class="fa-solid fa-fingerprint"></i> User ID
+                </label>
                 <div class="input-wrapper">
                     <i class="fa-solid fa-fingerprint"></i>
                     <input type="text" id="id" placeholder="User ID">
                 </div>
             </div>
             <div class="input-group">
-                <label for="bank">Nama Bank</label>
+                <label for="bank">
+                    <i class="fa-solid fa-building-columns"></i> Nama Bank
+                </label>
                 <div class="input-wrapper">
                     <i class="fa-solid fa-building-columns"></i>
                     <input type="text" id="bank" placeholder="Contoh: BCA">
                 </div>
             </div>
             <div class="input-group">
-                <label for="nomorRekening">Nomor Rekening</label>
+                <label for="nomorRekening">
+                    <i class="fa-regular fa-credit-card"></i> Nomor Rekening
+                </label>
                 <div class="input-wrapper">
                     <i class="fa-regular fa-credit-card"></i>
                     <input type="text" id="nomorRekening" placeholder="No. Rek">
                 </div>
             </div>
             <div class="input-group">
-                <label for="namaRekening">Nama Rekening</label>
+                <label for="namaRekening">
+                    <i class="fa-regular fa-user"></i> Nama Rekening
+                </label>
                 <div class="input-wrapper">
                     <i class="fa-regular fa-user"></i>
                     <input type="text" id="namaRekening" placeholder="Atas Nama">
@@ -452,7 +627,7 @@ SEABANK, 901635944310, TURNOVER X1 APRILIA FIKA KUMALA"></textarea>
                 <div id="crosscheckValue" class="crosscheck-value">0</div>
             </div>
 
-            <h2 style="text-align:center; font-size:18px; margin-bottom:15px; color:var(--text-main);">Hasil Pemecahan</h2>
+            <div class="section-title">Hasil Pemecahan</div>
             
             <div class="table-container">
                 <table id="resultTable">
@@ -462,7 +637,7 @@ SEABANK, 901635944310, TURNOVER X1 APRILIA FIKA KUMALA"></textarea>
                             <th>Bank</th>
                             <th>No. Rek</th>
                             <th>Nama Rek</th>
-                            <th style="background-color: #f3f4f6; width: 20px;">&nbsp;</th>
+                            <th class="col-empty"></th>
                             <th>Nominal</th>
                         </tr>
                     </thead>
@@ -477,6 +652,10 @@ SEABANK, 901635944310, TURNOVER X1 APRILIA FIKA KUMALA"></textarea>
                     <i class="fa-regular fa-copy"></i> Salin ke Google Sheets
                 </button>
             </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2024 Withdraw Pro Tool • Auto Split 35 Juta per Transaksi</p>
         </div>
     </div>
 
@@ -506,7 +685,7 @@ SEABANK, 901635944310, TURNOVER X1 APRILIA FIKA KUMALA"></textarea>
 
         // Fungsi Format Angka (Ribuan)
         function formatNumber(num) {
-            return num.toLocaleString('en-US');
+            return new Intl.NumberFormat('id-ID').format(num);
         }
 
         // Fungsi untuk mem-parse data mentah
@@ -521,15 +700,12 @@ SEABANK, 901635944310, TURNOVER X1 APRILIA FIKA KUMALA"></textarea>
             try {
                 // Parsing User ID dari baris pertama
                 const firstLine = lines[0];
-                // Mengambil kata terakhir setelah tab terakhir
                 const idParts = firstLine.split('\t');
                 const userId = idParts[idParts.length - 1].trim();
                 
-                // Parsing Nominal dari baris kedua - PERBAIKAN DISINI
+                // Parsing Nominal dari baris kedua
                 const secondLine = lines[1];
-                // Split dengan tab
                 const secondParts = secondLine.split('\t');
-                // Bagian ke-3 (indeks 2) adalah nominal withdraw
                 let nominalString = "";
                 
                 // Cari bagian yang mengandung koma sebagai pemisah ribuan
@@ -550,9 +726,7 @@ SEABANK, 901635944310, TURNOVER X1 APRILIA FIKA KUMALA"></textarea>
                 // Bersihkan dari titik dan koma, hanya ambil angka
                 let nominal = 0;
                 if (nominalString) {
-                    // Hapus semua karakter non-angka kecuali koma
                     let cleanNominal = nominalString.replace(/[^\d,]/g, '');
-                    // Hapus koma pemisah ribuan
                     cleanNominal = cleanNominal.replace(/,/g, '');
                     nominal = parseInt(cleanNominal, 10);
                 }
@@ -574,7 +748,6 @@ SEABANK, 901635944310, TURNOVER X1 APRILIA FIKA KUMALA"></textarea>
                 // Validasi hasil parsing
                 if (!userId || isNaN(nominal) || nominal <= 0 || !bank || !accountNumber || !accountName) {
                     showToast("Gagal memparse semua data. Periksa format.", true);
-                    console.log("Debug parsing:", { userId, nominal, bank, accountNumber, accountName });
                     return false;
                 }
 
@@ -671,18 +844,23 @@ SEABANK, 901635944310, TURNOVER X1 APRILIA FIKA KUMALA"></textarea>
 
             data.forEach((row, index) => {
                 const tr = document.createElement('tr');
-                tr.style.animation = `fadeIn 0.3s ease-out forwards ${index * 0.05}s`;
+                tr.style.animation = `fadeInRow 0.3s ease-out forwards ${index * 0.05}s`;
                 tr.style.opacity = '0'; 
 
                 tr.innerHTML = `
-                    <td>${row.id}</td>
+                    <td><strong>${row.id}</strong></td>
                     <td>${row.bank}</td>
-                    <td style="font-family:'Courier New', monospace;">${row.nomorRekening}</td>
+                    <td style="font-family:'Inter', 'Courier New', monospace; font-weight: 600;">${row.nomorRekening}</td>
                     <td>${row.namaRekening}</td>
-                    <td class="col-empty"></td>
-                    <td data-raw="${row.nominal}">${formatNumber(row.nominal)}</td>
+                    <td class="col-empty">→</td>
+                    <td data-raw="${row.nominal}">Rp ${formatNumber(row.nominal)}</td>
                 `;
                 tableBody.appendChild(tr);
+                
+                // Trigger animation
+                setTimeout(() => {
+                    tr.style.opacity = '1';
+                }, index * 50);
             });
         }
 
@@ -696,7 +874,7 @@ SEABANK, 901635944310, TURNOVER X1 APRILIA FIKA KUMALA"></textarea>
             rows.forEach(row => {
                 const cells = row.querySelectorAll('td');
                 
-                const id = cells[0].textContent;
+                const id = cells[0].textContent.replace('→', '').trim();
                 const bank = cells[1].textContent;
                 const rek = cells[2].textContent;
                 const nama = cells[3].textContent;
@@ -731,10 +909,12 @@ SEABANK, 901635944310, TURNOVER X1 APRILIA FIKA KUMALA"></textarea>
             toast.className = "show";
             
             if (isError) {
-                toast.style.backgroundColor = "#ef4444";
+                toast.classList.add("error");
+                toast.style.borderLeftColor = "#ef4444";
                 icon.className = "fa-solid fa-circle-exclamation";
             } else {
-                toast.style.backgroundColor = "#1e293b";
+                toast.classList.remove("error");
+                toast.style.borderLeftColor = "#10b981";
                 icon.className = "fa-solid fa-check-circle";
             }
 
@@ -746,6 +926,13 @@ SEABANK, 901635944310, TURNOVER X1 APRILIA FIKA KUMALA"></textarea>
         // Auto-focus ke textarea saat halaman dimuat
         window.addEventListener('DOMContentLoaded', () => {
             rawDataTextarea.focus();
+            
+            // Contoh data untuk preview
+            rawDataTextarea.placeholder = `Tempel data lengkap di sini, contoh:
+1		jembot12
+Withdraw	2026-01-22 19:19:38	6,000,000 	1,111,995
+G4
+BRI, 454601028593532, agus lukman toro`;
         });
     </script>
 
