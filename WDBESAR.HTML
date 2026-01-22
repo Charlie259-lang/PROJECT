@@ -18,20 +18,20 @@
             --success-hover: #059669;
             --warning-color: #f59e0b;
             --warning-hover: #d97706;
-            --card-bg: rgba(255, 255, 255, 0.97);
-            --text-main: #1e293b;
-            --text-secondary: #64748b;
-            --text-light: #94a3b8;
-            --border-color: #e2e8f0;
+            --card-bg: #0f172a; /* Dark background */
+            --text-main: #f1f5f9; /* Light text */
+            --text-secondary: #94a3b8;
+            --text-light: #64748b;
+            --border-color: #334155;
             --radius: 16px;
             --radius-sm: 8px;
-            --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            --table-dark: #0f172a;
-            --table-darker: #020617;
+            --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            --table-dark: #020617; /* Very dark for table */
+            --table-darker: #000000; /* Pure black for accents */
             --table-accent: #1e293b;
-            --table-border: #334155;
-            --table-text-light: #cbd5e1;
+            --table-border: #475569;
+            --table-text-light: #f8fafc;
         }
 
         * {
@@ -59,7 +59,7 @@
             content: '';
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(135deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.4) 100%);
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.6) 100%);
             z-index: -1;
         }
 
@@ -72,7 +72,7 @@
             width: 100%;
             max-width: 1000px;
             animation: fadeIn 0.6s ease-out;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         header {
@@ -99,7 +99,7 @@
             color: var(--text-main);
             margin-bottom: 8px;
             letter-spacing: -0.5px;
-            background: linear-gradient(135deg, var(--primary-color) 0%, #3a0ca3 100%);
+            background: linear-gradient(135deg, var(--primary-color) 0%, #60a5fa 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -115,10 +115,10 @@
         .paste-section {
             margin-bottom: 35px;
             padding: 25px;
-            background: var(--primary-light);
+            background: rgba(30, 41, 59, 0.8);
             border-radius: var(--radius);
             border: 1px solid var(--border-color);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
         }
 
         .section-label {
@@ -149,7 +149,8 @@
             resize: vertical;
             min-height: 130px;
             margin-bottom: 20px;
-            background: white;
+            background: rgba(15, 23, 42, 0.9);
+            color: var(--text-main);
             transition: all 0.3s ease;
         }
 
@@ -217,14 +218,14 @@
             font-family: inherit;
             font-weight: 500;
             transition: all 0.3s ease;
-            background-color: white;
+            background-color: rgba(15, 23, 42, 0.9);
             color: var(--text-main);
         }
 
         input:focus {
             outline: none;
             border-color: var(--primary-color);
-            background-color: white;
+            background-color: rgba(15, 23, 42, 1);
             box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.15);
         }
 
@@ -257,7 +258,7 @@
             align-items: center;
             gap: 10px;
             letter-spacing: 0.3px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
         }
 
         #processButton {
@@ -294,7 +295,7 @@
         }
 
         #copyButton:disabled {
-            background: linear-gradient(135deg, #cbd5e1 0%, #94a3b8 100%);
+            background: linear-gradient(135deg, #475569 0%, #64748b 100%);
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
@@ -303,20 +304,21 @@
         .output-section {
             margin-top: 40px;
             display: none;
-            border-top: 1px solid rgba(0, 0, 0, 0.08);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
             padding-top: 35px;
         }
 
         .crosscheck-card {
-            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-            border: 1px solid #6ee7b7;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%);
+            border: 1px solid rgba(16, 185, 129, 0.3);
             border-radius: var(--radius);
             padding: 25px;
             text-align: center;
             margin-bottom: 30px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
             position: relative;
             overflow: hidden;
+            backdrop-filter: blur(10px);
         }
 
         .crosscheck-card::before {
@@ -330,7 +332,7 @@
         }
 
         .crosscheck-label {
-            color: #065f46;
+            color: #6ee7b7;
             font-weight: 700;
             font-size: 13px;
             margin-bottom: 8px;
@@ -340,7 +342,7 @@
         }
 
         .crosscheck-value {
-            color: #047857;
+            color: #10b981;
             font-size: 32px;
             font-weight: 900;
             letter-spacing: -1px;
@@ -372,13 +374,13 @@
             border-radius: 3px;
         }
 
-        /* STYLING TABEL HITAM */
+        /* TABEL DARK MODE */
         .table-container {
             overflow-x: auto;
             border-radius: var(--radius);
-            border: 2px solid var(--table-darker);
+            border: 1px solid var(--table-darker);
             background: var(--table-dark);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
             margin-bottom: 30px;
             position: relative;
             overflow: hidden;
@@ -391,7 +393,7 @@
             left: 0;
             right: 0;
             height: 1px;
-            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.1), transparent);
+            background: linear-gradient(to right, transparent, rgba(67, 97, 238, 0.3), transparent);
         }
 
         table {
@@ -402,15 +404,15 @@
         }
 
         thead {
-            background: linear-gradient(135deg, var(--table-darker) 0%, #1a1f36 100%);
-            border-bottom: 2px solid var(--table-border);
+            background: linear-gradient(135deg, #000000 0%, #111827 100%);
+            border-bottom: 2px solid rgba(67, 97, 238, 0.5);
             position: sticky;
             top: 0;
             z-index: 10;
         }
 
         th {
-            padding: 20px 24px;
+            padding: 18px 20px;
             text-align: left;
             font-weight: 700;
             color: #e2e8f0;
@@ -418,7 +420,7 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
             white-space: nowrap;
-            border-right: 1px solid var(--table-border);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
             position: relative;
         }
 
@@ -437,8 +439,8 @@
         }
 
         td {
-            padding: 18px 24px;
-            border-bottom: 1px solid var(--table-border);
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             white-space: nowrap;
             font-weight: 500;
             transition: all 0.2s ease;
@@ -454,15 +456,15 @@
         }
 
         tbody tr:nth-child(odd) {
-            background-color: rgba(15, 23, 42, 0.8);
+            background-color: rgba(0, 0, 0, 0.5);
         }
 
         tbody tr:nth-child(even) {
-            background-color: rgba(30, 41, 59, 0.8);
+            background-color: rgba(15, 23, 42, 0.5);
         }
 
         tbody tr:hover {
-            background-color: rgba(56, 70, 95, 0.8);
+            background-color: rgba(30, 41, 59, 0.8);
         }
 
         tbody tr:hover td {
@@ -508,20 +510,20 @@
             font-weight: 600;
         }
 
-        /* KOLOM TENGAH DENGAN WARNA HITAM */
+        /* KOLOM TENGAH HITAM */
         td.col-empty {
-            background: #000000; /* Warna hitam pekat */
+            background: #000000;
             width: 40px;
+            min-width: 40px;
             text-align: center;
-            color: #ffffff; /* Warna putih untuk panah */
+            color: #ffffff;
             font-size: 14px;
             font-weight: 800;
-            border-left: 2px solid #333333; /* Border hitam gelap */
-            border-right: 2px solid #333333; /* Border hitam gelap */
+            border-left: 2px solid rgba(255, 255, 255, 0.1);
+            border-right: 2px solid rgba(255, 255, 255, 0.1);
             position: relative;
         }
 
-        /* Tambahkan efek cahaya tipis pada kolom hitam */
         td.col-empty::before {
             content: '';
             position: absolute;
@@ -534,21 +536,6 @@
                 rgba(255, 255, 255, 0.02) 50%, 
                 rgba(255, 255, 255, 0.05) 100%);
             pointer-events: none;
-        }
-
-        /* Striped effect dengan garis tipis */
-        tbody tr {
-            position: relative;
-        }
-
-        tbody tr::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 10%;
-            width: 80%;
-            height: 1px;
-            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.05), transparent);
         }
 
         /* Toast Notification */
@@ -609,12 +596,10 @@
             from { 
                 opacity: 0; 
                 transform: translateX(-10px); 
-                background-color: rgba(30, 41, 59, 0); 
             }
             to { 
                 opacity: 1; 
                 transform: translateX(0); 
-                background-color: rgba(30, 41, 59, 0.8); 
             }
         }
 
@@ -629,7 +614,7 @@
             font-weight: 700;
             letter-spacing: 0.3px;
             margin-left: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
         }
 
         /* Footer */
@@ -637,7 +622,7 @@
             text-align: center;
             margin-top: 40px;
             padding-top: 20px;
-            border-top: 1px solid var(--border-color);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
             color: var(--text-light);
             font-size: 13px;
         }
@@ -645,7 +630,7 @@
         /* Scrollbar styling untuk tabel */
         .table-container::-webkit-scrollbar {
             height: 8px;
-            background-color: var(--table-darker);
+            background-color: #000000;
             border-radius: 0 0 var(--radius) var(--radius);
         }
 
@@ -674,10 +659,10 @@
                 <i class="fa-solid fa-paste"></i> Tempel Data Lengkap (Auto Parse)
             </label>
             <textarea id="rawData" placeholder="Tempel data lengkap di sini, contoh:
-1		vikakumala
-Withdraw	2026-01-22 18:44:42	66,000 	145.30
-G20
-SEABANK, 901635944310, TURNOVER X1 APRILIA FIKA KUMALA"></textarea>
+1		jembot12
+Withdraw	2026-01-22 19:19:38	6,000,000 	1,111,995
+G4
+BRI, 454601028593532, agus lukman toro"></textarea>
             <div class="button-group">
                 <button id="parseButton">
                     <i class="fa-solid fa-magic"></i> Parse Data Otomatis
