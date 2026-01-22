@@ -508,15 +508,32 @@
             font-weight: 600;
         }
 
+        /* KOLOM TENGAH DENGAN WARNA HITAM */
         td.col-empty {
-            background: linear-gradient(135deg, #334155 0%, #475569 100%);
+            background: #000000; /* Warna hitam pekat */
             width: 40px;
             text-align: center;
-            color: #fbbf24;
+            color: #ffffff; /* Warna putih untuk panah */
             font-size: 14px;
             font-weight: 800;
-            border-left: 2px solid rgba(251, 191, 36, 0.3);
-            border-right: 2px solid rgba(251, 191, 36, 0.3);
+            border-left: 2px solid #333333; /* Border hitam gelap */
+            border-right: 2px solid #333333; /* Border hitam gelap */
+            position: relative;
+        }
+
+        /* Tambahkan efek cahaya tipis pada kolom hitam */
+        td.col-empty::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, 
+                rgba(255, 255, 255, 0.05) 0%, 
+                rgba(255, 255, 255, 0.02) 50%, 
+                rgba(255, 255, 255, 0.05) 100%);
+            pointer-events: none;
         }
 
         /* Striped effect dengan garis tipis */
