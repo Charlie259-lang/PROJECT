@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Shortcut Withdraw Pro - 35Jt Limit</title>
+    <!-- Font Awesome untuk Ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --primary-hover: #3a53d0;
+            --success-color: #2ec4b6;
+            --success-hover: #25a096;
+            --warning-color: #f59e0b;
+            --warning-hover: #d97706;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --text-main: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --radius: 16px;
+            --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-image: url('https://cdn.areabermain.club/assets/cdn/az6/2026/01/08/20260108/0e9b0ec9a88ad88a5935bc5802bc41a5/linetogel-background-07januari2026.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: -1;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 900px;
+            animation: fadeIn 0.6s ease-out;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 35px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 5px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .paste-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .paste-section label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-main);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        #rawData {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            resize: vertical;
+            min-height: 120px;
+            margin-bottom: 15px;
+            background: white;
+        }
+
+        #rawData:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.1);
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .input-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-main);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 12px 12px 12px 40px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            background-color: #ffffff;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background-color: #fff;
+            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.1);
+        }
+
+        .input-full {
+            grid-column: 1 / -1;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 14px 32px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #processButton {
+            background-color: var(--primary-color);
+            box-shadow: 0 4px 14px rgba(67, 97, 238, 0.3);
+        }
+
+        #processButton:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(67, 97, 238, 0.4);
+        }
+
+        #parseButton {
+            background-color: var(--warning-color);
+            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
+        }
+
+        #parseButton:hover {
+            background-color: var(--warning-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+        }
+
+        #copyButton {
+            background-color: var(--success-color);
+            box-shadow: 0 4px 14px rgba(46, 196, 182, 0.3);
+        }
+
+        #copyButton:hover {
+            background-color: var(--success-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(46, 196, 182, 0.4);
+        }
+
+        #copyButton:disabled {
+            background-color: #cbd5e1;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .output-section {
+            margin-top: 40px;
+            display: none;
+            border-top: 1px solid var(--border-color);
+            padding-top: 30px;
+        }
+
+        .crosscheck-card {
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            border: 1px solid #a7f3d0;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .crosscheck-label {
+            color: #065f46;
+            font-weight: 600;
+            font-size: 13px;
+            margin-bottom: 5px;
+            display: block;
+            text-transform: uppercase;
+        }
+
+        .crosscheck-value {
+            color: #047857;
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background: #fff;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        thead {
+            background-color: #f8fafc;
+        }
+
+        th {
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 12px;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-main);
+            white-space: nowrap;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background-color: #f1f5f9;
+        }
+
+        td:last-child {
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            color: var(--primary-color);
+            background-color: rgba(67, 97, 238, 0.03);
+        }
+
+        td.col-empty {
+            background-color: #f3f4f6;
+            width: 20px;
+            text-align: center;
+            color: #ccc;
+            font-size: 10px;
+        }
+
+        #toast {
+            visibility: hidden;
+            min-width: 280px;
+            background-color: #1e293b;
+            color: #fff;
+            text-align: center;
+            border-radius: 10px;
+            padding: 16px;
+            position: fixed;
+            z-index: 100;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transition: opacity 0.3s, bottom 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 50px;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Withdraw Besar Pro</h1>
+            <p class="subtitle">Auto Split 35 Juta / Transaksi</p>
+        </header>
+
+        <!-- Paste Area untuk Data Mentah -->
+        <div class="paste-section">
+            <label for="rawData">Tempel Data Lengkap (Auto Parse)</label>
+            <textarea id="rawData" placeholder="Tempel data lengkap di sini, contoh:
+1		vikakumala
+Withdraw	2026-01-22 18:44:42	66,000 	145.30
+G20
+SEABANK, 901635944310, TURNOVER X1 APRILIA FIKA KUMALA"></textarea>
+            <div class="button-group">
+                <button id="parseButton">
+                    <i class="fa-solid fa-magic"></i> Parse Data Otomatis
+                </button>
+            </div>
+        </div>
+
+        <div class="input-grid">
+            <!-- Nominal Full Width -->
+            <div class="input-group input-full">
+                <label for="nominal">Nominal Total (Rupiah)</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-money-bill-wave"></i>
+                    <input type="text" id="nominal" placeholder="Contoh: 150000000" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                </div>
+            </div>
+
+            <!-- Kolom Data Baru -->
+            <div class="input-group">
+                <label for="id">User ID</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-fingerprint"></i>
+                    <input type="text" id="id" placeholder="User ID">
+                </div>
+            </div>
+            <div class="input-group">
+                <label for="bank">Nama Bank</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-building-columns"></i>
+                    <input type="text" id="bank" placeholder="Contoh: BCA">
+                </div>
+            </div>
+            <div class="input-group">
+                <label for="nomorRekening">Nomor Rekening</label>
+                <div class="input-wrapper">
+                    <i class="fa-regular fa-credit-card"></i>
+                    <input type="text" id="nomorRekening" placeholder="No. Rek">
+                </div>
+            </div>
+            <div class="input-group">
+                <label for="namaRekening">Nama Rekening</label>
+                <div class="input-wrapper">
+                    <i class="fa-regular fa-user"></i>
+                    <input type="text" id="namaRekening" placeholder="Atas Nama">
+                </div>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button id="processButton">
+                <i class="fa-solid fa-bolt"></i> Proses Pemecahan
+            </button>
+        </div>
+
+        <div id="outputSection" class="output-section">
+            
+            <!-- Tampilan Cross-Check -->
+            <div class="crosscheck-card">
+                <span class="crosscheck-label">Total Cross-Check</span>
+                <div id="crosscheckValue" class="crosscheck-value">0</div>
+            </div>
+
+            <h2 style="text-align:center; font-size:18px; margin-bottom:15px; color:var(--text-main);">Hasil Pemecahan</h2>
+            
+            <div class="table-container">
+                <table id="resultTable">
+                    <thead>
+                        <tr>
+                            <th>User ID</th>
+                            <th>Bank</th>
+                            <th>No. Rek</th>
+                            <th>Nama Rek</th>
+                            <th style="background-color: #f3f4f6; width: 20px;">&nbsp;</th>
+                            <th>Nominal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data akan di-generate di sini -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="button-group">
+                <button id="copyButton">
+                    <i class="fa-regular fa-copy"></i> Salin ke Google Sheets
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast"><i class="fa-solid fa-check-circle"></i> <span>Tabel berhasil disalin!</span></div>
+
+    <script>
+        // Referensi Elemen DOM
+        const processButton = document.getElementById('processButton');
+        const parseButton = document.getElementById('parseButton');
+        const copyButton = document.getElementById('copyButton');
+        const outputSection = document.getElementById('outputSection');
+        const crosscheckValue = document.getElementById('crosscheckValue');
+        const tableBody = document.querySelector('#resultTable tbody');
+        const toast = document.getElementById("toast");
+        const rawDataTextarea = document.getElementById('rawData');
+
+        // Input Elements
+        const nominalInput = document.getElementById('nominal');
+        const idInput = document.getElementById('id');
+        const bankInput = document.getElementById('bank');
+        const nomorRekeningInput = document.getElementById('nomorRekening');
+        const namaRekeningInput = document.getElementById('namaRekening');
+
+        // Konfigurasi Limit
+        const CHUNK_SIZE = 35000000; // 35 Juta per transaksi
+
+        // Fungsi Format Angka (Ribuan)
+        function formatNumber(num) {
+            return num.toLocaleString('en-US');
+        }
+
+        // Fungsi untuk mem-parse data mentah
+        function parseRawData(rawData) {
+            const lines = rawData.split('\n').filter(line => line.trim() !== '');
+            
+            if (lines.length < 4) {
+                showToast("Format data tidak valid. Pastikan data lengkap 4 baris.", true);
+                return false;
+            }
+
+            try {
+                // Parsing User ID dari baris pertama
+                const firstLine = lines[0];
+                const idMatch = firstLine.match(/[a-zA-Z0-9]+$/);
+                const userId = idMatch ? idMatch[0].trim() : '';
+                
+                // Parsing Nominal dari baris kedua
+                const secondLine = lines[1];
+                const nominalMatch = secondLine.match(/(\d{1,3}(,\d{3})*)\s/);
+                let nominal = 0;
+                if (nominalMatch) {
+                    nominal = parseInt(nominalMatch[1].replace(/,/g, ''), 10);
+                }
+                
+                // Parsing Bank, Nomor Rekening, Nama Rekening dari baris keempat
+                const fourthLine = lines[3];
+                const bankMatch = fourthLine.match(/^([^,]+),\s*([^,]+),\s*(.+)$/);
+                
+                let bank = '';
+                let accountNumber = '';
+                let accountName = '';
+                
+                if (bankMatch) {
+                    bank = bankMatch[1].trim();
+                    accountNumber = bankMatch[2].trim();
+                    accountName = bankMatch[3].trim();
+                }
+
+                // Isi field-field input
+                idInput.value = userId;
+                nominalInput.value = nominal;
+                bankInput.value = bank;
+                nomorRekeningInput.value = accountNumber;
+                namaRekeningInput.value = accountName;
+
+                showToast("Data berhasil diparse!");
+                return true;
+                
+            } catch (error) {
+                console.error("Parsing error:", error);
+                showToast("Gagal memparse data. Periksa format.", true);
+                return false;
+            }
+        }
+
+        // Event Listener Tombol Parse
+        parseButton.addEventListener('click', () => {
+            const rawData = rawDataTextarea.value.trim();
+            if (!rawData) {
+                showToast("Tempel data terlebih dahulu.", true);
+                rawDataTextarea.focus();
+                return;
+            }
+            
+            parseRawData(rawData);
+        });
+
+        // Event Listener Tombol Proses
+        processButton.addEventListener('click', () => {
+            // 1. Ambil dan Bersihkan Nilai
+            const nominalString = nominalInput.value.replace(/\D/g, '');
+            const totalAmount = parseInt(nominalString, 10);
+            
+            const id = idInput.value.trim();
+            const bank = bankInput.value.trim();
+            const nomorRekening = nomorRekeningInput.value.trim();
+            const namaRekening = namaRekeningInput.value.trim();
+
+            // 2. Validasi Input
+            if (isNaN(totalAmount) || totalAmount <= 0) {
+                showToast("Masukkan nominal yang valid.", true);
+                nominalInput.focus();
+                return;
+            }
+            if (!id || !bank || !nomorRekening || !namaRekening) {
+                showToast("Mohon lengkapi semua kolom data (ID, Bank, Rek, Nama).", true);
+                return;
+            }
+
+            // 3. Proses Pemecahan Nominal (35jt per trx)
+            const fullChunks = Math.floor(totalAmount / CHUNK_SIZE);
+            const remainder = totalAmount % CHUNK_SIZE;
+
+            let rowsData = [];
+
+            // Loop untuk potongan 35jt
+            for (let i = 0; i < fullChunks; i++) {
+                rowsData.push({
+                    id: id,
+                    bank: bank,
+                    nomorRekening: nomorRekening,
+                    namaRekening: namaRekening,
+                    nominal: CHUNK_SIZE
+                });
+            }
+
+            // Tambahkan sisa jika ada
+            if (remainder > 0) {
+                rowsData.push({
+                    id: id,
+                    bank: bank,
+                    nomorRekening: nomorRekening,
+                    namaRekening: namaRekening,
+                    nominal: remainder
+                });
+            }
+            
+            // 4. Update Tampilan UI
+            crosscheckValue.textContent = formatNumber(totalAmount);
+            renderTable(rowsData);
+            
+            outputSection.style.display = 'block';
+            outputSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+
+        // Fungsi Render Tabel
+        function renderTable(data) {
+            tableBody.innerHTML = ''; 
+
+            data.forEach((row, index) => {
+                const tr = document.createElement('tr');
+                tr.style.animation = `fadeIn 0.3s ease-out forwards ${index * 0.05}s`;
+                tr.style.opacity = '0'; 
+
+                tr.innerHTML = `
+                    <td>${row.id}</td>
+                    <td>${row.bank}</td>
+                    <td style="font-family:'Courier New', monospace;">${row.nomorRekening}</td>
+                    <td>${row.namaRekening}</td>
+                    <td class="col-empty"></td>
+                    <td data-raw="${row.nominal}">${formatNumber(row.nominal)}</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        // Event Listener Tombol Salin
+        copyButton.addEventListener('click', () => {
+            const rows = tableBody.querySelectorAll('tr');
+            if (rows.length === 0) return;
+
+            let clipboardText = "";
+
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                
+                const id = cells[0].textContent;
+                const bank = cells[1].textContent;
+                const rek = cells[2].textContent;
+                const nama = cells[3].textContent;
+                const nominalRaw = cells[5].getAttribute('data-raw');
+
+                clipboardText += `${id}\t${bank}\t${rek}\t${nama}\t\t${nominalRaw}\n`;
+            });
+
+            navigator.clipboard.writeText(clipboardText.trim()).then(() => {
+                showToast("Data siap dipaste ke Google Sheets!");
+                
+                const originalText = copyButton.innerHTML;
+                copyButton.innerHTML = '<i class="fa-solid fa-check"></i> Tersalin';
+                copyButton.disabled = true;
+                
+                setTimeout(() => {
+                    copyButton.innerHTML = originalText;
+                    copyButton.disabled = false;
+                }, 2000);
+            }).catch(err => {
+                showToast("Gagal menyalin teks.", true);
+                console.error('Error copying text: ', err);
+            });
+        });
+
+        // Fungsi Toast Notification
+        function showToast(message, isError = false) {
+            const span = toast.querySelector('span');
+            const icon = toast.querySelector('i');
+            
+            span.textContent = message;
+            toast.className = "show";
+            
+            if (isError) {
+                toast.style.backgroundColor = "#ef4444";
+                icon.className = "fa-solid fa-circle-exclamation";
+            } else {
+                toast.style.backgroundColor = "#1e293b";
+                icon.className = "fa-solid fa-check-circle";
+            }
+
+            setTimeout(() => { 
+                toast.className = toast.className.replace("show", ""); 
+            }, 3000);
+        }
+
+        // Auto-focus ke textarea saat halaman dimuat
+        window.addEventListener('DOMContentLoaded', () => {
+            rawDataTextarea.focus();
+        });
+    </script>
+
+</body>
+</html>
