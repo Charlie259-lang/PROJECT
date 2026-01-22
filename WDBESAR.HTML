@@ -521,15 +521,40 @@ SEABANK, 901635944310, TURNOVER X1 APRILIA FIKA KUMALA"></textarea>
             try {
                 // Parsing User ID dari baris pertama
                 const firstLine = lines[0];
-                const idMatch = firstLine.match(/[a-zA-Z0-9]+$/);
-                const userId = idMatch ? idMatch[0].trim() : '';
+                // Mengambil kata terakhir setelah tab terakhir
+                const idParts = firstLine.split('\t');
+                const userId = idParts[idParts.length - 1].trim();
                 
-                // Parsing Nominal dari baris kedua
+                // Parsing Nominal dari baris kedua - PERBAIKAN DISINI
                 const secondLine = lines[1];
-                const nominalMatch = secondLine.match(/(\d{1,3}(,\d{3})*)\s/);
+                // Split dengan tab
+                const secondParts = secondLine.split('\t');
+                // Bagian ke-3 (indeks 2) adalah nominal withdraw
+                let nominalString = "";
+                
+                // Cari bagian yang mengandung koma sebagai pemisah ribuan
+                for (let i = 0; i < secondParts.length; i++) {
+                    const part = secondParts[i].trim();
+                    // Cari pattern angka dengan koma (misal: 6,000,000 atau 66,000)
+                    if (part.includes(',') && /\d+,\d+/.test(part)) {
+                        nominalString = part;
+                        break;
+                    }
+                }
+                
+                // Jika tidak ditemukan dengan cara di atas, ambil bagian indeks 2
+                if (!nominalString && secondParts.length > 2) {
+                    nominalString = secondParts[2].trim();
+                }
+                
+                // Bersihkan dari titik dan koma, hanya ambil angka
                 let nominal = 0;
-                if (nominalMatch) {
-                    nominal = parseInt(nominalMatch[1].replace(/,/g, ''), 10);
+                if (nominalString) {
+                    // Hapus semua karakter non-angka kecuali koma
+                    let cleanNominal = nominalString.replace(/[^\d,]/g, '');
+                    // Hapus koma pemisah ribuan
+                    cleanNominal = cleanNominal.replace(/,/g, '');
+                    nominal = parseInt(cleanNominal, 10);
                 }
                 
                 // Parsing Bank, Nomor Rekening, Nama Rekening dari baris keempat
@@ -544,6 +569,13 @@ SEABANK, 901635944310, TURNOVER X1 APRILIA FIKA KUMALA"></textarea>
                     bank = bankMatch[1].trim();
                     accountNumber = bankMatch[2].trim();
                     accountName = bankMatch[3].trim();
+                }
+
+                // Validasi hasil parsing
+                if (!userId || isNaN(nominal) || nominal <= 0 || !bank || !accountNumber || !accountName) {
+                    showToast("Gagal memparse semua data. Periksa format.", true);
+                    console.log("Debug parsing:", { userId, nominal, bank, accountNumber, accountName });
+                    return false;
                 }
 
                 // Isi field-field input
