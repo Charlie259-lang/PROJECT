@@ -1,0 +1,2219 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Izin Keluar Staff - Linetogel</title>
+  
+  <!-- FAVICON -->
+  <link rel="shortcut icon" href="https://cdn-icons-png.flaticon.com/512/190/190411.png" type="image/x-icon">
+
+  <!-- FONT AWESOME -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+  
+  <!-- GOOGLE FONTS -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ============================================
+       VARIABEL CSS
+    ============================================ */
+    :root {
+      --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --danger-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+      --bg-gradient: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+      --glass-bg: rgba(255, 255, 255, 0.08);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255, 255, 255, 0.7);
+      --text-muted: rgba(255, 255, 255, 0.5);
+      --shadow-primary: 0 10px 30px rgba(0, 0, 0, 0.3);
+      --shadow-secondary: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    /* ============================================
+       RESET & BASE STYLES
+    ============================================ */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg-gradient);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: var(--text-primary);
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* ============================================
+       BACKGROUND SLIDESHOW
+    ============================================ */
+    .background-slideshow {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+    }
+
+    .bg-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 1.5s ease-in-out;
+      filter: brightness(0.3) blur(2px);
+    }
+
+    .bg-image.active {
+      opacity: 0.3;
+    }
+
+    /* ============================================
+       LOADING SPINNER
+    ============================================ */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(5px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      transition: opacity 0.3s;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(255, 255, 255, 0.1);
+      border-top-color: #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      color: white;
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    /* ============================================
+       LOGIN FORM
+    ============================================ */
+    .login-container {
+      width: 100%;
+      max-width: 450px;
+      padding: 40px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      box-shadow: var(--shadow-primary);
+      animation: slideUp 0.5s ease-out;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .logo-section {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .logo-section img {
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
+      margin-bottom: 15px;
+      filter: drop-shadow(0 5px 15px rgba(102, 126, 234, 0.3));
+    }
+
+    .logo-section h1 {
+      font-size: 28px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 5px;
+    }
+
+    .logo-section p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--text-secondary);
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .input-with-icon {
+      position: relative;
+    }
+
+    .input-with-icon i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 16px;
+      transition: color 0.3s;
+    }
+
+    .input-with-icon input {
+      width: 100%;
+      padding: 14px 15px 14px 45px;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--glass-border);
+      border-radius: 10px;
+      color: var(--text-primary);
+      font-family: 'Poppins', sans-serif;
+      font-size: 15px;
+      transition: all 0.3s;
+    }
+
+    .input-with-icon input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+    }
+
+    .input-with-icon input:focus + i {
+      color: #667eea;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 16px;
+      transition: color 0.3s;
+    }
+
+    .password-toggle:hover {
+      color: #667eea;
+    }
+
+    .alert-message {
+      padding: 12px 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      display: none;
+      animation: fadeIn 0.3s;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .alert-error {
+      background: rgba(245, 87, 108, 0.1);
+      border: 1px solid rgba(245, 87, 108, 0.3);
+      color: #f5576c;
+    }
+
+    .alert-warning {
+      background: rgba(250, 112, 154, 0.1);
+      border: 1px solid rgba(250, 112, 154, 0.3);
+      color: #fa709a;
+    }
+
+    .alert-success {
+      background: rgba(79, 172, 254, 0.1);
+      border: 1px solid rgba(79, 172, 254, 0.3);
+      color: #4facfe;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-primary {
+      background: var(--primary-gradient);
+      color: white;
+      box-shadow: var(--shadow-secondary);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-primary:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .login-footer {
+      text-align: center;
+      margin-top: 25px;
+      padding-top: 20px;
+      border-top: 1px solid var(--glass-border);
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    /* ============================================
+       DASHBOARD
+    ============================================ */
+    .dashboard-container {
+      width: 100%;
+      max-width: 800px;
+      padding: 30px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      box-shadow: var(--shadow-primary);
+      animation: slideUp 0.5s ease-out;
+      margin: 20px;
+    }
+
+    .dashboard-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .dashboard-logo {
+      width: 70px;
+      height: 70px;
+      object-fit: contain;
+      margin-bottom: 15px;
+      filter: drop-shadow(0 5px 15px rgba(102, 126, 234, 0.3));
+    }
+
+    .dashboard-header h1 {
+      font-size: 24px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 5px;
+    }
+
+    .dashboard-header p {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    /* ============================================
+       CLOCK
+    ============================================ */
+    .clock-container {
+      text-align: center;
+      margin: 30px 0;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 15px;
+      border: 1px solid var(--glass-border);
+    }
+
+    .clock-display {
+      font-family: 'Digital-7', monospace;
+      font-size: 3.5rem;
+      font-weight: 700;
+      color: #00f2fe;
+      text-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+    }
+
+    .date-display {
+      font-size: 18px;
+      color: var(--text-secondary);
+    }
+
+    /* ============================================
+       USER INFO
+    ============================================ */
+    .user-info-card {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 25px;
+      border: 1px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .user-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: var(--primary-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 600;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .user-details {
+      flex: 1;
+    }
+
+    .user-name {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 5px;
+    }
+
+    .user-role {
+      display: inline-block;
+      padding: 4px 12px;
+      background: rgba(102, 126, 234, 0.1);
+      border: 1px solid rgba(102, 126, 234, 0.3);
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #667eea;
+      margin-bottom: 8px;
+    }
+
+    .user-ip {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    /* ============================================
+       STATUS PANEL
+    ============================================ */
+    .status-panel {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 15px;
+      padding: 25px;
+      margin-bottom: 25px;
+      border: 1px solid var(--glass-border);
+      text-align: center;
+      transition: all 0.3s;
+    }
+
+    .status-panel.active {
+      border-color: #4facfe;
+      background: rgba(79, 172, 254, 0.05);
+    }
+
+    .status-icon {
+      font-size: 40px;
+      margin-bottom: 15px;
+      color: #667eea;
+    }
+
+    .status-panel.active .status-icon {
+      color: #4facfe;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .status-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+    }
+
+    .status-time {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+    }
+
+    .status-duration {
+      font-size: 16px;
+      color: #fa709a;
+      background: rgba(250, 112, 154, 0.1);
+      padding: 8px 15px;
+      border-radius: 20px;
+      display: inline-block;
+      margin-bottom: 15px;
+    }
+
+    .status-info {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    /* ============================================
+       JOBDESK SELECTION
+    ============================================ */
+    .jobdesk-section {
+      margin-bottom: 25px;
+    }
+
+    .jobdesk-section h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+
+    .jobdesk-select {
+      width: 100%;
+      padding: 14px 20px;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--glass-border);
+      border-radius: 10px;
+      color: var(--text-primary);
+      font-family: 'Poppins', sans-serif;
+      font-size: 15px;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23667eea' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 15px center;
+      background-size: 16px;
+      cursor: pointer;
+      transition: border-color 0.3s;
+    }
+
+    .jobdesk-select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+    }
+
+    .jobdesk-select option {
+      background: #1a1a2e;
+      color: white;
+    }
+
+    /* ============================================
+       ACTION BUTTONS
+    ============================================ */
+    .action-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .btn-secondary {
+      background: var(--success-gradient);
+      color: white;
+      box-shadow: var(--shadow-secondary);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(79, 172, 254, 0.4);
+    }
+
+    .btn-danger {
+      background: var(--danger-gradient);
+      color: white;
+      box-shadow: var(--shadow-secondary);
+    }
+
+    .btn-danger:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(245, 87, 108, 0.4);
+    }
+
+    .btn-warning {
+      background: var(--warning-gradient);
+      color: white;
+      box-shadow: var(--shadow-secondary);
+    }
+
+    .btn-warning:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(250, 112, 154, 0.4);
+    }
+
+    /* ============================================
+       ALERTS & WARNINGS
+    ============================================ */
+    .system-alert {
+      padding: 20px;
+      border-radius: 15px;
+      margin-bottom: 25px;
+      text-align: center;
+      animation: slideIn 0.3s;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateY(-10px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .system-alert.warning {
+      background: rgba(250, 112, 154, 0.1);
+      border: 1px solid rgba(250, 112, 154, 0.3);
+    }
+
+    .system-alert.error {
+      background: rgba(245, 87, 108, 0.1);
+      border: 1px solid rgba(245, 87, 108, 0.3);
+    }
+
+    .system-alert.info {
+      background: rgba(102, 126, 234, 0.1);
+      border: 1px solid rgba(102, 126, 234, 0.3);
+    }
+
+    .alert-icon {
+      font-size: 40px;
+      margin-bottom: 15px;
+      color: #fa709a;
+    }
+
+    .system-alert.error .alert-icon {
+      color: #f5576c;
+    }
+
+    .system-alert.info .alert-icon {
+      color: #667eea;
+    }
+
+    .alert-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--text-primary);
+    }
+
+    .alert-message {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 15px;
+    }
+
+    /* ============================================
+       QUICK LINKS
+    ============================================ */
+    .quick-links {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .link-card {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 15px;
+      padding: 20px;
+      text-decoration: none;
+      border: 1px solid var(--glass-border);
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .link-card:hover {
+      transform: translateY(-3px);
+      border-color: #667eea;
+      background: rgba(102, 126, 234, 0.05);
+    }
+
+    .link-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--primary-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .link-content h4 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 5px;
+    }
+
+    .link-content p {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    /* ============================================
+       ACCOUNT ACTIONS
+    ============================================ */
+    .account-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-top: 30px;
+      padding-top: 30px;
+      border-top: 1px solid var(--glass-border);
+    }
+
+    /* ============================================
+       MODALS
+    ============================================ */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(5px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal-content {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: var(--shadow-primary);
+      animation: modalIn 0.3s;
+    }
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .modal-icon {
+      font-size: 60px;
+      margin-bottom: 20px;
+      color: #667eea;
+    }
+
+    .modal-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+    }
+
+    .modal-message {
+      font-size: 16px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+
+    .modal-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    /* ============================================
+       PASSWORD MODAL
+    ============================================ */
+    .password-form {
+      margin-bottom: 30px;
+    }
+
+    .password-form .form-group {
+      margin-bottom: 25px;
+    }
+
+    /* ============================================
+       MAINTENANCE MODE
+    ============================================ */
+    .maintenance-container {
+      width: 100%;
+      max-width: 600px;
+      padding: 40px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      box-shadow: var(--shadow-primary);
+      text-align: center;
+      animation: slideUp 0.5s ease-out;
+    }
+
+    .maintenance-icon {
+      font-size: 80px;
+      color: #fa709a;
+      margin-bottom: 30px;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .maintenance-title {
+      font-size: 36px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #fa709a, #fee140);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 20px;
+    }
+
+    .maintenance-message {
+      font-size: 18px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+
+    /* ============================================
+       SYSTEM INFO BAR
+    ============================================ */
+    .system-info-bar {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      border-radius: 10px;
+      padding: 10px 15px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #4facfe;
+      animation: blink 2s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* ============================================
+       RESPONSIVE DESIGN
+    ============================================ */
+    @media (max-width: 768px) {
+      .login-container,
+      .dashboard-container,
+      .maintenance-container {
+        padding: 25px;
+        margin: 15px;
+      }
+
+      .clock-display {
+        font-size: 2.5rem;
+      }
+
+      .action-buttons,
+      .account-actions,
+      .quick-links {
+        grid-template-columns: 1fr;
+      }
+
+      .user-info-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+      }
+
+      .modal-content {
+        padding: 25px;
+      }
+
+      .modal-actions {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .login-container,
+      .dashboard-container,
+      .maintenance-container {
+        padding: 20px;
+        margin: 10px;
+      }
+
+      .clock-display {
+        font-size: 2rem;
+      }
+
+      .dashboard-header h1,
+      .maintenance-title {
+        font-size: 24px;
+      }
+    }
+
+    /* ============================================
+       UTILITY CLASSES
+    ============================================ */
+    .hidden {
+      display: none !important;
+    }
+
+    .text-center {
+      text-align: center;
+    }
+
+    .mb-20 {
+      margin-bottom: 20px;
+    }
+
+    .mt-20 {
+      margin-top: 20px;
+    }
+
+    .mb-30 {
+      margin-bottom: 30px;
+    }
+
+    .mt-30 {
+      margin-top: 30px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Background Slideshow -->
+  <div class="background-slideshow" id="backgroundSlideshow">
+    <!-- Background images will be added dynamically -->
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+    <div class="loading-text" id="loadingText">Loading...</div>
+  </div>
+
+  <!-- Maintenance Mode -->
+  <div class="maintenance-container hidden" id="maintenanceMode">
+    <div class="maintenance-icon">
+      <i class="fas fa-tools"></i>
+    </div>
+    <h1 class="maintenance-title">🚧 MAINTENANCE MODE 🚧</h1>
+    <p class="maintenance-message">
+      Sistem sedang dalam perawatan dan pengembangan.<br>
+      Harap bersabar, kami akan kembali segera.
+    </p>
+    <div class="system-alert info mb-30">
+      <div class="alert-icon">
+        <i class="fas fa-info-circle"></i>
+      </div>
+      <div class="alert-title">Informasi</div>
+      <div class="alert-message">
+        Sistem akan kembali aktif setelah maintenance selesai.<br>
+        Hubungi administrator untuk informasi lebih lanjut.
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="checkMaintenance()">
+      <i class="fas fa-sync-alt"></i> Refresh Status
+    </button>
+  </div>
+
+  <!-- Login Form -->
+  <div class="login-container hidden" id="loginForm">
+    <div class="logo-section">
+      <img src="https://cdn.areabermain.club/assets/cdn/az4/2025/04/23/20250423/a82bdc6fb564d0dff3671aeb9a4d1da5/logo.png" alt="Linetogel Logo">
+      <h1>Linetogel Staff</h1>
+      <p>Izin Keluar Management System</p>
+    </div>
+
+    <div class="alert-message alert-error" id="loginError"></div>
+    <div class="alert-message alert-warning" id="ipWarning"></div>
+
+    <form id="loginFormElement">
+      <div class="form-group">
+        <label for="username"><i class="fas fa-user"></i> Username</label>
+        <div class="input-with-icon">
+          <input type="text" id="username" placeholder="Masukkan username" required autocomplete="username">
+          <i class="fas fa-user"></i>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password"><i class="fas fa-lock"></i> Password</label>
+        <div class="input-with-icon">
+          <input type="password" id="password" placeholder="Masukkan password" required autocomplete="current-password">
+          <i class="fas fa-lock"></i>
+          <button type="button" class="password-toggle" id="togglePassword">
+            <i class="fas fa-eye"></i>
+          </button>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary" id="loginButton">
+        <i class="fas fa-sign-in-alt"></i> Login
+      </button>
+    </form>
+
+    <div class="login-footer">
+      <p>© 2026 Linetogel Staff Management System</p>
+      <p>Versi 2.0.0</p>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div class="dashboard-container hidden" id="dashboard">
+    <div class="dashboard-header">
+      <img src="https://cdn.areabermain.club/assets/cdn/az4/2025/04/23/20250423/a82bdc6fb564d0dff3671aeb9a4d1da5/logo.png" alt="Linetogel Logo" class="dashboard-logo">
+      <h1>IZIN KELUAR STAFF</h1>
+      <p>Sistem Management Izin Keluar Linetogel</p>
+    </div>
+
+    <!-- Clock -->
+    <div class="clock-container">
+      <div class="clock-display" id="clockDisplay">00:00:00</div>
+      <div class="date-display" id="dateDisplay">Loading...</div>
+    </div>
+
+    <!-- User Info -->
+    <div class="user-info-card">
+      <div class="user-avatar" id="userAvatar">U</div>
+      <div class="user-details">
+        <div class="user-name" id="userName">Loading...</div>
+        <div class="user-role" id="userRole">Loading...</div>
+        <div class="user-ip">
+          <i class="fas fa-network-wired"></i> IP: <span id="userIP">Loading...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- System Alerts -->
+    <div class="system-alert warning hidden" id="timeRestrictionAlert">
+      <div class="alert-icon">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <div class="alert-title">⚠️ PERINGATAN WAKTU</div>
+      <div class="alert-message">
+        Izin keluar tidak tersedia pada pukul 23:50 - 00:01 WIB.<br>
+        Harap menunggu hingga waktu tersebut berlalu.
+      </div>
+    </div>
+
+    <div class="system-alert error hidden" id="maxLimitAlert">
+      <div class="alert-icon">
+        <i class="fas fa-ban"></i>
+      </div>
+      <div class="alert-title">⛔ BATAS MAKSIMAL TERCAPAI</div>
+      <div class="alert-message" id="maxLimitMessage">
+        Anda sudah mencapai batas maksimal izin keluar hari ini (4x).<br>
+        Silakan lanjut besok!
+      </div>
+    </div>
+
+    <div class="system-alert error hidden" id="roleLimitAlert">
+      <div class="alert-icon">
+        <i class="fas fa-users"></i>
+      </div>
+      <div class="alert-title" id="roleLimitTitle">⚠️ BATAS ROLE TERCAPAI</div>
+      <div class="alert-message" id="roleLimitMessage">
+        Jumlah staff dengan role yang sama yang sedang izin telah mencapai batas maksimum.
+      </div>
+    </div>
+
+    <div class="system-alert error hidden" id="staffLimitAlert">
+      <div class="alert-icon">
+        <i class="fas fa-user-slash"></i>
+      </div>
+      <div class="alert-title">🚫 BATAS STAFF KELUAR</div>
+      <div class="alert-message">
+        Maksimal hanya 3 staff yang dapat izin keluar pada saat bersamaan.<br>
+        Harap tunggu hingga salah satu staff kembali masuk.
+      </div>
+    </div>
+
+    <!-- Status Panel -->
+    <div class="status-panel" id="statusPanel">
+      <div class="status-icon">
+        <i class="fas fa-clock" id="statusIcon"></i>
+      </div>
+      <div class="status-title" id="statusTitle">Status Anda</div>
+      <div class="status-time" id="statusTime">-</div>
+      <div class="status-duration" id="statusDuration">-</div>
+      <div class="status-info" id="statusInfo">Loading...</div>
+    </div>
+
+    <!-- Jobdesk Selection -->
+    <div class="jobdesk-section hidden" id="jobdeskSection">
+      <h3><i class="fas fa-tasks"></i> Pilih Jobdesk</h3>
+      <select class="jobdesk-select" id="jobdeskSelect">
+        <option value="">-- Silahkan Pilih --</option>
+      </select>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button class="btn btn-secondary" id="startButton" onclick="startTime()">
+        <i class="fas fa-door-open"></i> Izin Keluar
+      </button>
+      <button class="btn btn-danger" id="endButton" onclick="endTime()">
+        <i class="fas fa-sign-in-alt"></i> Kembali Masuk
+      </button>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="quick-links">
+      <a href="https://linetogel-izin.vercel.app/izin-staff-Linetgl.html" target="_blank" class="link-card">
+        <div class="link-icon">
+          <i class="fas fa-chart-bar"></i>
+        </div>
+        <div class="link-content">
+          <h4>Dashboard Data</h4>
+          <p>Lihat statistik dan laporan lengkap</p>
+        </div>
+      </a>
+      <a href="#" class="link-card" onclick="showHelp()">
+        <div class="link-icon">
+          <i class="fas fa-question-circle"></i>
+        </div>
+        <div class="link-content">
+          <h4>Bantuan</h4>
+          <p>Panduan penggunaan sistem</p>
+        </div>
+      </a>
+    </div>
+
+    <!-- Account Actions -->
+    <div class="account-actions">
+      <button class="btn btn-warning" onclick="showChangePassword()">
+        <i class="fas fa-key"></i> Ganti Password
+      </button>
+      <button class="btn btn-danger" onclick="logout()">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </button>
+    </div>
+
+    <!-- System Info -->
+    <div class="login-footer mt-30">
+      <p>Session ID: <span id="sessionId">-</span></p>
+      <p>Terakhir diperbarui: <span id="lastUpdate">-</span></p>
+    </div>
+  </div>
+
+  <!-- Modals -->
+  <!-- Success Modal -->
+  <div class="modal-overlay hidden" id="successModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <h2 class="modal-title" id="successTitle">Berhasil!</h2>
+        <p class="modal-message" id="successMessage">Operasi berhasil dilakukan.</p>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-primary" onclick="hideModal('successModal')">
+          <i class="fas fa-check"></i> OK
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error Modal -->
+  <div class="modal-overlay hidden" id="errorModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-icon">
+          <i class="fas fa-exclamation-circle"></i>
+        </div>
+        <h2 class="modal-title" id="errorTitle">Terjadi Kesalahan!</h2>
+        <p class="modal-message" id="errorMessage">Terjadi kesalahan pada sistem.</p>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-danger" onclick="hideModal('errorModal')">
+          <i class="fas fa-times"></i> Tutup
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Change Password Modal -->
+  <div class="modal-overlay hidden" id="passwordModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-icon">
+          <i class="fas fa-key"></i>
+        </div>
+        <h2 class="modal-title">Ganti Password</h2>
+        <p class="modal-message">Masukkan password lama dan password baru Anda.</p>
+      </div>
+
+      <form class="password-form" id="passwordForm">
+        <div class="alert-message alert-error hidden" id="passwordError"></div>
+        <div class="alert-message alert-success hidden" id="passwordSuccess"></div>
+
+        <div class="form-group">
+          <label for="oldPassword">Password Lama</label>
+          <div class="input-with-icon">
+            <input type="password" id="oldPassword" placeholder="Masukkan password lama" required>
+            <i class="fas fa-lock"></i>
+            <button type="button" class="password-toggle" onclick="togglePasswordVisibility('oldPassword', 'toggleOldPassword')">
+              <i class="fas fa-eye" id="toggleOldPassword"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="newPassword">Password Baru</label>
+          <div class="input-with-icon">
+            <input type="password" id="newPassword" placeholder="Masukkan password baru" required>
+            <i class="fas fa-key"></i>
+            <button type="button" class="password-toggle" onclick="togglePasswordVisibility('newPassword', 'toggleNewPassword')">
+              <i class="fas fa-eye" id="toggleNewPassword"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Konfirmasi Password Baru</label>
+          <div class="input-with-icon">
+            <input type="password" id="confirmPassword" placeholder="Konfirmasi password baru" required>
+            <i class="fas fa-check-circle"></i>
+            <button type="button" class="password-toggle" onclick="togglePasswordVisibility('confirmPassword', 'toggleConfirmPassword')">
+              <i class="fas fa-eye" id="toggleConfirmPassword"></i>
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <div class="modal-actions">
+        <button class="btn btn-primary" onclick="changePassword()">
+          <i class="fas fa-save"></i> Simpan
+        </button>
+        <button class="btn btn-danger" onclick="hideModal('passwordModal')">
+          <i class="fas fa-times"></i> Batal
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Help Modal -->
+  <div class="modal-overlay hidden" id="helpModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-icon">
+          <i class="fas fa-question-circle"></i>
+        </div>
+        <h2 class="modal-title">Bantuan & Panduan</h2>
+      </div>
+
+      <div class="modal-message">
+        <h4>Cara Penggunaan:</h4>
+        <ol style="text-align: left; margin-left: 20px; margin-bottom: 20px;">
+          <li>Login dengan username dan password yang valid</li>
+          <li>IP Anda harus terdaftar di whitelist</li>
+          <li>Klik "Izin Keluar" saat akan keluar dari kantor</li>
+          <li>Pilih jobdesk jika diperlukan</li>
+          <li>Klik "Kembali Masuk" saat sudah kembali</li>
+          <li>Maksimal 4x izin keluar per hari</li>
+          <li>Maksimal 3 staff yang bisa keluar bersamaan</li>
+        </ol>
+
+        <h4>Batasan:</h4>
+        <ul style="text-align: left; margin-left: 20px;">
+          <li>Tidak bisa izin keluar pukul 23:50 - 00:01</li>
+          <li>Setiap role memiliki batas maksimal staff yang bisa izin</li>
+          <li>Durasi izin maksimal dihitung otomatis</li>
+        </ul>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-primary" onclick="hideModal('helpModal')">
+          <i class="fas fa-check"></i> Mengerti
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- System Info Bar -->
+  <div class="system-info-bar">
+    <div class="status-dot"></div>
+    <span id="systemStatus">Menyambungkan...</span>
+  </div>
+
+  <script>
+    // ============================================
+    // KONFIGURASI
+    // ============================================
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzCrbbVEeEgEq8L0a4w8-SPJBoRQg7rDV9h6mOt4OQ82oeuoL6AgdSwE1DzwjhAdEc/exec';
+    
+    // Background images untuk slideshow
+    const BACKGROUND_IMAGES = [
+      'https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80',
+      'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80',
+      'https://images.unsplash.com/photo-1540206395-68808572332f?ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80'
+    ];
+
+    // ============================================
+    // STATE MANAGEMENT
+    // ============================================
+    let currentUser = null;
+    let userIP = '';
+    let currentSession = null;
+    let jobdeskOptions = [];
+    let isMaintenanceMode = false;
+    let lastUpdateTime = new Date();
+    let backgroundIndex = 0;
+    let statusUpdateInterval = null;
+    let clockInterval = null;
+    let backgroundInterval = null;
+
+    // ============================================
+    // DOM ELEMENTS
+    // ============================================
+    const elements = {
+      // Containers
+      loadingOverlay: document.getElementById('loadingOverlay'),
+      loadingText: document.getElementById('loadingText'),
+      maintenanceMode: document.getElementById('maintenanceMode'),
+      loginForm: document.getElementById('loginForm'),
+      dashboard: document.getElementById('dashboard'),
+      
+      // Login
+      loginFormElement: document.getElementById('loginFormElement'),
+      username: document.getElementById('username'),
+      password: document.getElementById('password'),
+      togglePassword: document.getElementById('togglePassword'),
+      loginError: document.getElementById('loginError'),
+      ipWarning: document.getElementById('ipWarning'),
+      loginButton: document.getElementById('loginButton'),
+      
+      // Dashboard
+      clockDisplay: document.getElementById('clockDisplay'),
+      dateDisplay: document.getElementById('dateDisplay'),
+      userAvatar: document.getElementById('userAvatar'),
+      userName: document.getElementById('userName'),
+      userRole: document.getElementById('userRole'),
+      userIP: document.getElementById('userIP'),
+      sessionId: document.getElementById('sessionId'),
+      lastUpdate: document.getElementById('lastUpdate'),
+      
+      // Alerts
+      timeRestrictionAlert: document.getElementById('timeRestrictionAlert'),
+      maxLimitAlert: document.getElementById('maxLimitAlert'),
+      maxLimitMessage: document.getElementById('maxLimitMessage'),
+      roleLimitAlert: document.getElementById('roleLimitAlert'),
+      roleLimitTitle: document.getElementById('roleLimitTitle'),
+      roleLimitMessage: document.getElementById('roleLimitMessage'),
+      staffLimitAlert: document.getElementById('staffLimitAlert'),
+      
+      // Status Panel
+      statusPanel: document.getElementById('statusPanel'),
+      statusIcon: document.getElementById('statusIcon'),
+      statusTitle: document.getElementById('statusTitle'),
+      statusTime: document.getElementById('statusTime'),
+      statusDuration: document.getElementById('statusDuration'),
+      statusInfo: document.getElementById('statusInfo'),
+      
+      // Jobdesk
+      jobdeskSection: document.getElementById('jobdeskSection'),
+      jobdeskSelect: document.getElementById('jobdeskSelect'),
+      
+      // Buttons
+      startButton: document.getElementById('startButton'),
+      endButton: document.getElementById('endButton'),
+      
+      // Modals
+      successModal: document.getElementById('successModal'),
+      successTitle: document.getElementById('successTitle'),
+      successMessage: document.getElementById('successMessage'),
+      errorModal: document.getElementById('errorModal'),
+      errorTitle: document.getElementById('errorTitle'),
+      errorMessage: document.getElementById('errorMessage'),
+      passwordModal: document.getElementById('passwordModal'),
+      passwordForm: document.getElementById('passwordForm'),
+      oldPassword: document.getElementById('oldPassword'),
+      newPassword: document.getElementById('newPassword'),
+      confirmPassword: document.getElementById('confirmPassword'),
+      passwordError: document.getElementById('passwordError'),
+      passwordSuccess: document.getElementById('passwordSuccess'),
+      helpModal: document.getElementById('helpModal'),
+      
+      // System
+      systemStatus: document.getElementById('systemStatus'),
+      backgroundSlideshow: document.getElementById('backgroundSlideshow')
+    };
+
+    // ============================================
+    // UTILITY FUNCTIONS
+    // ============================================
+    function showLoading(message = 'Loading...') {
+      elements.loadingText.textContent = message;
+      elements.loadingOverlay.style.display = 'flex';
+    }
+
+    function hideLoading() {
+      elements.loadingOverlay.style.display = 'none';
+    }
+
+    function showModal(modalId) {
+      document.getElementById(modalId).classList.remove('hidden');
+    }
+
+    function hideModal(modalId) {
+      document.getElementById(modalId).classList.add('hidden');
+    }
+
+    function showSuccess(title, message) {
+      elements.successTitle.textContent = title;
+      elements.successMessage.textContent = message;
+      showModal('successModal');
+    }
+
+    function showError(title, message) {
+      elements.errorTitle.textContent = title;
+      elements.errorMessage.textContent = message;
+      showModal('errorModal');
+    }
+
+    function formatTime(date) {
+      return date.toLocaleTimeString('id-ID', { 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        second: '2-digit',
+        hour12: false 
+      });
+    }
+
+    function formatDate(date) {
+      return date.toLocaleDateString('id-ID', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    }
+
+    function updateClock() {
+      const now = new Date();
+      elements.clockDisplay.textContent = formatTime(now);
+      elements.dateDisplay.textContent = formatDate(now);
+      
+      // Update last update time
+      elements.lastUpdate.textContent = formatTime(lastUpdateTime);
+    }
+
+    // ============================================
+    // BACKGROUND SLIDESHOW
+    // ============================================
+    function initBackgroundSlideshow() {
+      BACKGROUND_IMAGES.forEach((imageUrl, index) => {
+        const img = document.createElement('img');
+        img.src = imageUrl;
+        img.classList.add('bg-image');
+        if (index === 0) img.classList.add('active');
+        elements.backgroundSlideshow.appendChild(img);
+      });
+      
+      // Start slideshow
+      backgroundInterval = setInterval(() => {
+        const images = document.querySelectorAll('.bg-image');
+        images[backgroundIndex].classList.remove('active');
+        backgroundIndex = (backgroundIndex + 1) % images.length;
+        images[backgroundIndex].classList.add('active');
+      }, 8000);
+    }
+
+    // ============================================
+    // GOOGLE APPS SCRIPT API CALLS
+    // ============================================
+    async function callGoogleScript(action, data = {}) {
+      try {
+        const formData = new FormData();
+        formData.append('action', action);
+        
+        // Add data to formData
+        Object.keys(data).forEach(key => {
+          formData.append(key, data[key]);
+        });
+        
+        const response = await fetch(GOOGLE_SCRIPT_URL, {
+          method: 'POST',
+          body: formData,
+          mode: 'no-cors'
+        });
+        
+        // Note: Karena mode no-cors, kita tidak bisa membaca response body
+        // Tapi request tetap dikirim ke server
+        return { success: true, message: 'Request sent successfully' };
+      } catch (error) {
+        console.error('Error calling Google Script:', error);
+        return { success: false, message: error.message };
+      }
+    }
+
+    // Untuk GET requests (dengan query parameters)
+    async function getGoogleScript(action, params = {}) {
+      try {
+        const url = new URL(GOOGLE_SCRIPT_URL);
+        url.searchParams.append('action', action);
+        
+        Object.keys(params).forEach(key => {
+          url.searchParams.append(key, params[key]);
+        });
+        
+        // Untuk development, kita bisa menggunakan mode cors
+        // Tapi di production harus no-cors
+        const response = await fetch(url.toString(), {
+          method: 'GET'
+        });
+        
+        if (response.ok) {
+          return await response.text();
+        } else {
+          throw new Error(`HTTP ${response.status}`);
+        }
+      } catch (error) {
+        console.error(`Error in ${action}:`, error);
+        throw error;
+      }
+    }
+
+    // ============================================
+    // MAINTENANCE CHECK
+    // ============================================
+    async function checkMaintenance() {
+      try {
+        const response = await getGoogleScript('checkMaintenanceStatus');
+        return response.trim() === 'ON';
+      } catch (error) {
+        console.error('Error checking maintenance:', error);
+        return false;
+      }
+    }
+
+    // ============================================
+    // LOGIN SYSTEM
+    // ============================================
+    async function getUserIP() {
+      try {
+        const response = await fetch('https://api.ipify.org?format=json');
+        const data = await response.json();
+        userIP = data.ip;
+        elements.userIP.textContent = userIP;
+        return userIP;
+      } catch (error) {
+        console.error('Error getting IP:', error);
+        userIP = '127.0.0.1';
+        return userIP;
+      }
+    }
+
+    async function login() {
+      const username = elements.username.value.trim();
+      const password = elements.password.value.trim();
+      
+      if (!username || !password) {
+        elements.loginError.textContent = 'Username dan password harus diisi';
+        elements.loginError.style.display = 'block';
+        return;
+      }
+      
+      showLoading('Memeriksa login...');
+      
+      try {
+        // Cek maintenance mode dulu
+        const maintenance = await checkMaintenance();
+        if (maintenance) {
+          elements.loginForm.classList.add('hidden');
+          elements.maintenanceMode.classList.remove('hidden');
+          hideLoading();
+          return;
+        }
+        
+        // Panggil Google Apps Script untuk login
+        const response = await getGoogleScript('checkLogin', {
+          username: username,
+          password: password,
+          ipAddress: userIP
+        });
+        
+        console.log('Login response:', response);
+        
+        // Parse response (bisa string error atau JSON success)
+        try {
+          const result = JSON.parse(response);
+          
+          if (result.success) {
+            // Login berhasil
+            currentUser = {
+              username: result.username,
+              role: result.role,
+              name: result.username // GAS tidak mengembalikan nama, jadi pakai username
+            };
+            
+            // Simpan ke localStorage
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            localStorage.setItem('loginTime', new Date().toISOString());
+            
+            // Update UI
+            updateUserInfo();
+            loadDashboard();
+            
+            // Hide login error jika ada
+            elements.loginError.style.display = 'none';
+            
+            // Show success message
+            showSuccess('Login Berhasil', `Selamat datang ${currentUser.name}!`);
+            
+          } else {
+            // Login gagal
+            elements.loginError.textContent = result.message || 'Username atau password salah';
+            elements.loginError.style.display = 'block';
+          }
+          
+        } catch (parseError) {
+          // Jika response bukan JSON (kemungkinan error message langsung)
+          if (response.includes('Whitelist')) {
+            elements.ipWarning.textContent = response;
+            elements.ipWarning.style.display = 'block';
+            elements.loginError.style.display = 'none';
+          } else {
+            elements.loginError.textContent = response || 'Terjadi kesalahan pada sistem';
+            elements.loginError.style.display = 'block';
+            elements.ipWarning.style.display = 'none';
+          }
+        }
+        
+      } catch (error) {
+        console.error('Login error:', error);
+        elements.loginError.textContent = 'Gagal menghubungi server. Coba lagi nanti.';
+        elements.loginError.style.display = 'block';
+      }
+      
+      hideLoading();
+    }
+
+    function updateUserInfo() {
+      if (!currentUser) return;
+      
+      // Set avatar dengan inisial
+      const initials = currentUser.name.charAt(0).toUpperCase();
+      elements.userAvatar.textContent = initials;
+      
+      // Set nama dan role
+      elements.userName.textContent = currentUser.name;
+      elements.userRole.textContent = currentUser.role || 'Staff';
+      
+      // Generate session ID
+      const sessionId = 'SESS-' + Date.now().toString(36).toUpperCase();
+      elements.sessionId.textContent = sessionId;
+    }
+
+    // ============================================
+    // DASHBOARD FUNCTIONS
+    // ============================================
+    function loadDashboard() {
+      // Hide other containers
+      elements.maintenanceMode.classList.add('hidden');
+      elements.loginForm.classList.add('hidden');
+      
+      // Show dashboard
+      elements.dashboard.classList.remove('hidden');
+      
+      // Start clock
+      updateClock();
+      clockInterval = setInterval(updateClock, 1000);
+      
+      // Load jobdesk options
+      loadJobdeskOptions();
+      
+      // Check current status
+      checkUserStatus();
+      
+      // Start status updates
+      startStatusUpdates();
+      
+      // Update system status
+      updateSystemStatus('Terhubung');
+    }
+
+    async function loadJobdeskOptions() {
+      try {
+        const response = await getGoogleScript('getJobdeskOptions');
+        
+        try {
+          const options = JSON.parse(response);
+          if (Array.isArray(options) && options.length > 0) {
+            jobdeskOptions = options;
+            
+            // Clear existing options
+            elements.jobdeskSelect.innerHTML = '<option value="">-- Silahkan Pilih --</option>';
+            
+            // Add new options
+            options.forEach(option => {
+              const optionElement = document.createElement('option');
+              optionElement.value = option;
+              optionElement.textContent = option;
+              elements.jobdeskSelect.appendChild(optionElement);
+            });
+            
+            // Check if jobdesk is required
+            const accessResponse = await getGoogleScript('checkAccess');
+            if (accessResponse.trim() === 'ON') {
+              elements.jobdeskSection.classList.remove('hidden');
+            } else {
+              elements.jobdeskSection.classList.add('hidden');
+            }
+          }
+        } catch (parseError) {
+          console.error('Error parsing jobdesk options:', parseError);
+        }
+      } catch (error) {
+        console.error('Error loading jobdesk options:', error);
+      }
+    }
+
+    async function checkUserStatus() {
+      try {
+        // Get today's date
+        const today = new Date().toISOString().split('T')[0];
+        
+        // In a real implementation, you would fetch from Google Sheets
+        // For now, we'll use localStorage
+        const sessions = JSON.parse(localStorage.getItem('userSessions') || '[]');
+        
+        const activeSession = sessions.find(session => 
+          session.username === currentUser.username && 
+          session.date === today && 
+          session.status === 'active'
+        );
+        
+        if (activeSession) {
+          currentSession = activeSession;
+          updateStatusPanel(true);
+        } else {
+          currentSession = null;
+          updateStatusPanel(false);
+        }
+        
+        // Check time restrictions
+        checkTimeRestrictions();
+        
+      } catch (error) {
+        console.error('Error checking user status:', error);
+      }
+    }
+
+    function updateStatusPanel(isActive) {
+      if (isActive && currentSession) {
+        // User is currently out
+        elements.statusPanel.classList.add('active');
+        elements.statusIcon.className = 'fas fa-door-open';
+        elements.statusTitle.textContent = 'Sedang Izin Keluar';
+        elements.statusTime.textContent = `Mulai: ${currentSession.startTime}`;
+        
+        // Calculate duration
+        const startTime = new Date(currentSession.startTime);
+        const now = new Date();
+        const diffMs = now - startTime;
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMins / 60);
+        const remainingMins = diffMins % 60;
+        
+        elements.statusDuration.textContent = `${diffHours}j ${remainingMins}m`;
+        elements.statusInfo.textContent = 'Silakan klik "Kembali Masuk" saat sudah kembali';
+        
+        // Update buttons
+        elements.startButton.disabled = true;
+        elements.endButton.disabled = false;
+        
+      } else {
+        // User is in office
+        elements.statusPanel.classList.remove('active');
+        elements.statusIcon.className = 'fas fa-briefcase';
+        elements.statusTitle.textContent = 'Sedang di Kantor';
+        elements.statusTime.textContent = '-';
+        elements.statusDuration.textContent = '-';
+        elements.statusInfo.textContent = 'Silakan klik "Izin Keluar" jika perlu keluar';
+        
+        // Update buttons
+        elements.startButton.disabled = false;
+        elements.endButton.disabled = true;
+        
+        // Check max limit
+        checkMaxLimit();
+      }
+    }
+
+    function checkTimeRestrictions() {
+      const now = new Date();
+      const hours = now.getHours();
+      const minutes = now.getMinutes();
+      
+      // Check if time is between 23:50 and 00:01
+      if ((hours === 23 && minutes >= 50) || (hours === 0 && minutes <= 1)) {
+        elements.timeRestrictionAlert.classList.remove('hidden');
+        elements.startButton.disabled = true;
+      } else {
+        elements.timeRestrictionAlert.classList.add('hidden');
+        if (!currentSession) {
+          elements.startButton.disabled = false;
+        }
+      }
+    }
+
+    function checkMaxLimit() {
+      // In a real implementation, check from Google Sheets
+      // For demo, we'll use localStorage
+      const today = new Date().toISOString().split('T')[0];
+      const sessions = JSON.parse(localStorage.getItem('userSessions') || '[]');
+      
+      const todaySessions = sessions.filter(session => 
+        session.username === currentUser.username && 
+        session.date === today && 
+        session.status === 'completed'
+      );
+      
+      if (todaySessions.length >= 4) {
+        elements.maxLimitAlert.classList.remove('hidden');
+        elements.startButton.disabled = true;
+      } else {
+        elements.maxLimitAlert.classList.add('hidden');
+      }
+    }
+
+    function startStatusUpdates() {
+      if (statusUpdateInterval) {
+        clearInterval(statusUpdateInterval);
+      }
+      
+      statusUpdateInterval = setInterval(() => {
+        checkUserStatus();
+        lastUpdateTime = new Date();
+      }, 30000); // Update every 30 seconds
+    }
+
+    function updateSystemStatus(status) {
+      elements.systemStatus.textContent = status;
+    }
+
+    // ============================================
+    // TIME TRACKING FUNCTIONS
+    // ============================================
+    async function startTime() {
+      if (!currentUser) return;
+      
+      showLoading('Memproses izin keluar...');
+      
+      try {
+        const jobdesk = elements.jobdeskSelect.value;
+        const now = new Date();
+        const time = formatTime(now);
+        
+        // Call Google Apps Script
+        const response = await getGoogleScript('logStartTime', {
+          username: currentUser.username,
+          time: time,
+          jobdesk: jobdesk || ''
+        });
+        
+        console.log('Start time response:', response);
+        
+        // Parse response (GAS returns HTML string)
+        if (response.includes('alert-success')) {
+          // Success
+          const today = new Date().toISOString().split('T')[0];
+          
+          // Save to localStorage
+          const sessions = JSON.parse(localStorage.getItem('userSessions') || '[]');
+          sessions.push({
+            username: currentUser.username,
+            date: today,
+            startTime: time,
+            jobdesk: jobdesk,
+            status: 'active'
+          });
+          
+          localStorage.setItem('userSessions', JSON.stringify(sessions));
+          
+          // Update UI
+          checkUserStatus();
+          showSuccess('Izin Keluar Berhasil', 'Data telah dicatat. Selamat beristirahat!');
+          
+        } else if (response.includes('alert-error')) {
+          // Error
+          const errorMatch = response.match(/❌ (.+?)<\/div>/);
+          const errorMessage = errorMatch ? errorMatch[1] : 'Terjadi kesalahan';
+          
+          // Check for specific errors
+          if (response.includes('Cek Sudah Berapa')) {
+            elements.roleLimitTitle.textContent = '⚠️ BATAS ROLE TERCAPAI';
+            elements.roleLimitMessage.textContent = errorMessage;
+            elements.roleLimitAlert.classList.remove('hidden');
+          } else if (response.includes('Sudah 3 Staff')) {
+            elements.staffLimitAlert.classList.remove('hidden');
+          } else if (response.includes('Sudah 4')) {
+            elements.maxLimitMessage.textContent = errorMessage;
+            elements.maxLimitAlert.classList.remove('hidden');
+          } else {
+            showError('Gagal Izin Keluar', errorMessage);
+          }
+        }
+        
+      } catch (error) {
+        console.error('Error starting time:', error);
+        showError('Kesalahan Sistem', 'Gagal menghubungi server. Coba lagi nanti.');
+      }
+      
+      hideLoading();
+    }
+
+    async function endTime() {
+      if (!currentUser) return;
+      
+      showLoading('Memproses kembali masuk...');
+      
+      try {
+        const now = new Date();
+        const time = formatTime(now);
+        
+        // Call Google Apps Script
+        const response = await getGoogleScript('logEndTime', {
+          username: currentUser.username,
+          time: time
+        });
+        
+        console.log('End time response:', response);
+        
+        // Parse response
+        if (response.includes('alert-success')) {
+          // Success
+          const today = new Date().toISOString().split('T')[0];
+          
+          // Update localStorage
+          const sessions = JSON.parse(localStorage.getItem('userSessions') || '[]');
+          const activeIndex = sessions.findIndex(session => 
+            session.username === currentUser.username && 
+            session.date === today && 
+            session.status === 'active'
+          );
+          
+          if (activeIndex !== -1) {
+            sessions[activeIndex].endTime = time;
+            sessions[activeIndex].status = 'completed';
+            localStorage.setItem('userSessions', JSON.stringify(sessions));
+          }
+          
+          // Update UI
+          checkUserStatus();
+          showSuccess('Kembali Masuk Berhasil', 'Selamat datang kembali!');
+          
+        } else if (response.includes('alert-error')) {
+          // Error
+          const errorMatch = response.match(/❌ (.+?)<\/div>/);
+          const errorMessage = errorMatch ? errorMatch[1] : 'Terjadi kesalahan';
+          showError('Gagal Kembali Masuk', errorMessage);
+        }
+        
+      } catch (error) {
+        console.error('Error ending time:', error);
+        showError('Kesalahan Sistem', 'Gagal menghubungi server. Coba lagi nanti.');
+      }
+      
+      hideLoading();
+    }
+
+    // ============================================
+    // PASSWORD MANAGEMENT
+    // ============================================
+    async function changePassword() {
+      const oldPassword = elements.oldPassword.value;
+      const newPassword = elements.newPassword.value;
+      const confirmPassword = elements.confirmPassword.value;
+      
+      // Validation
+      if (!oldPassword || !newPassword || !confirmPassword) {
+        elements.passwordError.textContent = 'Semua field harus diisi';
+        elements.passwordError.classList.remove('hidden');
+        return;
+      }
+      
+      if (newPassword !== confirmPassword) {
+        elements.passwordError.textContent = 'Password baru tidak cocok';
+        elements.passwordError.classList.remove('hidden');
+        return;
+      }
+      
+      if (newPassword.length < 4) {
+        elements.passwordError.textContent = 'Password minimal 4 karakter';
+        elements.passwordError.classList.remove('hidden');
+        return;
+      }
+      
+      showLoading('Mengubah password...');
+      
+      try {
+        const response = await getGoogleScript('updatePassword', {
+          username: currentUser.username,
+          oldPassword: oldPassword,
+          newPassword: newPassword
+        });
+        
+        console.log('Password change response:', response);
+        
+        if (response.includes('berhasil diperbarui')) {
+          elements.passwordSuccess.textContent = 'Password berhasil diubah';
+          elements.passwordSuccess.classList.remove('hidden');
+          elements.passwordError.classList.add('hidden');
+          
+          // Clear form
+          elements.oldPassword.value = '';
+          elements.newPassword.value = '';
+          elements.confirmPassword.value = '';
+          
+          // Hide modal after 2 seconds
+          setTimeout(() => {
+            hideModal('passwordModal');
+            showSuccess('Password Diubah', 'Password Anda telah berhasil diperbarui.');
+          }, 2000);
+          
+        } else {
+          elements.passwordError.textContent = response;
+          elements.passwordError.classList.remove('hidden');
+          elements.passwordSuccess.classList.add('hidden');
+        }
+        
+      } catch (error) {
+        console.error('Error changing password:', error);
+        elements.passwordError.textContent = 'Gagal menghubungi server';
+        elements.passwordError.classList.remove('hidden');
+        elements.passwordSuccess.classList.add('hidden');
+      }
+      
+      hideLoading();
+    }
+
+    function showChangePassword() {
+      // Clear previous messages
+      elements.passwordError.classList.add('hidden');
+      elements.passwordSuccess.classList.add('hidden');
+      elements.oldPassword.value = '';
+      elements.newPassword.value = '';
+      elements.confirmPassword.value = '';
+      
+      showModal('passwordModal');
+    }
+
+    // ============================================
+    // HELPER FUNCTIONS
+    // ============================================
+    function showHelp() {
+      showModal('helpModal');
+    }
+
+    function togglePasswordVisibility(inputId, toggleId) {
+      const input = document.getElementById(inputId);
+      const toggle = document.getElementById(toggleId);
+      
+      if (input.type === 'password') {
+        input.type = 'text';
+        toggle.classList.remove('fa-eye');
+        toggle.classList.add('fa-eye-slash');
+      } else {
+        input.type = 'password';
+        toggle.classList.remove('fa-eye-slash');
+        toggle.classList.add('fa-eye');
+      }
+    }
+
+    function logout() {
+      // Clear intervals
+      if (clockInterval) clearInterval(clockInterval);
+      if (statusUpdateInterval) clearInterval(statusUpdateInterval);
+      if (backgroundInterval) clearInterval(backgroundInterval);
+      
+      // Clear user data
+      currentUser = null;
+      currentSession = null;
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('loginTime');
+      
+      // Reset forms
+      elements.username.value = '';
+      elements.password.value = '';
+      elements.loginError.style.display = 'none';
+      elements.ipWarning.style.display = 'none';
+      
+      // Show login form
+      elements.dashboard.classList.add('hidden');
+      elements.maintenanceMode.classList.add('hidden');
+      elements.loginForm.classList.remove('hidden');
+      
+      // Update system status
+      updateSystemStatus('Silakan login');
+      
+      showSuccess('Logout Berhasil', 'Anda telah berhasil logout dari sistem.');
+    }
+
+    // ============================================
+    // INITIALIZATION
+    // ============================================
+    async function init() {
+      showLoading('Menyiapkan sistem...');
+      
+      // Initialize background slideshow
+      initBackgroundSlideshow();
+      
+      // Get user IP
+      await getUserIP();
+      
+      // Check maintenance mode
+      const maintenance = await checkMaintenance();
+      if (maintenance) {
+        elements.maintenanceMode.classList.remove('hidden');
+        elements.loginForm.classList.add('hidden');
+        hideLoading();
+        return;
+      }
+      
+      // Check if user is already logged in
+      const savedUser = localStorage.getItem('currentUser');
+      const loginTime = localStorage.getItem('loginTime');
+      
+      if (savedUser && loginTime) {
+        const loginDate = new Date(loginTime);
+        const now = new Date();
+        const hoursDiff = (now - loginDate) / (1000 * 60 * 60);
+        
+        if (hoursDiff < 8) {
+          // Auto login
+          currentUser = JSON.parse(savedUser);
+          updateUserInfo();
+          loadDashboard();
+          hideLoading();
+          return;
+        } else {
+          // Session expired
+          localStorage.removeItem('currentUser');
+          localStorage.removeItem('loginTime');
+        }
+      }
+      
+      // Show login form
+      elements.loginForm.classList.remove('hidden');
+      hideLoading();
+      
+      // Update system status
+      updateSystemStatus('Siap');
+    }
+
+    // ============================================
+    // EVENT LISTENERS
+    // ============================================
+    // Login form submission
+    elements.loginFormElement.addEventListener('submit', function(e) {
+      e.preventDefault();
+      login();
+    });
+
+    // Password toggle
+    elements.togglePassword.addEventListener('click', function() {
+      const passwordInput = elements.password;
+      const icon = this.querySelector('i');
+      
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+      } else {
+        passwordInput.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+      }
+    });
+
+    // Password form submission
+    elements.passwordForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      changePassword();
+    });
+
+    // Initialize on load
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
