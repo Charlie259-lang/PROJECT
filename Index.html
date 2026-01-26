@@ -1,1585 +1,2326 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Izin Keluar Staff - Linetogel</title>
+  <title>Izin Keluar Linetgl</title>
   
   <!-- FAVICON -->
   <link rel="shortcut icon" href="https://cdn-icons-png.flaticon.com/512/190/190411.png" type="image/x-icon">
 
-  <!-- FONT AWESOME -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+  <!-- Bootstrap CSS for modal -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
   
-  <!-- GOOGLE FONTS -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Google Fonts: Orbitron (Futuristik) & Poppins (Modern) -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
   
   <style>
     /* ============================================
-       VARIABEL CSS
+       QUANTUM GLOW DESIGN (PADA UKURAN ASLI)
     ============================================ */
     :root {
-      --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      --danger-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-      --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-      --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-      --bg-gradient: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
-      --glass-bg: rgba(255, 255, 255, 0.08);
-      --glass-border: rgba(255, 255, 255, 0.1);
-      --text-primary: #ffffff;
-      --text-secondary: rgba(255, 255, 255, 0.7);
-      --text-muted: rgba(255, 255, 255, 0.5);
-      --shadow-primary: 0 10px 30px rgba(0, 0, 0, 0.3);
-      --shadow-secondary: 0 5px 15px rgba(0, 0, 0, 0.2);
-    }
-
-    /* ============================================
-       RESET & BASE STYLES
-    ============================================ */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+      --neon-blue: #00f3ff;
+      --neon-purple: #bc13fe;
+      --bg-void: #050505;
+      --glass-bg: rgba(255, 255, 255, 0.05);
+      --text-glow: #ffffff;
     }
 
     body {
       font-family: 'Poppins', sans-serif;
-      background: var(--bg-gradient);
-      background-size: 400% 400%;
-      animation: gradientBG 15s ease infinite;
+      background-color: var(--bg-void);
+      color: var(--text-glow);
       min-height: 100vh;
+      overflow-x: hidden;
       display: flex;
       justify-content: center;
       align-items: center;
-      color: var(--text-primary);
-      position: relative;
-      overflow-x: hidden;
+      margin: 0;
     }
 
-    @keyframes gradientBG {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    /* ============================================
-       BACKGROUND SLIDESHOW
-    ============================================ */
-    .background-slideshow {
+    /* Background Effects */
+    .space-bg {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      z-index: -2;
+      background-image: 
+        linear-gradient(rgba(0, 243, 255, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 243, 255, 0.1) 1px, transparent 1px);
+      background-size: 50px 50px;
+      z-index: -3;
+      opacity: 0.3;
     }
 
-    .bg-image {
-      position: absolute;
+    .vignette {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, transparent 40%, #000 100%);
+      z-index: -1;
+    }
+
+    .scanlines {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+      background-size: 100% 2px, 3px 100%;
+      pointer-events: none;
+      z-index: 100;
+      opacity: 0.4;
+    }
+
+    /* BACKGROUND IMAGE LOGIC */
+    .background-image {
+      position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
       object-fit: cover;
+      z-index: -2;
       opacity: 0;
       transition: opacity 1.5s ease-in-out;
-      filter: brightness(0.3) blur(2px);
     }
-
-    .bg-image.active {
-      opacity: 0.3;
+    .background-image.active {
+      opacity: 0.2;
+      filter: blur(5px);
     }
 
     /* ============================================
-       LOADING SPINNER
+       LOGIN FORM (ASLI: 420px) - MODIFIKASI: BACKGROUND GIF YANG HIDUP
     ============================================ */
-    .loading-overlay {
+    #loginForm {
+      position: relative;
+      width: 100%;
+      max-width: 420px; /* UKURAN ASLI DIPERTAHANKAN */
+      padding: 40px;
+      /* PERUBAHAN: Background GIF yang hidup */
+      background: linear-gradient(
+        135deg,
+        rgba(0, 5, 20, 0.85) 0%,
+        rgba(0, 10, 30, 0.9) 50%,
+        rgba(0, 20, 40, 0.85) 100%
+      ), url('https://i.pinimg.com/originals/1b/de/85/1bde855b1bd40f35b92ae6fc2d2173fa.gif');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-blend-mode: overlay;
+      border: 1px solid rgba(0, 243, 255, 0.3);
+      border-radius: 4px; /* Bentuk sesuai asli/tech */
+      /* Shadow yang kuat untuk efek kedalaman dengan glow neon */
+      box-shadow: 
+        0 0 50px rgba(0, 243, 255, 0.3),
+        0 10px 40px rgba(0, 0, 0, 0.8),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.6);
+      animation: cardFloat 6s ease-in-out infinite;
+      z-index: 10;
+      overflow: hidden;
+    }
+
+    /* Tambahkan overlay animasi untuk efek partikel */
+    #loginForm::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(
+        circle at 50% 50%,
+        rgba(0, 243, 255, 0.1) 0%,
+        rgba(0, 0, 0, 0.5) 70%
+      );
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* Efek partikel bergerak */
+    #loginForm::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(
+        circle,
+        rgba(0, 243, 255, 0.05) 0%,
+        transparent 70%
+      );
+      animation: rotateParticles 20s linear infinite;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    @keyframes rotateParticles {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    #loginForm .login-logo-wrapper {
+      text-align: center;
+      margin-bottom: 35px;
+      position: relative;
+      z-index: 2;
+    }
+
+    #loginForm img {
+      width: 90px;
+      height: auto;
+      margin-bottom: 15px;
+      filter: drop-shadow(0 0 15px rgba(0, 243, 255, 0.7));
+      animation: logoPulse 3s ease-in-out infinite;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 10px;
+    }
+
+    @keyframes logoPulse {
+      0%, 100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 15px rgba(0, 243, 255, 0.7));
+      }
+      50% {
+        transform: scale(1.05);
+        filter: drop-shadow(0 0 25px rgba(0, 243, 255, 0.9));
+      }
+    }
+
+    #loginForm h2 {
+      text-align: center;
+      color: #ffffff;
+      font-family: 'Orbitron', sans-serif; /* Font Canggih */
+      font-weight: 700;
+      font-size: 26px;
+      letter-spacing: 1px;
+      margin: 0 0 8px 0;
+      text-shadow: 
+        0 0 10px rgba(0, 243, 255, 0.8),
+        0 0 20px rgba(0, 243, 255, 0.4);
+      background: linear-gradient(45deg, #ffffff, #00f3ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      position: relative;
+      z-index: 2;
+    }
+
+    #loginForm .subtitle {
+      text-align: center;
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 14px;
+      margin-bottom: 35px;
+      font-weight: 300;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Modern Inputs */
+    .modern-input-group {
+      position: relative;
+      margin-bottom: 25px;
+      z-index: 2;
+    }
+
+    .modern-input-group i.icon-left {
+      position: absolute;
+      left: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 16px;
+      transition: all 0.3s ease;
+      text-shadow: 0 0 5px rgba(0, 243, 255, 0.5);
+    }
+
+    .modern-input-group input {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 16px 50px 16px 50px; 
+      border-radius: 16px; /* Bentuk sesuai asli */
+      color: #fff;
+      font-size: 15px;
+      font-family: 'Poppins', sans-serif;
+      box-sizing: border-box;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(5px);
+      box-shadow: 
+        inset 0 2px 5px rgba(0, 0, 0, 0.3),
+        0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .modern-input-group input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .modern-input-group input:focus {
+      outline: none;
+      background: rgba(0, 0, 0, 0.8);
+      border-color: var(--neon-blue);
+      box-shadow: 
+        0 0 20px rgba(0, 243, 255, 0.4),
+        inset 0 2px 5px rgba(0, 0, 0, 0.4);
+    }
+
+    .modern-input-group input:focus + i.icon-left {
+      color: var(--neon-blue);
+      text-shadow: 0 0 10px var(--neon-blue);
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    .modern-input-group i.toggle-password, .modern-input-group i.toggle-pwd-icon {
+      position: absolute;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      text-shadow: 0 0 5px rgba(0, 243, 255, 0.5);
+    }
+    .modern-input-group i.toggle-password:hover, .modern-input-group i.toggle-pwd-icon:hover {
+      color: var(--neon-blue);
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    /* Error Message */
+    #error-message, #ipWhitelistMessage {
+      font-size: 13px;
+      text-align: center;
+      margin-top: -15px;
+      margin-bottom: 20px;
+      padding: 10px;
+      border-radius: 10px;
+      display: none;
+      z-index: 2;
+      position: relative;
+      backdrop-filter: blur(5px);
+    }
+
+    #error-message {
+      color: #ff6b6b;
+      background: rgba(255, 71, 87, 0.2);
+      border: 1px solid rgba(255, 71, 87, 0.3);
+      box-shadow: 0 0 10px rgba(255, 71, 87, 0.3);
+    }
+    
+    #ipWhitelistMessage {
+      color: #ffd32a;
+      background: rgba(255, 211, 42, 0.2);
+      border: 1px solid rgba(255, 211, 42, 0.3);
+      box-shadow: 0 0 10px rgba(255, 211, 42, 0.2);
+    }
+
+    /* Login Button */
+    #loginButton {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, 
+        rgba(0, 243, 255, 0.9) 0%, 
+        rgba(188, 19, 254, 0.9) 100%);
+      border: none;
+      border-radius: 16px;
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 
+        0 10px 20px rgba(0, 243, 255, 0.3),
+        0 5px 15px rgba(188, 19, 254, 0.2);
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-family: 'Orbitron', sans-serif; /* Font Canggih */
+      text-transform: uppercase;
+      position: relative;
+      z-index: 2;
+      overflow: hidden;
+    }
+
+    #loginButton::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent
+      );
+      transition: left 0.7s ease;
+    }
+
+    #loginButton:hover::before {
+      left: 100%;
+    }
+
+    #loginButton:hover {
+      transform: translateY(-2px);
+      box-shadow: 
+        0 15px 30px rgba(0, 243, 255, 0.5),
+        0 10px 25px rgba(188, 19, 254, 0.3);
+      background: linear-gradient(135deg, 
+        rgba(0, 243, 255, 1) 0%, 
+        rgba(188, 19, 254, 1) 100%);
+    }
+
+    #loginButton:active {
+      transform: translateY(1px);
+      box-shadow: 
+        0 5px 15px rgba(0, 243, 255, 0.3),
+        0 3px 10px rgba(188, 19, 254, 0.2);
+    }
+
+    #loginButton i {
+      transition: transform 0.3s ease;
+    }
+
+    #loginButton:hover i {
+      transform: translateX(5px);
+    }
+
+    /* ============================================
+       DASHBOARD (ASLI: 600px) - TETAP SAMA
+    ============================================ */
+    .container {
+      width: 100%;
+      max-width: 600px; /* UKURAN ASLI DIPERTAHANKAN */
+      margin: 20px auto;
+      padding: 30px;
+      border-radius: 30px; /* Bentuk sesuai asli */
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+      animation: fadeIn 0.5s ease-out;
+    }
+    
+    /* Tambahkan Glow pada Dashboard Container */
+    .container {
+       box-shadow: 0 0 40px rgba(0, 243, 255, 0.1);
+       border: 1px solid rgba(0, 243, 255, 0.2);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes cardFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+
+    /* Dashboard Elements Styling */
+    .account-actions-container {
+      margin-top: 25px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    button {
+      width: 100%;
+      padding: 14px 20px;
+      border: none;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      font-family: 'Poppins', sans-serif;
+    }
+
+    #dashboard h2 {
+      font-size: 22px;
+      color: #fff;
+      font-weight: 600;
+      margin-bottom: 25px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      text-align: center;
+      font-family: 'Orbitron', sans-serif;
+      text-shadow: 0 0 15px rgba(0, 243, 255, 0.6);
+    }
+    
+    #dashboard img.logo {
+      width: 80px;
+      margin-bottom: 15px;
+      filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
+    }
+
+    .clock {
+      font-family: 'Digital dream Fat', monospace;
+      font-size: 3.2rem;
+      font-weight: bold;
+      color: var(--neon-blue);
+      text-align: center;
+      margin: 20px 0;
+      text-shadow: 0 0 20px rgba(0, 243, 255, 0.8);
+      letter-spacing: 2px;
+    }
+
+    .fancy-hr {
+      border: 0;
+      height: 1px;
+      background: linear-gradient(to right, transparent, rgba(0, 243, 255, 0.5), transparent);
+      margin: 25px 0;
+    }
+
+    /* Staff Info Card */
+    .staff-info {
+      background: linear-gradient(135deg, rgba(0, 210, 255, 0.1), rgba(58, 123, 213, 0.05));
+      padding: 20px;
+      border-radius: 20px;
+      margin: 20px 0;
+      border: 1px solid rgba(0, 210, 255, 0.2);
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .staff-info p {
+      margin: 10px 0;
+      color: #e0e0e0;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .staff-info i {
+      color: var(--neon-blue);
+      width: 20px;
+      text-shadow: 0 0 10px var(--neon-blue);
+    }
+    
+    .staff-name {
+      font-size: 20px !important;
+      font-weight: 700 !important;
+      color: #fff !important;
+      text-shadow: 0 0 10px rgba(255,255,255,0.5);
+    }
+    
+    .role-display {
+      font-size: 13px !important;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 4px 12px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--neon-blue) !important;
+      text-shadow: 0 0 5px var(--neon-blue);
+    }
+
+    /* Status Panel */
+    .status-panel {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 20px;
+      margin: 20px 0;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+    
+    .status-panel.active {
+      border-color: #2ed573;
+      box-shadow: 0 0 30px rgba(46, 213, 115, 0.2);
+      background: linear-gradient(135deg, rgba(46, 213, 115, 0.05), rgba(0, 0, 0, 0.3));
+    }
+
+    .status-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: rgba(255,255,255,0.7);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .status-time {
+      font-size: 24px;
+      font-weight: 700;
+      color: #fff;
+      margin: 5px 0;
+      text-shadow: 0 0 15px rgba(255,255,255,0.3);
+    }
+
+    .status-duration {
+      font-size: 15px;
+      color: #ffa502;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 165, 2, 0.1);
+      padding: 5px 12px;
+      border-radius: 50px;
+      border: 1px solid rgba(255, 165, 2, 0.2);
+    }
+
+    /* Jobdesk Select */
+    #jobdeskSection {
+      margin-top: 20px;
+    }
+
+    #jobdeskSection select {
+      width: 100%;
+      padding: 14px 20px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(0, 0, 0, 0.3);
+      color: white;
+      font-size: 15px;
+      appearance: none; /* Hide default arrow */
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      background-size: 1em;
+      cursor: pointer;
+      transition: border-color 0.3s;
+    }
+
+    #jobdeskSection select:focus {
+      outline: none;
+      border-color: var(--neon-blue);
+      box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
+    }
+
+    /* Action Buttons Layout */
+    .time-btns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-top: 25px;
+    }
+
+    .account-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    /* Specific Button Colors */
+    .gradient-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(118, 75, 162, 0.4);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .gradient-btn:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(118, 75, 162, 0.6);
+    }
+
+    .logout-btn {
+      background: rgba(255, 71, 87, 0.1);
+      color: #ff6b6b;
+      border: 1px solid rgba(255, 71, 87, 0.3);
+    }
+
+    .logout-btn:hover:not(:disabled) {
+      background: #ff4757;
+      color: white;
+      box-shadow: 0 5px 15px rgba(255, 71, 87, 0.4);
+    }
+
+    .change-password-btn {
+      background: rgba(0, 210, 255, 0.1);
+      color: #00d2ff;
+      border: 1px solid rgba(0, 210, 255, 0.3);
+    }
+
+    .change-password-btn:hover:not(:disabled) {
+      background: #00d2ff;
+      color: white;
+      box-shadow: 0 5px 15px rgba(0, 210, 255, 0.4);
+    }
+
+    /* Disabled State */
+    .disabled-btn {
+      opacity: 0.4 !important;
+      cursor: not-allowed !important;
+      transform: none !important;
+      box-shadow: none !important;
+      background: #333 !important;
+      color: #888 !important;
+    }
+
+    /* Modals */
+    .custom-modal, .password-modal {
+      display: none;
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(5px);
-      display: flex;
-      flex-direction: column;
+      background-color: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(8px);
+      z-index: 9999;
       justify-content: center;
       align-items: center;
-      z-index: 9999;
-      transition: opacity 0.3s;
+    }
+
+    .custom-modal-content, .password-modal-content {
+      background: #1a1a2e;
+      padding: 40px;
+      border-radius: 24px;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      border: 1px solid rgba(0, 243, 255, 0.2);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .custom-modal-title, .password-modal-title {
+      font-size: 24px;
+      margin-bottom: 15px;
+      color: #fff;
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    .custom-modal-message, .password-message {
+      font-size: 16px;
+      margin-bottom: 25px;
+      color: #ccc;
+      line-height: 1.6;
+    }
+
+    /* Warning Marquee & Alerts */
+    .warning-marquee {
+      background: rgba(255, 71, 87, 0.1);
+      border: 1px solid rgba(255, 71, 87, 0.3);
+      color: #ff6b6b;
+      padding: 12px;
+      border-radius: 12px;
+      margin: 20px 0;
+      overflow: hidden;
+      white-space: nowrap;
+      font-weight: 500;
+    }
+
+    .danger-alert {
+      background: rgba(255, 71, 87, 0.15);
+      border: 1px solid rgba(255, 71, 87, 0.4);
+      color: #ff4757;
+      padding: 20px;
+      border-radius: 16px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .blocked-dashboard {
+      text-align: center;
+      padding: 40px 20px;
+      background: rgba(255, 71, 87, 0.05);
+      border: 2px solid rgba(255, 71, 87, 0.3);
+      border-radius: 24px;
+    }
+
+    .blocked-icon {
+      font-size: 50px;
+      color: #ff4757;
+      margin-bottom: 20px;
+      animation: shake 3s infinite;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+      20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+
+    /* Status Indicators */
+    .connection-status, .ip-display, .realtime-indicator, .update-notification, .debug-info {
+      position: fixed;
+      padding: 8px 15px;
+      border-radius: 50px;
+      font-size: 12px;
+      z-index: 1000;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .connection-status {
+      top: 20px;
+      right: 20px;
+      background: rgba(0,0,0,0.6);
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ip-display {
+      bottom: 20px;
+      right: 20px;
+      background: rgba(0,0,0,0.6);
+      color: #ccc;
+    }
+
+    .realtime-indicator {
+      top: 20px;
+      left: 20px;
+      background: rgba(46, 213, 115, 0.1);
+      color: #2ed573;
+      border-color: rgba(46, 213, 115, 0.3);
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .update-notification {
+      bottom: 80px;
+      right: 20px;
+      background: rgba(0, 210, 255, 0.15);
+      color: #00d2ff;
+      border-color: rgba(0, 210, 255, 0.3);
+      display: none;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .status-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .status-connected { background: #2ed573; box-shadow: 0 0 10px #2ed573; }
+    .status-disconnected { background: #ff4757; box-shadow: 0 0 10px #ff4757; }
+
+    /* Spinner */
+    .loading-spinner {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(5px);
+      z-index: 10000;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
     }
 
     .spinner {
       width: 50px;
       height: 50px;
-      border: 4px solid rgba(255, 255, 255, 0.1);
-      border-top-color: #667eea;
+      border: 3px solid rgba(255,255,255,0.1);
       border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin-bottom: 20px;
+      border-top-color: var(--neon-blue);
+      animation: spin 1s ease-in-out infinite;
     }
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    .loading-text {
-      color: white;
-      font-size: 16px;
-      font-weight: 500;
-    }
+    .loading-spinner p { margin-top: 15px; color: white; font-weight: 500; }
 
-    /* ============================================
-       LOGIN FORM
-    ============================================ */
-    .login-container {
-      width: 100%;
-      max-width: 450px;
-      padding: 40px;
-      background: var(--glass-bg);
-      backdrop-filter: blur(20px);
-      border: 1px solid var(--glass-border);
-      border-radius: 20px;
-      box-shadow: var(--shadow-primary);
-      animation: slideUp 0.5s ease-out;
-    }
-
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .logo-section {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
-    .logo-section img {
-      width: 80px;
-      height: 80px;
-      object-fit: contain;
-      margin-bottom: 15px;
-      filter: drop-shadow(0 5px 15px rgba(102, 126, 234, 0.3));
-    }
-
-    .logo-section h1 {
-      font-size: 28px;
-      font-weight: 700;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 5px;
-    }
-
-    .logo-section p {
-      font-size: 14px;
-      color: var(--text-secondary);
-      margin-bottom: 10px;
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-      position: relative;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 8px;
-      color: var(--text-secondary);
-      font-size: 14px;
-      font-weight: 500;
-    }
-
-    .input-with-icon {
-      position: relative;
-    }
-
-    .input-with-icon i {
-      position: absolute;
-      left: 15px;
+    /* Popups */
+    .popup-notification {
+      position: fixed;
       top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-muted);
-      font-size: 16px;
-      transition: color 0.3s;
-    }
-
-    .input-with-icon input {
-      width: 100%;
-      padding: 14px 15px 14px 45px;
-      background: rgba(0, 0, 0, 0.2);
-      border: 1px solid var(--glass-border);
-      border-radius: 10px;
-      color: var(--text-primary);
-      font-family: 'Poppins', sans-serif;
-      font-size: 15px;
-      transition: all 0.3s;
-    }
-
-    .input-with-icon input:focus {
-      outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
-    }
-
-    .input-with-icon input:focus + i {
-      color: #667eea;
-    }
-
-    .password-toggle {
-      position: absolute;
-      right: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      cursor: pointer;
-      font-size: 16px;
-      transition: color 0.3s;
-    }
-
-    .password-toggle:hover {
-      color: #667eea;
-    }
-
-    .alert-message {
-      padding: 12px 15px;
-      border-radius: 10px;
-      margin-bottom: 20px;
-      font-size: 14px;
-      display: none;
-      animation: fadeIn 0.3s;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    .alert-error {
-      background: rgba(245, 87, 108, 0.1);
-      border: 1px solid rgba(245, 87, 108, 0.3);
-      color: #f5576c;
-    }
-
-    .alert-warning {
-      background: rgba(250, 112, 154, 0.1);
-      border: 1px solid rgba(250, 112, 154, 0.3);
-      color: #fa709a;
-    }
-
-    .alert-success {
-      background: rgba(79, 172, 254, 0.1);
-      border: 1px solid rgba(79, 172, 254, 0.3);
-      color: #4facfe;
-    }
-
-    .btn {
-      width: 100%;
-      padding: 15px;
-      border: none;
-      border-radius: 10px;
-      font-family: 'Poppins', sans-serif;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .btn-primary {
-      background: var(--primary-gradient);
-      color: white;
-      box-shadow: var(--shadow-secondary);
-    }
-
-    .btn-primary:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
-    }
-
-    .btn-primary:active:not(:disabled) {
-      transform: translateY(0);
-    }
-
-    .btn-primary:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .login-footer {
-      text-align: center;
-      margin-top: 25px;
-      padding-top: 20px;
-      border-top: 1px solid var(--glass-border);
-      color: var(--text-muted);
-      font-size: 12px;
-    }
-
-    /* ============================================
-       DASHBOARD
-    ============================================ */
-    .dashboard-container {
-      width: 100%;
-      max-width: 800px;
-      padding: 30px;
-      background: var(--glass-bg);
-      backdrop-filter: blur(20px);
-      border: 1px solid var(--glass-border);
-      border-radius: 20px;
-      box-shadow: var(--shadow-primary);
-      animation: slideUp 0.5s ease-out;
-      margin: 20px;
-    }
-
-    .dashboard-header {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
-    .dashboard-logo {
-      width: 70px;
-      height: 70px;
-      object-fit: contain;
-      margin-bottom: 15px;
-      filter: drop-shadow(0 5px 15px rgba(102, 126, 234, 0.3));
-    }
-
-    .dashboard-header h1 {
-      font-size: 24px;
-      font-weight: 700;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 5px;
-    }
-
-    .dashboard-header p {
-      font-size: 14px;
-      color: var(--text-secondary);
-    }
-
-    /* ============================================
-       CLOCK
-    ============================================ */
-    .clock-container {
-      text-align: center;
-      margin: 30px 0;
-      padding: 20px;
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 15px;
-      border: 1px solid var(--glass-border);
-    }
-
-    .clock-display {
-      font-family: 'Digital-7', monospace;
-      font-size: 3.5rem;
-      font-weight: 700;
-      color: #00f2fe;
-      text-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
-      letter-spacing: 2px;
-      margin-bottom: 10px;
-    }
-
-    .date-display {
-      font-size: 18px;
-      color: var(--text-secondary);
-    }
-
-    /* ============================================
-       USER INFO
-    ============================================ */
-    .user-info-card {
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 15px;
-      padding: 20px;
-      margin-bottom: 25px;
-      border: 1px solid var(--glass-border);
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-
-    .user-avatar {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background: var(--primary-gradient);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      font-weight: 600;
-      color: white;
-      flex-shrink: 0;
-    }
-
-    .user-details {
-      flex: 1;
-    }
-
-    .user-name {
-      font-size: 20px;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 5px;
-    }
-
-    .user-role {
-      display: inline-block;
-      padding: 4px 12px;
-      background: rgba(102, 126, 234, 0.1);
-      border: 1px solid rgba(102, 126, 234, 0.3);
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 500;
-      color: #667eea;
-      margin-bottom: 8px;
-    }
-
-    .user-ip {
-      font-size: 13px;
-      color: var(--text-secondary);
-    }
-
-    /* ============================================
-       STATUS PANEL
-    ============================================ */
-    .status-panel {
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 15px;
-      padding: 25px;
-      margin-bottom: 25px;
-      border: 1px solid var(--glass-border);
-      text-align: center;
-      transition: all 0.3s;
-    }
-
-    .status-panel.active {
-      border-color: #4facfe;
-      background: rgba(79, 172, 254, 0.05);
-    }
-
-    .status-icon {
-      font-size: 40px;
-      margin-bottom: 15px;
-      color: #667eea;
-    }
-
-    .status-panel.active .status-icon {
-      color: #4facfe;
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-    }
-
-    .status-title {
-      font-size: 18px;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 10px;
-    }
-
-    .status-time {
-      font-size: 28px;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 10px;
-    }
-
-    .status-duration {
-      font-size: 16px;
-      color: #fa709a;
-      background: rgba(250, 112, 154, 0.1);
-      padding: 8px 15px;
-      border-radius: 20px;
-      display: inline-block;
-      margin-bottom: 15px;
-    }
-
-    .status-info {
-      font-size: 14px;
-      color: var(--text-secondary);
-    }
-
-    /* ============================================
-       JOBDESK SELECTION
-    ============================================ */
-    .jobdesk-section {
-      margin-bottom: 25px;
-    }
-
-    .jobdesk-section h3 {
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 12px;
-    }
-
-    .jobdesk-select {
-      width: 100%;
-      padding: 14px 20px;
-      background: rgba(0, 0, 0, 0.2);
-      border: 1px solid var(--glass-border);
-      border-radius: 10px;
-      color: var(--text-primary);
-      font-family: 'Poppins', sans-serif;
-      font-size: 15px;
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23667eea' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 15px center;
-      background-size: 16px;
-      cursor: pointer;
-      transition: border-color 0.3s;
-    }
-
-    .jobdesk-select:focus {
-      outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
-    }
-
-    .jobdesk-select option {
+      left: 50%;
+      transform: translate(-50%, -50%);
       background: #1a1a2e;
-      color: white;
-    }
-
-    /* ============================================
-       ACTION BUTTONS
-    ============================================ */
-    .action-buttons {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
-      margin-bottom: 25px;
-    }
-
-    .btn-secondary {
-      background: var(--success-gradient);
-      color: white;
-      box-shadow: var(--shadow-secondary);
-    }
-
-    .btn-secondary:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(79, 172, 254, 0.4);
-    }
-
-    .btn-danger {
-      background: var(--danger-gradient);
-      color: white;
-      box-shadow: var(--shadow-secondary);
-    }
-
-    .btn-danger:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(245, 87, 108, 0.4);
-    }
-
-    .btn-warning {
-      background: var(--warning-gradient);
-      color: white;
-      box-shadow: var(--shadow-secondary);
-    }
-
-    .btn-warning:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(250, 112, 154, 0.4);
-    }
-
-    /* ============================================
-       ALERTS & WARNINGS
-    ============================================ */
-    .system-alert {
-      padding: 20px;
-      border-radius: 15px;
-      margin-bottom: 25px;
+      color: #fff;
+      padding: 25px 35px;
+      border-radius: 20px;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+      z-index: 10001;
+      display: none;
       text-align: center;
-      animation: slideIn 0.3s;
+      border: 1px solid rgba(255,255,255,0.1);
+      animation: popIn 0.3s forwards;
+      width: 80%;
+      max-width: 400px;
     }
-
-    @keyframes slideIn {
-      from { transform: translateY(-10px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-
-    .system-alert.warning {
-      background: rgba(250, 112, 154, 0.1);
-      border: 1px solid rgba(250, 112, 154, 0.3);
-    }
-
-    .system-alert.error {
-      background: rgba(245, 87, 108, 0.1);
-      border: 1px solid rgba(245, 87, 108, 0.3);
-    }
-
-    .system-alert.info {
-      background: rgba(102, 126, 234, 0.1);
-      border: 1px solid rgba(102, 126, 234, 0.3);
-    }
-
-    .alert-icon {
-      font-size: 40px;
-      margin-bottom: 15px;
-      color: #fa709a;
-    }
-
-    .system-alert.error .alert-icon {
-      color: #f5576c;
-    }
-
-    .system-alert.info .alert-icon {
-      color: #667eea;
-    }
-
-    .alert-title {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 10px;
-      color: var(--text-primary);
-    }
-
-    .alert-message {
-      font-size: 14px;
-      color: var(--text-secondary);
-      margin-bottom: 15px;
-    }
-
-    /* ============================================
-       QUICK LINKS
-    ============================================ */
-    .quick-links {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
-      margin-bottom: 25px;
-    }
-
-    .link-card {
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 15px;
-      padding: 20px;
-      text-decoration: none;
-      border: 1px solid var(--glass-border);
-      transition: all 0.3s;
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-
-    .link-card:hover {
-      transform: translateY(-3px);
-      border-color: #667eea;
-      background: rgba(102, 126, 234, 0.05);
-    }
-
-    .link-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 10px;
-      background: var(--primary-gradient);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 18px;
-      flex-shrink: 0;
-    }
-
-    .link-content h4 {
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 5px;
-    }
-
-    .link-content p {
-      font-size: 12px;
-      color: var(--text-secondary);
-    }
-
-    /* ============================================
-       ACCOUNT ACTIONS
-    ============================================ */
-    .account-actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
-      margin-top: 30px;
-      padding-top: 30px;
-      border-top: 1px solid var(--glass-border);
-    }
-
-    /* ============================================
-       MODALS
-    ============================================ */
-    .modal-overlay {
+    
+    #popupOverlay {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(5px);
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      z-index: 10000;
       display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #popupNotification {
+      background: rgba(20, 20, 30, 0.95);
+      padding: 30px;
+      border-radius: 24px;
+      text-align: center;
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      max-width: 90%;
+      width: 400px;
+    }
+
+    /* Password Modal Specifics */
+    .password-form-group { margin-bottom: 20px; text-align: left; }
+    .password-form-group label { display: block; margin-bottom: 8px; color: #ccc; font-size: 13px; font-weight: 500; }
+    
+    /* Reuse modern-input-group for modal inputs for consistency */
+    .password-form-group .modern-input-group { margin-bottom: 0; }
+    .password-form-group input {
+      width: 100%;
+      padding: 12px 50px 12px 45px; /* Adjust padding for icon */
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      color: white;
+      box-sizing: border-box;
+      transition: 0.3s;
+    }
+    .password-form-group input:focus { border-color: var(--neon-blue); outline: none; box-shadow: 0 0 10px rgba(0, 243, 255, 0.2); }
+    
+    /* Icon left positioning for modal inputs */
+    .password-form-group .modal-icon-left {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255,255,255,0.5);
+    }
+
+    .password-message { padding: 10px; border-radius: 10px; font-size: 14px; margin-bottom: 15px; display: none; }
+    .password-message.success { background: rgba(46, 213, 115, 0.1); color: #2ed573; border: 1px solid rgba(46, 213, 115, 0.2); }
+    .password-message.error { background: rgba(255, 71, 87, 0.1); color: #ff4757; border: 1px solid rgba(255, 71, 87, 0.2); }
+
+    .password-modal-buttons { display: flex; gap: 10px; margin-top: 10px; }
+    .password-save-btn { background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple)); color: white; border: none; box-shadow: 0 4px 15px rgba(0, 243, 255, 0.3); }
+    .password-cancel-btn { background: rgba(255, 255, 255, 0.1); color: white; border: 1px solid rgba(255,255,255,0.1); }
+
+    /* Loading Effect Modal */
+    .loading-effect-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(5, 5, 5, 0.95);
+      backdrop-filter: blur(15px);
+      z-index: 10002;
       justify-content: center;
       align-items: center;
-      z-index: 1000;
-      padding: 20px;
+      flex-direction: column;
+      animation: fadeIn 0.3s ease-out;
     }
 
-    .modal-content {
-      background: var(--glass-bg);
-      backdrop-filter: blur(20px);
-      border: 1px solid var(--glass-border);
-      border-radius: 20px;
-      padding: 40px;
-      max-width: 500px;
-      width: 100%;
-      box-shadow: var(--shadow-primary);
-      animation: modalIn 0.3s;
-    }
-
-    @keyframes modalIn {
-      from { opacity: 0; transform: scale(0.9); }
-      to { opacity: 1; transform: scale(1); }
-    }
-
-    .modal-header {
+    .loading-effect-content {
+      background: rgba(20, 20, 30, 0.9);
+      border-radius: 24px;
+      padding: 30px;
       text-align: center;
-      margin-bottom: 30px;
+      max-width: 400px;
+      width: 90%;
+      border: 1px solid rgba(0, 243, 255, 0.3);
+      box-shadow: 0 0 50px rgba(0, 243, 255, 0.2);
+      animation: pulseGlow 2s infinite alternate;
     }
 
-    .modal-icon {
-      font-size: 60px;
+    @keyframes pulseGlow {
+      0% { box-shadow: 0 0 30px rgba(0, 243, 255, 0.2); }
+      100% { box-shadow: 0 0 60px rgba(0, 243, 255, 0.4); }
+    }
+
+    .loading-effect-gif {
+      width: 100%;
+      max-width: 250px;
+      border-radius: 12px;
       margin-bottom: 20px;
-      color: #667eea;
+      border: 2px solid rgba(0, 243, 255, 0.3);
     }
 
-    .modal-title {
-      font-size: 24px;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 10px;
+    .loading-effect-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 22px;
+      color: #00f3ff;
+      margin-bottom: 15px;
+      text-shadow: 0 0 15px rgba(0, 243, 255, 0.7);
+      letter-spacing: 1px;
     }
 
-    .modal-message {
+    .loading-effect-message {
+      font-family: 'Poppins', sans-serif;
       font-size: 16px;
-      color: var(--text-secondary);
-      line-height: 1.6;
-      margin-bottom: 30px;
-    }
-
-    .modal-actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
-    }
-
-    /* ============================================
-       PASSWORD MODAL
-    ============================================ */
-    .password-form {
-      margin-bottom: 30px;
-    }
-
-    .password-form .form-group {
+      color: #ffffff;
+      line-height: 1.5;
       margin-bottom: 25px;
+      padding: 0 10px;
     }
 
-    /* ============================================
-       MAINTENANCE MODE
-    ============================================ */
-    .maintenance-container {
+    .loading-effect-progress {
       width: 100%;
-      max-width: 600px;
-      padding: 40px;
-      background: var(--glass-bg);
-      backdrop-filter: blur(20px);
-      border: 1px solid var(--glass-border);
-      border-radius: 20px;
-      box-shadow: var(--shadow-primary);
-      text-align: center;
-      animation: slideUp 0.5s ease-out;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 20px;
     }
 
-    .maintenance-icon {
-      font-size: 80px;
-      color: #fa709a;
-      margin-bottom: 30px;
-      animation: bounce 2s infinite;
+    .loading-effect-progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #00f3ff, #bc13fe);
+      border-radius: 3px;
+      animation: progressBar 3s ease-in-out forwards;
     }
 
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
+    @keyframes progressBar {
+      0% { width: 0%; }
+      100% { width: 100%; }
     }
 
-    .maintenance-title {
-      font-size: 36px;
-      font-weight: 700;
-      background: linear-gradient(135deg, #fa709a, #fee140);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 20px;
-    }
-
-    .maintenance-message {
-      font-size: 18px;
-      color: var(--text-secondary);
-      line-height: 1.6;
-      margin-bottom: 30px;
-    }
-
-    /* ============================================
-       SYSTEM INFO BAR
-    ============================================ */
-    .system-info-bar {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: rgba(0, 0, 0, 0.3);
-      backdrop-filter: blur(10px);
-      border: 1px solid var(--glass-border);
-      border-radius: 10px;
-      padding: 10px 15px;
-      font-size: 12px;
-      color: var(--text-secondary);
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #4facfe;
-      animation: blink 2s infinite;
-    }
-
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
-
-    /* ============================================
-       RESPONSIVE DESIGN
-    ============================================ */
-    @media (max-width: 768px) {
-      .login-container,
-      .dashboard-container,
-      .maintenance-container {
-        padding: 25px;
-        margin: 15px;
-      }
-
-      .clock-display {
-        font-size: 2.5rem;
-      }
-
-      .action-buttons,
-      .account-actions,
-      .quick-links {
-        grid-template-columns: 1fr;
-      }
-
-      .user-info-card {
-        flex-direction: column;
-        text-align: center;
-        gap: 15px;
-      }
-
-      .modal-content {
-        padding: 25px;
-      }
-
-      .modal-actions {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .login-container,
-      .dashboard-container,
-      .maintenance-container {
-        padding: 20px;
-        margin: 10px;
-      }
-
-      .clock-display {
-        font-size: 2rem;
-      }
-
-      .dashboard-header h1,
-      .maintenance-title {
-        font-size: 24px;
-      }
-    }
-
-    /* ============================================
-       UTILITY CLASSES
-    ============================================ */
+    /* Utility Classes */
     .hidden {
       display: none !important;
     }
 
-    .text-center {
-      text-align: center;
+    /* Font Face for Clock */
+    @font-face {
+      font-family: 'Digital dream Fat';
+      src: url('https://semicon.github.io/fonts/DigitaldreamFat.woff2') format('woff2'),
+        url('https://semicon.github.io/fonts/DigitaldreamFat.woff') format('woff');
+      font-weight: normal;
+      font-style: normal;
+      font-display: swap;
     }
 
-    .mb-20 {
-      margin-bottom: 20px;
-    }
-
-    .mt-20 {
-      margin-top: 20px;
-    }
-
-    .mb-30 {
-      margin-bottom: 30px;
-    }
-
-    .mt-30 {
-      margin-top: 30px;
+    @media (max-width: 768px) {
+      .container { padding: 20px; margin: 10px; }
+      .time-btns, .account-actions { grid-template-columns: 1fr; }
+      .clock { font-size: 2.5rem; }
+      #loginForm { padding: 30px 20px; }
+      .loading-effect-content { padding: 20px; }
+      .loading-effect-title { font-size: 18px; }
+      .loading-effect-message { font-size: 14px; }
     }
   </style>
 </head>
 
 <body>
-  <!-- Background Slideshow -->
-  <div class="background-slideshow" id="backgroundSlideshow">
-    <!-- Background images will be added dynamically -->
+
+  <!-- Background Image -->
+  <img id="backgroundImage" class="background-image" src="" alt="Background">
+  
+  <!-- Background Effects -->
+  <div class="scanlines"></div>
+  <div class="vignette"></div>
+  <div class="space-bg"></div>
+
+  <!-- Loading Effect Modal -->
+  <div id="loadingEffectModal" class="loading-effect-modal">
+    <div class="loading-effect-content">
+      <img src="https://i.pinimg.com/originals/1b/de/85/1bde855b1bd40f35b92ae6fc2d2173fa.gif" alt="Loading" class="loading-effect-gif">
+      <h3 class="loading-effect-title" id="loadingEffectTitle">PROSES SEDANG BERJALAN</h3>
+      <p class="loading-effect-message" id="loadingEffectMessage">Mohon tunggu sebentar...</p>
+      <div class="loading-effect-progress">
+        <div class="loading-effect-progress-bar"></div>
+      </div>
+    </div>
   </div>
 
-  <!-- Loading Overlay -->
-  <div class="loading-overlay" id="loadingOverlay">
+  <!-- Loading Spinner Notification -->
+  <div id="loadingSpinner" class="loading-spinner">
     <div class="spinner"></div>
-    <div class="loading-text" id="loadingText">Loading...</div>
+    <p id="loadingText">Loading...</p>
   </div>
 
-  <!-- Maintenance Mode -->
-  <div class="maintenance-container hidden" id="maintenanceMode">
-    <div class="maintenance-icon">
-      <i class="fas fa-tools"></i>
-    </div>
-    <h1 class="maintenance-title">🚧 MAINTENANCE MODE 🚧</h1>
-    <p class="maintenance-message">
-      Sistem sedang dalam perawatan dan pengembangan.<br>
-      Harap bersabar, kami akan kembali segera.
-    </p>
-    <div class="system-alert info mb-30">
-      <div class="alert-icon">
-        <i class="fas fa-info-circle"></i>
-      </div>
-      <div class="alert-title">Informasi</div>
-      <div class="alert-message">
-        Sistem akan kembali aktif setelah maintenance selesai.<br>
-        Hubungi administrator untuk informasi lebih lanjut.
-      </div>
-    </div>
-    <button class="btn btn-primary" onclick="checkMaintenance()">
-      <i class="fas fa-sync-alt"></i> Refresh Status
-    </button>
+  <!-- Connection Status -->
+  <div class="connection-status">
+    <span class="status-indicator" id="statusIndicator"></span>
+    <span id="statusText">Connecting...</span>
   </div>
 
-  <!-- Login Form -->
-  <div class="login-container hidden" id="loginForm">
-    <div class="logo-section">
-      <img src="https://cdn.areabermain.club/assets/cdn/az4/2025/04/23/20250423/a82bdc6fb564d0dff3671aeb9a4d1da5/logo.png" alt="Linetogel Logo">
-      <h1>Linetogel Staff</h1>
-      <p>Izin Keluar Management System</p>
-    </div>
-
-    <div class="alert-message alert-error" id="loginError"></div>
-    <div class="alert-message alert-warning" id="ipWarning"></div>
-
-    <form id="loginFormElement">
-      <div class="form-group">
-        <label for="username"><i class="fas fa-user"></i> Username</label>
-        <div class="input-with-icon">
-          <input type="text" id="username" placeholder="Masukkan username" required autocomplete="username">
-          <i class="fas fa-user"></i>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="password"><i class="fas fa-lock"></i> Password</label>
-        <div class="input-with-icon">
-          <input type="password" id="password" placeholder="Masukkan password" required autocomplete="current-password">
-          <i class="fas fa-lock"></i>
-          <button type="button" class="password-toggle" id="togglePassword">
-            <i class="fas fa-eye"></i>
-          </button>
-        </div>
-      </div>
-
-      <button type="submit" class="btn btn-primary" id="loginButton">
-        <i class="fas fa-sign-in-alt"></i> Login
-      </button>
-    </form>
-
-    <div class="login-footer">
-      <p>© 2026 Linetogel Staff Management System</p>
-      <p>Versi 2.0.0</p>
-    </div>
+  <!-- Real-time Update Indicator -->
+  <div class="realtime-indicator" id="realtimeIndicator">
+    <i class="fas fa-wifi" style="font-size: 10px;"></i>
+    <span>Live Update Active</span>
   </div>
 
-  <!-- Dashboard -->
-  <div class="dashboard-container hidden" id="dashboard">
-    <div class="dashboard-header">
-      <img src="https://cdn.areabermain.club/assets/cdn/az4/2025/04/23/20250423/a82bdc6fb564d0dff3671aeb9a4d1da5/logo.png" alt="Linetogel Logo" class="dashboard-logo">
-      <h1>IZIN KELUAR STAFF</h1>
-      <p>Sistem Management Izin Keluar Linetogel</p>
-    </div>
+  <!-- Update Notification -->
+  <div class="update-notification" id="updateNotification">
+    <i class="fas fa-sync-alt"></i>
+    <span id="updateMessage">Data Updated</span>
+  </div>
 
-    <!-- Clock -->
-    <div class="clock-container">
-      <div class="clock-display" id="clockDisplay">00:00:00</div>
-      <div class="date-display" id="dateDisplay">Loading...</div>
-    </div>
+  <!-- IP Display -->
+  <div class="ip-display" id="ipDisplay">
+    IP: <span id="currentIPText">Getting IP...</span>
+  </div>
 
-    <!-- User Info -->
-    <div class="user-info-card">
-      <div class="user-avatar" id="userAvatar">U</div>
-      <div class="user-details">
-        <div class="user-name" id="userName">Loading...</div>
-        <div class="user-role" id="userRole">Loading...</div>
-        <div class="user-ip">
-          <i class="fas fa-network-wired"></i> IP: <span id="userIP">Loading...</span>
-        </div>
-      </div>
-    </div>
 
-    <!-- System Alerts -->
-    <div class="system-alert warning hidden" id="timeRestrictionAlert">
-      <div class="alert-icon">
-        <i class="fas fa-exclamation-triangle"></i>
-      </div>
-      <div class="alert-title">⚠️ PERINGATAN WAKTU</div>
-      <div class="alert-message">
-        Izin keluar tidak tersedia pada pukul 23:50 - 00:01 WIB.<br>
-        Harap menunggu hingga waktu tersebut berlalu.
-      </div>
-    </div>
 
-    <div class="system-alert error hidden" id="maxLimitAlert">
-      <div class="alert-icon">
+  <!-- Custom Modal for Max Limit Warning -->
+  <div id="maxLimitModal" class="custom-modal">
+    <div class="custom-modal-content">
+      <div style="font-size: 50px; color: #ff4757; margin-bottom: 20px;">
         <i class="fas fa-ban"></i>
       </div>
-      <div class="alert-title">⛔ BATAS MAKSIMAL TERCAPAI</div>
-      <div class="alert-message" id="maxLimitMessage">
-        Anda sudah mencapai batas maksimal izin keluar hari ini (4x).<br>
+      <h3 class="custom-modal-title">⛔ STOP! SUDAH 4 KALI!</h3>
+      <p class="custom-modal-message" id="maxLimitMessage">
+        Anda sudah mencapai batas maksimal izin keluar hari ini.<br>
         Silakan lanjut besok!
-      </div>
-    </div>
-
-    <div class="system-alert error hidden" id="roleLimitAlert">
-      <div class="alert-icon">
-        <i class="fas fa-users"></i>
-      </div>
-      <div class="alert-title" id="roleLimitTitle">⚠️ BATAS ROLE TERCAPAI</div>
-      <div class="alert-message" id="roleLimitMessage">
-        Jumlah staff dengan role yang sama yang sedang izin telah mencapai batas maksimum.
-      </div>
-    </div>
-
-    <div class="system-alert error hidden" id="staffLimitAlert">
-      <div class="alert-icon">
-        <i class="fas fa-user-slash"></i>
-      </div>
-      <div class="alert-title">🚫 BATAS STAFF KELUAR</div>
-      <div class="alert-message">
-        Maksimal hanya 3 staff yang dapat izin keluar pada saat bersamaan.<br>
-        Harap tunggu hingga salah satu staff kembali masuk.
-      </div>
-    </div>
-
-    <!-- Status Panel -->
-    <div class="status-panel" id="statusPanel">
-      <div class="status-icon">
-        <i class="fas fa-clock" id="statusIcon"></i>
-      </div>
-      <div class="status-title" id="statusTitle">Status Anda</div>
-      <div class="status-time" id="statusTime">-</div>
-      <div class="status-duration" id="statusDuration">-</div>
-      <div class="status-info" id="statusInfo">Loading...</div>
-    </div>
-
-    <!-- Jobdesk Selection -->
-    <div class="jobdesk-section hidden" id="jobdeskSection">
-      <h3><i class="fas fa-tasks"></i> Pilih Jobdesk</h3>
-      <select class="jobdesk-select" id="jobdeskSelect">
-        <option value="">-- Silahkan Pilih --</option>
-      </select>
-    </div>
-
-    <!-- Action Buttons -->
-    <div class="action-buttons">
-      <button class="btn btn-secondary" id="startButton" onclick="startTime()">
-        <i class="fas fa-door-open"></i> Izin Keluar
+      </p>
+      <button class="gradient-btn" onclick="closeMaxLimitModal()">
+        <i class="fas fa-times"></i> Tutup
       </button>
-      <button class="btn btn-danger" id="endButton" onclick="endTime()">
-        <i class="fas fa-sign-in-alt"></i> Kembali Masuk
-      </button>
-    </div>
-
-    <!-- Quick Links -->
-    <div class="quick-links">
-      <a href="https://linetogel-izin.vercel.app/izin-staff-Linetgl.html" target="_blank" class="link-card">
-        <div class="link-icon">
-          <i class="fas fa-chart-bar"></i>
-        </div>
-        <div class="link-content">
-          <h4>Dashboard Data</h4>
-          <p>Lihat statistik dan laporan lengkap</p>
-        </div>
-      </a>
-      <a href="#" class="link-card" onclick="showHelp()">
-        <div class="link-icon">
-          <i class="fas fa-question-circle"></i>
-        </div>
-        <div class="link-content">
-          <h4>Bantuan</h4>
-          <p>Panduan penggunaan sistem</p>
-        </div>
-      </a>
-    </div>
-
-    <!-- Account Actions -->
-    <div class="account-actions">
-      <button class="btn btn-warning" onclick="showChangePassword()">
-        <i class="fas fa-key"></i> Ganti Password
-      </button>
-      <button class="btn btn-danger" onclick="logout()">
-        <i class="fas fa-sign-out-alt"></i> Logout
-      </button>
-    </div>
-
-    <!-- System Info -->
-    <div class="login-footer mt-30">
-      <p>Session ID: <span id="sessionId">-</span></p>
-      <p>Terakhir diperbarui: <span id="lastUpdate">-</span></p>
     </div>
   </div>
 
-  <!-- Modals -->
-  <!-- Success Modal -->
-  <div class="modal-overlay hidden" id="successModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="modal-icon">
-          <i class="fas fa-check-circle"></i>
-        </div>
-        <h2 class="modal-title" id="successTitle">Berhasil!</h2>
-        <p class="modal-message" id="successMessage">Operasi berhasil dilakukan.</p>
+  <!-- Password Change Modal -->
+  <div id="passwordChangeModal" class="password-modal">
+    <div class="password-modal-content">
+      <div class="password-modal-title">
+        <i class="fas fa-key" style="margin-right: 10px; color: var(--neon-blue);"></i>
+        <span>Ganti Password</span>
       </div>
-      <div class="modal-actions">
-        <button class="btn btn-primary" onclick="hideModal('successModal')">
-          <i class="fas fa-check"></i> OK
-        </button>
+      
+      <div id="passwordMessage" class="password-message"></div>
+      
+      <div class="password-form-group">
+        <label for="modalOldPassword">Password Lama:</label>
+        <div class="modern-input-group">
+          <i class="fas fa-lock modal-icon-left"></i>
+          <input type="password" id="modalOldPassword" placeholder="Masukkan password lama" required>
+          <i class="fas fa-eye toggle-pwd-icon" id="toggleOldPassword" onclick="toggleModalPassword('modalOldPassword', 'toggleOldPassword')"></i>
+        </div>
       </div>
-    </div>
-  </div>
-
-  <!-- Error Modal -->
-  <div class="modal-overlay hidden" id="errorModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="modal-icon">
-          <i class="fas fa-exclamation-circle"></i>
+      
+      <div class="password-form-group">
+        <label for="modalNewPassword">Password Baru:</label>
+        <div class="modern-input-group">
+          <i class="fas fa-key modal-icon-left"></i>
+          <input type="password" id="modalNewPassword" placeholder="Masukkan password baru" required>
+          <i class="fas fa-eye toggle-pwd-icon" id="toggleNewPassword" onclick="toggleModalPassword('modalNewPassword', 'toggleNewPassword')"></i>
         </div>
-        <h2 class="modal-title" id="errorTitle">Terjadi Kesalahan!</h2>
-        <p class="modal-message" id="errorMessage">Terjadi kesalahan pada sistem.</p>
       </div>
-      <div class="modal-actions">
-        <button class="btn btn-danger" onclick="hideModal('errorModal')">
-          <i class="fas fa-times"></i> Tutup
-        </button>
+      
+      <div class="password-form-group">
+        <label for="modalConfirmPassword">Konfirmasi Password Baru:</label>
+        <div class="modern-input-group">
+          <i class="fas fa-check-circle modal-icon-left"></i>
+          <input type="password" id="modalConfirmPassword" placeholder="Konfirmasi password baru" required>
+          <i class="fas fa-eye toggle-pwd-icon" id="toggleConfirmPassword" onclick="toggleModalPassword('modalConfirmPassword', 'toggleConfirmPassword')"></i>
+        </div>
       </div>
-    </div>
-  </div>
-
-  <!-- Change Password Modal -->
-  <div class="modal-overlay hidden" id="passwordModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="modal-icon">
-          <i class="fas fa-key"></i>
-        </div>
-        <h2 class="modal-title">Ganti Password</h2>
-        <p class="modal-message">Masukkan password lama dan password baru Anda.</p>
-      </div>
-
-      <form class="password-form" id="passwordForm">
-        <div class="alert-message alert-error hidden" id="passwordError"></div>
-        <div class="alert-message alert-success hidden" id="passwordSuccess"></div>
-
-        <div class="form-group">
-          <label for="oldPassword">Password Lama</label>
-          <div class="input-with-icon">
-            <input type="password" id="oldPassword" placeholder="Masukkan password lama" required>
-            <i class="fas fa-lock"></i>
-            <button type="button" class="password-toggle" onclick="togglePasswordVisibility('oldPassword', 'toggleOldPassword')">
-              <i class="fas fa-eye" id="toggleOldPassword"></i>
-            </button>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="newPassword">Password Baru</label>
-          <div class="input-with-icon">
-            <input type="password" id="newPassword" placeholder="Masukkan password baru" required>
-            <i class="fas fa-key"></i>
-            <button type="button" class="password-toggle" onclick="togglePasswordVisibility('newPassword', 'toggleNewPassword')">
-              <i class="fas fa-eye" id="toggleNewPassword"></i>
-            </button>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="confirmPassword">Konfirmasi Password Baru</label>
-          <div class="input-with-icon">
-            <input type="password" id="confirmPassword" placeholder="Konfirmasi password baru" required>
-            <i class="fas fa-check-circle"></i>
-            <button type="button" class="password-toggle" onclick="togglePasswordVisibility('confirmPassword', 'toggleConfirmPassword')">
-              <i class="fas fa-eye" id="toggleConfirmPassword"></i>
-            </button>
-          </div>
-        </div>
-      </form>
-
-      <div class="modal-actions">
-        <button class="btn btn-primary" onclick="changePassword()">
+      
+      <div class="password-modal-buttons">
+        <button class="password-save-btn" id="modalSavePasswordBtn">
           <i class="fas fa-save"></i> Simpan
         </button>
-        <button class="btn btn-danger" onclick="hideModal('passwordModal')">
+        <button class="password-cancel-btn" id="modalCancelPasswordBtn">
           <i class="fas fa-times"></i> Batal
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Help Modal -->
-  <div class="modal-overlay hidden" id="helpModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="modal-icon">
-          <i class="fas fa-question-circle"></i>
+  <!-- ============================================
+       NEW LOGIN FORM DESIGN (HTML ASLI DARI USER)
+  ============================================ -->
+  <div id="loginForm">
+    <div class="login-logo-wrapper">
+      <img src="https://i.pinimg.com/originals/1b/de/85/1bde855b1bd40f35b92ae6fc2d2173fa.gif" alt="Logo">
+      <h2>Selamat Datang</h2>
+      <p class="subtitle">Silahkan masuk ke akun anda</p>
+    </div>
+    
+    <form id="loginFormForm" onsubmit="event.preventDefault(); login();">
+      
+      <!-- Username Input -->
+      <div class="modern-input-group">
+        <i class="fas fa-user icon-left"></i>
+        <input type="text" id="username" placeholder="Username" required autocomplete="off">
+      </div>
+
+      <!-- Password Input with Eye Icon -->
+      <div class="modern-input-group">
+        <i class="fas fa-lock icon-left"></i>
+        <input type="password" id="password" placeholder="Password" required autocomplete="current-password">
+        <i class="fas fa-eye toggle-password" id="togglePassword" onclick="togglePasswordVisibility()"></i>
+      </div>
+
+      <!-- Error Message -->
+      <div id="error-message"></div>
+      
+      <!-- IP Whitelist Message -->
+      <div id="ipWhitelistMessage"></div>
+
+      <!-- Login Button -->
+      <button type="submit" id="loginButton">
+        <span>MASUK SEKARANG</span>
+        <i class="fas fa-arrow-right"></i>
+      </button>
+      
+    </form>
+    
+    <div style="text-align: center; margin-top: 25px; color: rgba(255,255,255,0.5); font-size: 11px; letter-spacing: 0.5px; position: relative; z-index: 2;">
+      &copy; 2026 Staff Linetogel
+    </div>
+  </div>
+  <!-- ============================================ -->
+
+  <!-- Dashboard (HTML ASLI DARI USER) -->
+  <div id="dashboard" class="container hidden">
+    <center><img src="https://cdn.areabermain.club/assets/cdn/az4/2025/04/23/20250423/a82bdc6fb564d0dff3671aeb9a4d1da5/logo.png" alt="Logo" class="logo"></center>
+    <h2><i class="fas fa-clock"></i>IZIN STAFF LINETOGEL 2026 </h2>
+    <center>
+      <div id="MyClockDisplay" class="clock"></div>
+    </center>
+    <hr class="fancy-hr">
+    
+    <!-- Warning Marquee -->
+    <div id="timeWarning" class="warning-marquee">
+      <i class="fas fa-exclamation-triangle"></i> 
+      <span id="warningText" style="margin-left: 10px;"></span>
+    </div>
+    
+    <!-- Danger Alert for Max Limit -->
+    <div id="maxLimitAlert" class="danger-alert" style="display: none;">
+      <i class="fas fa-ban fa-2x"></i>
+      <h4 style="margin-top: 15px;">⛔ STOP! SUDAH 4 KALI!</h4>
+      <p>Anda sudah mencapai batas maksimal izin keluar hari ini.<br>Silakan lanjut besok!</p>
+    </div>
+    
+    <!-- Blocked Dashboard View (shown when limit reached) -->
+    <div id="blockedDashboard" class="blocked-dashboard" style="display: none;">
+      <div class="blocked-icon">
+        <i class="fas fa-ban"></i>
+      </div>
+      <h3 class="blocked-title">⛔ </h3>
+      <p class="blocked-message">
+        Anda telah mencapai batas maksimal 4 izin keluar hari ini.<br>
+        Semua fitur telah dinonaktifkan.<br>
+        Silakan lanjut besok!
+      </p>
+      <div class="account-actions">
+        <button class="logout-btn" id="logoutButtonBlocked"><i class="fas fa-sign-out-alt"></i> Logout</button>
+      </div>
+    </div>
+
+    <!-- Normal Dashboard View (shown when not blocked) -->
+    <div id="normalDashboard">
+      <!-- Hanya tampilkan nama staff dan role saja -->
+      <div class="staff-info">
+        <p><i class="fas fa-user"></i> Staff Name: <span id="staffNameDisplay" class="staff-name"></span></p>
+        <p><i class="fas fa-id-badge"></i> Role: <span id="userRoleDisplay" class="role-display"></span></p>
+      </div>
+
+      <div id="jobdeskSection" class="hidden">
+        <label for="jobdesk" style="display:block; margin-bottom: 8px; color: #ccc;">Pilih Jobdesk</label>
+        <select id="jobdesk">
+          <option value="">-- Silahkan Pilih --</option>
+        </select>
+        <div id="jobdeskError" style="color: #ff6b6b; display: none; margin-top: 8px; font-size: 13px; text-align: center;">Silahkan Pilih Jobdesk Anda</div>
+      </div>
+
+      <div class="time-btns">
+        <button id="startTimeButton" class="gradient-btn"><i class="fas fa-door-open"></i> Izin Keluar</button>
+        <button id="endTimeButton" class="gradient-btn"><i class="fas fa-sign-in-alt"></i> Kembali Masuk</button>
+      </div>
+
+      <!-- Status Panel -->
+      <div id="statusPanel" class="status-panel">
+        <div class="status-title">
+          <i class="fas fa-user-clock" id="statusPanelIcon"></i>
+          <span id="statusPanelTitle">Status Izin</span>
         </div>
-        <h2 class="modal-title">Bantuan & Panduan</h2>
+        <div id="statusPanelContent">
+          <div id="statusPanelTime"></div>
+          <div id="statusPanelDuration"></div>
+          <div id="statusPanelInfo" style="margin-top: 10px; font-size: 14px; color: #aaa;"></div>
+        </div>
       </div>
 
-      <div class="modal-message">
-        <h4>Cara Penggunaan:</h4>
-        <ol style="text-align: left; margin-left: 20px; margin-bottom: 20px;">
-          <li>Login dengan username dan password yang valid</li>
-          <li>IP Anda harus terdaftar di whitelist</li>
-          <li>Klik "Izin Keluar" saat akan keluar dari kantor</li>
-          <li>Pilih jobdesk jika diperlukan</li>
-          <li>Klik "Kembali Masuk" saat sudah kembali</li>
-          <li>Maksimal 4x izin keluar per hari</li>
-          <li>Maksimal 3 staff yang bisa keluar bersamaan</li>
-        </ol>
-
-        <h4>Batasan:</h4>
-        <ul style="text-align: left; margin-left: 20px;">
-          <li>Tidak bisa izin keluar pukul 23:50 - 00:01</li>
-          <li>Setiap role memiliki batas maksimal staff yang bisa izin</li>
-          <li>Durasi izin maksimal dihitung otomatis</li>
-        </ul>
+      <div style="text-align: center; margin-top: 30px;">
+        <a href="https://linetogel-izin.vercel.app/izin-staff-Linetgl.html" target="_blank" style="text-decoration: none;">
+          <button type="button" class="gradient-btn"><i class="fas fa-tachometer-alt"></i> Dashboard Data</button>
+        </a>
       </div>
 
-      <div class="modal-actions">
-        <button class="btn btn-primary" onclick="hideModal('helpModal')">
-          <i class="fas fa-check"></i> Mengerti
-        </button>
+      <!-- Popup Overlay -->
+      <div id="popupOverlay">
+        <div id="popupNotification">
+          <p id="popupMessage"></p>
+          <button onclick="hidePopup()" style="margin-top: 20px; background: rgba(255, 71, 87, 0.2); color: #ff6b6b; border-color: rgba(255,71,87,0.3);" class="gradient-btn">
+            <i class="fas fa-times"></i> Close
+          </button>
+        </div>
+      </div>
+
+      <div class="account-actions-container">
+        <div class="account-actions">
+          <button class="logout-btn" id="logoutButton"><i class="fas fa-sign-out-alt"></i> Logout</button>
+          <button type="button" class="change-password-btn" id="changePasswordButton">
+            <i class="fas fa-key"></i> Ganti Password
+          </button>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- System Info Bar -->
-  <div class="system-info-bar">
-    <div class="status-dot"></div>
-    <span id="systemStatus">Menyambungkan...</span>
-  </div>
-
   <script>
     // ============================================
-    // KONFIGURASI
+    // KONFIGURASI (SAMA SEPERTI ASLI)
     // ============================================
+    const SPREADSHEET_ID = '1_k_mng62tOmLAAHfNp5rzMxso2Qsy7Ez1LuX91zfoc8';
+    const SHEET_NAMES = {
+      REGISTER: 'Register',
+      ACCESS: 'Access',
+      WHITELIST: 'Whitelist IP',
+      JOBDESK: 'Jobdesk',
+      BACKGROUND: 'background',
+      DATABASE: 'DATABASE LINETOGEL'
+    };
+
+    // Google Apps Script URL
     const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyfwQU2P0CgkXLI7jnSN_D5yGFVMwu5xmy8byRARUmdottCBsVIfAbwjf0edgR9u08/exec';
-    
-    // Background images untuk slideshow
-    const BACKGROUND_IMAGES = [
-      'https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80',
-      'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80',
-      'https://images.unsplash.com/photo-1540206395-68808572332f?ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80'
-    ];
 
     // ============================================
-    // STATE MANAGEMENT
+    // VARIABEL GLOBAL
     // ============================================
     let currentUser = null;
-    let userIP = '';
-    let currentSession = null;
-    let jobdeskOptions = [];
-    let isMaintenanceMode = false;
-    let lastUpdateTime = new Date();
-    let backgroundIndex = 0;
-    let statusUpdateInterval = null;
-    let clockInterval = null;
-    let backgroundInterval = null;
+    let userData = null;
+    let jobdeskList = [];
+    let accessStatus = 'ON';
+    let backgroundImages = [];
+    let currentBackgroundIndex = 0;
+    let currentIP = '';
+    let attendanceRecords = [];
+    let maxStartLimit = 4;
+    let todayStartCount = 0;
+    let isMaxLimitReached = false;
+    let isBlocked = false;
+    
+    // Variabel untuk real-time update
+    let realtimeUpdateInterval = null;
+    let lastUpdateCheck = null;
+    let userDataCache = null;
+    let jobdeskCache = null;
+    let accessCache = null;
+    let backgroundCache = null;
+    
+    // Variabel untuk status panel dan timer
+    let statusPanelTimer = null;
+    let currentSessionStartTime = null;
+
+    // ============================================
+    // FUNGSI BARU: TOGGLE PASSWORD VISIBILITY
+    // ============================================
+    function togglePasswordVisibility() {
+      const passwordInput = document.getElementById("password");
+      const toggleIcon = document.getElementById("togglePassword");
+      
+      if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        toggleIcon.classList.remove("fa-eye");
+        toggleIcon.classList.add("fa-eye-slash");
+        toggleIcon.style.color = "#00f3ff";
+      } else {
+        passwordInput.type = "password";
+        toggleIcon.classList.remove("fa-eye-slash");
+        toggleIcon.classList.add("fa-eye");
+        toggleIcon.style.color = "rgba(255, 255, 255, 0.5)";
+      }
+    }
+
+    // FUNGSI BARU: TOGGLE PASSWORD DI MODAL
+    function toggleModalPassword(inputId, iconId) {
+      const input = document.getElementById(inputId);
+      const icon = document.getElementById(iconId);
+      
+      if (input.type === "password") {
+        input.type = "text";
+        icon.classList.remove("fa-eye");
+        icon.classList.add("fa-eye-slash");
+        icon.style.color = "#00f3ff";
+      } else {
+        input.type = "password";
+        icon.classList.remove("fa-eye-slash");
+        icon.classList.add("fa-eye");
+        icon.style.color = "rgba(255, 255, 255, 0.5)";
+      }
+    }
+
+    // ============================================
+    // FUNGSI BARU: LOADING EFFECT
+    // ============================================
+    function showLoadingEffect(title, message) {
+      const modal = document.getElementById('loadingEffectModal');
+      const titleElement = document.getElementById('loadingEffectTitle');
+      const messageElement = document.getElementById('loadingEffectMessage');
+      const progressBar = document.querySelector('.loading-effect-progress-bar');
+      
+      titleElement.textContent = title;
+      messageElement.textContent = message;
+      
+      // Reset progress bar
+      progressBar.style.width = '0%';
+      progressBar.style.animation = 'none';
+      
+      modal.style.display = 'flex';
+      
+      // Start progress animation
+      setTimeout(() => {
+        progressBar.style.animation = 'progressBar 3s ease-in-out forwards';
+      }, 100);
+      
+      // Auto hide after 2 seconds
+      setTimeout(() => {
+        hideLoadingEffect();
+      }, 2000);
+    }
+    
+    function hideLoadingEffect() {
+      const modal = document.getElementById('loadingEffectModal');
+      modal.style.display = 'none';
+    }
+
+    // ============================================
+    // FUNGSI FORMAT TANGGAL & WAKTU
+    // ============================================
+
+    function getFormattedDate(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    function getFormattedTime(date) {
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const seconds = String(date.getSeconds()).padStart(2, '0');
+      return `${hours}:${minutes}:${seconds}`;
+    }
 
     // ============================================
     // DOM ELEMENTS
     // ============================================
     const elements = {
-      // Containers
-      loadingOverlay: document.getElementById('loadingOverlay'),
+      loadingSpinner: document.getElementById('loadingSpinner'),
       loadingText: document.getElementById('loadingText'),
-      maintenanceMode: document.getElementById('maintenanceMode'),
       loginForm: document.getElementById('loginForm'),
       dashboard: document.getElementById('dashboard'),
-      
-      // Login
-      loginFormElement: document.getElementById('loginFormElement'),
       username: document.getElementById('username'),
       password: document.getElementById('password'),
-      togglePassword: document.getElementById('togglePassword'),
-      loginError: document.getElementById('loginError'),
-      ipWarning: document.getElementById('ipWarning'),
-      loginButton: document.getElementById('loginButton'),
-      
-      // Dashboard
-      clockDisplay: document.getElementById('clockDisplay'),
-      dateDisplay: document.getElementById('dateDisplay'),
-      userAvatar: document.getElementById('userAvatar'),
-      userName: document.getElementById('userName'),
-      userRole: document.getElementById('userRole'),
-      userIP: document.getElementById('userIP'),
-      sessionId: document.getElementById('sessionId'),
-      lastUpdate: document.getElementById('lastUpdate'),
-      
-      // Alerts
-      timeRestrictionAlert: document.getElementById('timeRestrictionAlert'),
-      maxLimitAlert: document.getElementById('maxLimitAlert'),
-      maxLimitMessage: document.getElementById('maxLimitMessage'),
-      roleLimitAlert: document.getElementById('roleLimitAlert'),
-      roleLimitTitle: document.getElementById('roleLimitTitle'),
-      roleLimitMessage: document.getElementById('roleLimitMessage'),
-      staffLimitAlert: document.getElementById('staffLimitAlert'),
-      
-      // Status Panel
-      statusPanel: document.getElementById('statusPanel'),
-      statusIcon: document.getElementById('statusIcon'),
-      statusTitle: document.getElementById('statusTitle'),
-      statusTime: document.getElementById('statusTime'),
-      statusDuration: document.getElementById('statusDuration'),
-      statusInfo: document.getElementById('statusInfo'),
-      
-      // Jobdesk
+      errorMessage: document.getElementById('error-message'),
+      ipWhitelistMessage: document.getElementById('ipWhitelistMessage'),
+      staffNameDisplay: document.getElementById('staffNameDisplay'),
+      userRoleDisplay: document.getElementById('userRoleDisplay'),
       jobdeskSection: document.getElementById('jobdeskSection'),
-      jobdeskSelect: document.getElementById('jobdeskSelect'),
+      jobdeskSelect: document.getElementById('jobdesk'),
+      jobdeskError: document.getElementById('jobdeskError'),
+      popupOverlay: document.getElementById('popupOverlay'),
+      popupMessage: document.getElementById('popupMessage'),
+      backgroundImage: document.getElementById('backgroundImage'),
+      statusIndicator: document.getElementById('statusIndicator'),
+      statusText: document.getElementById('statusText'),
+      debugInfo: document.getElementById('debugInfo'),
+      currentIPText: document.getElementById('currentIPText'),
+      ipDisplay: document.getElementById('ipDisplay'),
+      realtimeIndicator: document.getElementById('realtimeIndicator'),
+      updateNotification: document.getElementById('updateNotification'),
+      updateMessage: document.getElementById('updateMessage'),
+      timeWarning: document.getElementById('timeWarning'),
+      warningText: document.getElementById('warningText'),
+      maxLimitAlert: document.getElementById('maxLimitAlert'),
+      maxLimitModal: document.getElementById('maxLimitModal'),
+      maxLimitMessage: document.getElementById('maxLimitMessage'),
+      blockedDashboard: document.getElementById('blockedDashboard'),
+      normalDashboard: document.getElementById('normalDashboard'),
+      logoutButtonBlocked: document.getElementById('logoutButtonBlocked'),
+      
+      // Status Panel Elements
+      statusPanel: document.getElementById('statusPanel'),
+      statusPanelIcon: document.getElementById('statusPanelIcon'),
+      statusPanelTitle: document.getElementById('statusPanelTitle'),
+      statusPanelTime: document.getElementById('statusPanelTime'),
+      statusPanelDuration: document.getElementById('statusPanelDuration'),
+      statusPanelInfo: document.getElementById('statusPanelInfo'),
+      statusPanelContent: document.getElementById('statusPanelContent'),
+      
+      // Password Modal Elements
+      passwordChangeModal: document.getElementById('passwordChangeModal'),
+      modalOldPassword: document.getElementById('modalOldPassword'),
+      modalNewPassword: document.getElementById('modalNewPassword'),
+      modalConfirmPassword: document.getElementById('modalConfirmPassword'),
+      passwordMessage: document.getElementById('passwordMessage'),
+      modalSavePasswordBtn: document.getElementById('modalSavePasswordBtn'),
+      modalCancelPasswordBtn: document.getElementById('modalCancelPasswordBtn'),
+      
+      // Loading Effect Elements
+      loadingEffectModal: document.getElementById('loadingEffectModal'),
+      loadingEffectTitle: document.getElementById('loadingEffectTitle'),
+      loadingEffectMessage: document.getElementById('loadingEffectMessage'),
       
       // Buttons
-      startButton: document.getElementById('startButton'),
-      endButton: document.getElementById('endButton'),
-      
-      // Modals
-      successModal: document.getElementById('successModal'),
-      successTitle: document.getElementById('successTitle'),
-      successMessage: document.getElementById('successMessage'),
-      errorModal: document.getElementById('errorModal'),
-      errorTitle: document.getElementById('errorTitle'),
-      errorMessage: document.getElementById('errorMessage'),
-      passwordModal: document.getElementById('passwordModal'),
-      passwordForm: document.getElementById('passwordForm'),
-      oldPassword: document.getElementById('oldPassword'),
-      newPassword: document.getElementById('newPassword'),
-      confirmPassword: document.getElementById('confirmPassword'),
-      passwordError: document.getElementById('passwordError'),
-      passwordSuccess: document.getElementById('passwordSuccess'),
-      helpModal: document.getElementById('helpModal'),
-      
-      // System
-      systemStatus: document.getElementById('systemStatus'),
-      backgroundSlideshow: document.getElementById('backgroundSlideshow')
+      loginButton: document.getElementById('loginButton'),
+      startTimeButton: document.getElementById('startTimeButton'),
+      endTimeButton: document.getElementById('endTimeButton'),
+      logoutButton: document.getElementById('logoutButton'),
+      changePasswordButton: document.getElementById('changePasswordButton')
     };
 
     // ============================================
-    // UTILITY FUNCTIONS
+    // FUNGSI STATUS PANEL
     // ============================================
-    function showLoading(message = 'Loading...') {
-      elements.loadingText.textContent = message;
-      elements.loadingOverlay.style.display = 'flex';
-    }
-
-    function hideLoading() {
-      elements.loadingOverlay.style.display = 'none';
-    }
-
-    function showModal(modalId) {
-      document.getElementById(modalId).classList.remove('hidden');
-    }
-
-    function hideModal(modalId) {
-      document.getElementById(modalId).classList.add('hidden');
-    }
-
-    function showSuccess(title, message) {
-      elements.successTitle.textContent = title;
-      elements.successMessage.textContent = message;
-      showModal('successModal');
-    }
-
-    function showError(title, message) {
-      elements.errorTitle.textContent = title;
-      elements.errorMessage.textContent = message;
-      showModal('errorModal');
-    }
-
-    function formatTime(date) {
-      return date.toLocaleTimeString('id-ID', { 
-        hour: '2-digit', 
-        minute: '2-digit', 
-        second: '2-digit',
-        hour12: false 
-      });
-    }
-
-    function formatDate(date) {
-      return date.toLocaleDateString('id-ID', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      });
-    }
-
-    function updateClock() {
-      const now = new Date();
-      elements.clockDisplay.textContent = formatTime(now);
-      elements.dateDisplay.textContent = formatDate(now);
+    function updateStatusPanel() {
+      const today = getFormattedDate(new Date());
+      const records = JSON.parse(localStorage.getItem('attendanceRecords') || '[]');
+      let activeRecord = null;
       
-      // Update last update time
-      elements.lastUpdate.textContent = formatTime(lastUpdateTime);
-    }
-
-    // ============================================
-    // BACKGROUND SLIDESHOW
-    // ============================================
-    function initBackgroundSlideshow() {
-      BACKGROUND_IMAGES.forEach((imageUrl, index) => {
-        const img = document.createElement('img');
-        img.src = imageUrl;
-        img.classList.add('bg-image');
-        if (index === 0) img.classList.add('active');
-        elements.backgroundSlideshow.appendChild(img);
-      });
+      for (let i = 0; i < records.length; i++) {
+        const record = records[i];
+        if (record.tanggal === today && 
+            record.username === currentUser?.username && 
+            record.attendance_status === 'Active') {
+          activeRecord = record;
+          break;
+        }
+      }
       
-      // Start slideshow
-      backgroundInterval = setInterval(() => {
-        const images = document.querySelectorAll('.bg-image');
-        images[backgroundIndex].classList.remove('active');
-        backgroundIndex = (backgroundIndex + 1) % images.length;
-        images[backgroundIndex].classList.add('active');
-      }, 8000);
+      if (activeRecord) {
+        elements.statusPanel.classList.add('active');
+        elements.statusPanelIcon.className = 'fas fa-door-open';
+        elements.statusPanelTitle.textContent = 'Anda Sedang Keluar (Izin)';
+        
+        elements.statusPanelTime.innerHTML = `<div class="status-time">Mulai: ${activeRecord.waktu_mulai}</div>`;
+        
+        const startTime = activeRecord.waktu_mulai.split(':').map(Number);
+        const now = new Date();
+        const startDate = new Date();
+        startDate.setHours(startTime[0], startTime[1], startTime[2] || 0, 0);
+        
+        let durationMs = now - startDate;
+        if (durationMs < 0) durationMs += 24 * 60 * 60 * 1000;
+        
+        const durationHours = Math.floor(durationMs / (1000 * 60 * 60));
+        const durationMinutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
+        const durationSeconds = Math.floor((durationMs % (1000 * 60)) / 1000);
+        
+        elements.statusPanelDuration.innerHTML = `<div class="status-duration">
+          <i class="far fa-clock"></i>
+          <span>${durationHours}j ${durationMinutes}m ${durationSeconds}d</span>
+        </div>`;
+        
+        elements.statusPanelInfo.innerHTML = `Silakan klik "Kembali Masuk" untuk masuk`;
+        
+      } else {
+        elements.statusPanel.classList.remove('active');
+        elements.statusPanelIcon.className = 'fas fa-briefcase';
+        elements.statusPanelTitle.textContent = 'Anda sudah Kembali ke Office ';
+        
+        const remaining = maxStartLimit - todayStartCount;
+        
+        if (todayStartCount > 0) {
+          elements.statusPanelTime.innerHTML = `<div class="status-time"></div>`;
+          elements.statusPanelDuration.innerHTML = `<div class="status-duration">
+            <i class="fas fa-history"></i>
+            <span>Sisa izin: ${remaining} kali</span>
+          </div>`;
+          
+          if (remaining > 0) elements.statusPanelInfo.innerHTML = `Anda dapat izin keluar ${remaining} kali lagi hari ini`;
+          else if (remaining === 0) elements.statusPanelInfo.innerHTML = `Anda sudah mencapai batas maksimal izin hari ini`;
+        } else {
+          elements.statusPanelTime.innerHTML = `<div class="status-time">Selamat datang ${currentUser?.name || ''}</div>`;
+          elements.statusPanelDuration.innerHTML = `<div class="status-duration">
+            <i class="fas fa-history"></i>
+            <span>Sisa izin: ${remaining} kali</span>
+          </div>`;
+          elements.statusPanelInfo.innerHTML = `Silakan klik "Izin Keluar" untuk keluar istirahat`;
+        }
+      }
+    }
+    
+    function startStatusPanelTimer() {
+      if (statusPanelTimer) clearInterval(statusPanelTimer);
+      statusPanelTimer = setInterval(updateStatusPanel, 1000);
+      updateStatusPanel();
+    }
+    
+    function stopStatusPanelTimer() {
+      if (statusPanelTimer) {
+        clearInterval(statusPanelTimer);
+        statusPanelTimer = null;
+      }
     }
 
     // ============================================
-    // GOOGLE APPS SCRIPT API CALLS
+    // FUNGSI WARNING JAM 23:50 - 00:01
     // ============================================
-    async function callGoogleScript(action, data = {}) {
+    function isRestrictedTime() {
+        const now = new Date();
+        const hours = now.getHours();
+        const minutes = now.getMinutes();
+        if ((hours === 23 && minutes >= 50) || (hours === 0 && minutes <= 1)) return true;
+        return false;
+    }
+
+    function updateTimeRestriction() {
+        const warningElement = document.getElementById('timeWarning');
+        const warningText = document.getElementById('warningText');
+        const startButton = document.getElementById('startTimeButton');
+        
+        if (isRestrictedTime()) {
+            warningElement.style.display = 'block';
+            warningText.textContent = '⚠️ Izin keluar tidak tersedia pada pukul 23:50 - 00:01 WIB ⚠️';
+            startButton.disabled = true;
+            startButton.classList.add('disabled-btn');
+            startButton.innerHTML = '<i class="fas fa-ban"></i> Izin Keluar (Tidak Tersedia)';
+            return true;
+        } else {
+            warningElement.style.display = 'none';
+            if (!isBlocked && !checkActiveRecord() && todayStartCount < maxStartLimit) {
+                startButton.disabled = false;
+                startButton.classList.remove('disabled-btn');
+                startButton.innerHTML = '<i class="fas fa-door-open"></i> Izin Keluar';
+            }
+            return false;
+        }
+    }
+
+    function checkActiveRecord() {
+        const today = getFormattedDate(new Date());
+        const records = JSON.parse(localStorage.getItem('attendanceRecords') || '[]');
+        for (let i = 0; i < records.length; i++) {
+            const record = records[i];
+            if (record.tanggal === today && 
+                record.username === currentUser?.username && 
+                record.attendance_status === 'Active') return true;
+        }
+        return false;
+    }
+
+    // ============================================
+    // FUNGSI CEK BATAS MAKSIMAL IZIN KELUAR
+    // ============================================
+    async function checkStartTimeLimit() {
+        try {
+            if (!currentUser || !currentUser.username) return { success: false, canStart: false, message: 'User not found' };
+            const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=checkStartTimeLimit&username=${encodeURIComponent(currentUser.username)}`);
+            const data = await response.json();
+            if (data.hardStop && data.count >= maxStartLimit) isMaxLimitReached = true;
+            else isMaxLimitReached = false;
+            return data;
+        } catch (error) {
+            console.error('Error checking izin keluar limit:', error);
+            return { success: false, canStart: true, message: 'Error checking limit' };
+        }
+    }
+
+    function updateStartCounterUI(limitData) {
+        if (limitData.success) {
+            todayStartCount = limitData.count || 0;
+            const remaining = limitData.remaining || 4 - todayStartCount;
+            const maxCount = limitData.maxCount || 4;
+            
+            if (limitData.hardStop && todayStartCount >= maxCount && !checkActiveRecord()) {
+                isBlocked = true;
+                if(elements.maxLimitAlert) elements.maxLimitAlert.style.display = 'block';
+                elements.normalDashboard.style.display = 'none';
+                elements.blockedDashboard.style.display = 'block';
+                elements.startTimeButton.disabled = true;
+                elements.startTimeButton.classList.add('disabled-btn');
+                elements.startTimeButton.innerHTML = '<i class="fas fa-ban"></i> STOP (Sudah 4x)';
+                showMaxLimitModal();
+            } else {
+                isBlocked = false;
+                if(elements.maxLimitAlert) elements.maxLimitAlert.style.display = 'none';
+                elements.normalDashboard.style.display = 'block';
+                elements.blockedDashboard.style.display = 'none';
+                if (!checkActiveRecord() && !isRestrictedTime() && todayStartCount < maxCount) {
+                    elements.startTimeButton.disabled = false;
+                    elements.startTimeButton.classList.remove('disabled-btn');
+                    elements.startTimeButton.innerHTML = '<i class="fas fa-door-open"></i> Izin Keluar';
+                }
+            }
+            
+            if (limitData.message) updateConnectionStatus(true, limitData.message);
+        }
+        updateStatusPanel();
+    }
+
+    function showMaxLimitModal() { elements.maxLimitModal.style.display = 'flex'; }
+    function closeMaxLimitModal() { elements.maxLimitModal.style.display = 'none'; }
+
+    // ============================================
+    // FUNGSI GANTI PASSWORD
+    // ============================================
+    function showPasswordChangeModal() {
+      elements.modalOldPassword.value = '';
+      elements.modalNewPassword.value = '';
+      elements.modalConfirmPassword.value = '';
+      elements.passwordMessage.style.display = 'none';
+      elements.passwordMessage.textContent = '';
+      elements.passwordChangeModal.style.display = 'flex';
+    }
+
+    function closePasswordChangeModal() { elements.passwordChangeModal.style.display = 'none'; }
+
+    async function changePassword() {
+      const oldPassword = elements.modalOldPassword.value.trim();
+      const newPassword = elements.modalNewPassword.value.trim();
+      const confirmPassword = elements.modalConfirmPassword.value.trim();
+      
+      if (!oldPassword || !newPassword || !confirmPassword) {
+        showPasswordMessage('Semua field harus diisi!', 'error'); return;
+      }
+      if (newPassword !== confirmPassword) {
+        showPasswordMessage('Password baru dan konfirmasi tidak cocok!', 'error'); return;
+      }
+      if (oldPassword === newPassword) {
+        showPasswordMessage('Password baru harus berbeda dengan password lama!', 'error'); return;
+      }
+      
+      showLoading('Mengubah password...');
       try {
         const formData = new FormData();
-        formData.append('action', action);
+        formData.append('action', 'changePassword');
+        formData.append('username', currentUser.username);
+        formData.append('oldPassword', oldPassword);
+        formData.append('newPassword', newPassword);
         
-        // Add data to formData
-        Object.keys(data).forEach(key => {
-          formData.append(key, data[key]);
-        });
+        const response = await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData });
+        const result = await response.json();
         
-        const response = await fetch(GOOGLE_SCRIPT_URL, {
-          method: 'POST',
-          body: formData,
-          mode: 'no-cors'
-        });
-        
-        // Note: Karena mode no-cors, kita tidak bisa membaca response body
-        // Tapi request tetap dikirim ke server
-        return { success: true, message: 'Request sent successfully' };
-      } catch (error) {
-        console.error('Error calling Google Script:', error);
-        return { success: false, message: error.message };
-      }
-    }
-
-    // Untuk GET requests (dengan query parameters)
-    async function getGoogleScript(action, params = {}) {
-      try {
-        const url = new URL(GOOGLE_SCRIPT_URL);
-        url.searchParams.append('action', action);
-        
-        Object.keys(params).forEach(key => {
-          url.searchParams.append(key, params[key]);
-        });
-        
-        // Untuk development, kita bisa menggunakan mode cors
-        // Tapi di production harus no-cors
-        const response = await fetch(url.toString(), {
-          method: 'GET'
-        });
-        
-        if (response.ok) {
-          return await response.text();
+        if (result.success) {
+          showPasswordMessage('Password berhasil diubah!', 'success');
+          if (currentUser) {
+            currentUser.password = newPassword;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+          }
+          setTimeout(() => {
+            closePasswordChangeModal();
+            showPopup(`<div style="color:#2ed573;text-align:center;"><i class="fas fa-check-circle fa-2x"></i><br><strong>Password Berhasil Diubah!</strong></div>`, 4000);
+          }, 2000);
         } else {
-          throw new Error(`HTTP ${response.status}`);
+          showPasswordMessage(result.message || 'Gagal mengubah password!', 'error');
         }
       } catch (error) {
-        console.error(`Error in ${action}:`, error);
-        throw error;
+        console.error('Error changing password:', error);
+        showPasswordMessage('Terjadi kesalahan saat mengubah password', 'error');
+      } finally {
+        hideLoading();
       }
     }
 
+    function showPasswordMessage(message, type) {
+      elements.passwordMessage.textContent = message;
+      elements.passwordMessage.className = `password-message ${type}`;
+      elements.passwordMessage.style.display = 'block';
+      setTimeout(() => { elements.passwordMessage.style.display = 'none'; }, 5000);
+    }
+
     // ============================================
-    // MAINTENANCE CHECK
+    // INISIALISASI
     // ============================================
-    async function checkMaintenance() {
+    document.addEventListener('DOMContentLoaded', function() {
+      setupEventListeners();
+      updateClock();
+      setInterval(updateClock, 1000);
+      getUserIP();
+      loadBackgroundImages();
+      checkLoginStatus();
+      testConnection();
+      setInterval(updateTimeRestriction, 30000);
+      
+      setInterval(async () => {
+          if (currentUser && !isBlocked) {
+              const limitData = await checkStartTimeLimit();
+              updateStartCounterUI(limitData);
+          }
+      }, 60000);
+      
+      document.addEventListener('contextmenu', event => event.preventDefault());
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key)) || (e.ctrlKey && e.key === 'U')) e.preventDefault();
+      });
+    });
+
+    function setupEventListeners() {
+      elements.password.addEventListener('keypress', function(e) { if (e.key === 'Enter') login(); });
+      
+      // Start Time Button dengan loading effect
+      elements.startTimeButton.addEventListener('click', function() {
+        showLoadingEffect(
+          "PROSES IZIN KELUAR", 
+          "Proses keluar anda sedang dalam antrian server LINETOGEL"
+        );
+        setTimeout(() => {
+          startTime();
+        }, 2000);
+      });
+      
+      // End Time Button dengan loading effect
+      elements.endTimeButton.addEventListener('click', function() {
+        showLoadingEffect(
+          "PROSES KEMBALI MASUK", 
+          "Proses masuk anda sedang di proses server LINETOGEL"
+        );
+        setTimeout(() => {
+          endTime();
+        }, 2000);
+      });
+      
+      elements.logoutButton.addEventListener('click', function(e) { e.preventDefault(); logout(); });
+      elements.logoutButtonBlocked.addEventListener('click', function(e) { e.preventDefault(); logout(); });
+      
+      elements.changePasswordButton.addEventListener('click', showPasswordChangeModal);
+      elements.modalSavePasswordBtn.addEventListener('click', changePassword);
+      elements.modalCancelPasswordBtn.addEventListener('click', closePasswordChangeModal);
+      
+      elements.passwordChangeModal.addEventListener('click', function(e) { if (e.target === elements.passwordChangeModal) closePasswordChangeModal(); });
+      elements.popupOverlay.addEventListener('click', function(e) { if (e.target === elements.popupOverlay) hidePopup(); });
+      elements.maxLimitModal.addEventListener('click', function(e) { if (e.target === elements.maxLimitModal) closeMaxLimitModal(); });
+      elements.loadingEffectModal.addEventListener('click', function(e) { if (e.target === elements.loadingEffectModal) hideLoadingEffect(); });
+    }
+
+    function logout() {
+      stopStatusPanelTimer();
+      stopRealtimeUpdates();
+      hideLoading();
+      hideLoadingEffect();
+      
+      currentUser = null;
+      userData = null;
+      jobdeskList = [];
+      accessStatus = 'OFF';
+      backgroundImages = [];
+      currentBackgroundIndex = 0;
+      attendanceRecords = [];
+      maxStartLimit = 4;
+      todayStartCount = 0;
+      isMaxLimitReached = false;
+      isBlocked = false;
+      
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('loginTime');
+      localStorage.removeItem('attendanceRecords');
+      localStorage.removeItem('currentSessionId');
+      localStorage.removeItem('databaseBackups');
+      
+      elements.username.value = '';
+      elements.password.value = '';
+      const passwordInput = document.getElementById('password');
+      const toggleIcon = document.getElementById('togglePassword');
+      if (passwordInput) passwordInput.type = "password";
+      if (toggleIcon) { toggleIcon.classList.remove("fa-eye-slash"); toggleIcon.classList.add("fa-eye"); }
+      
+      elements.jobdeskSelect.value = '';
+      elements.modalOldPassword.value = '';
+      elements.modalNewPassword.value = '';
+      elements.modalConfirmPassword.value = '';
+      
+      elements.passwordChangeModal.style.display = 'none';
+      elements.jobdeskError.style.display = 'none';
+      elements.errorMessage.textContent = '';
+      elements.errorMessage.style.display = 'none';
+      elements.ipWhitelistMessage.style.display = 'none';
+      elements.jobdeskSection.classList.add('hidden');
+      
+      if(elements.maxLimitAlert) elements.maxLimitAlert.style.display = 'none';
+      elements.normalDashboard.style.display = 'block';
+      elements.blockedDashboard.style.display = 'none';
+      
+      elements.statusPanel.classList.remove('active');
+      elements.statusPanelTitle.textContent = 'Status Izin';
+      elements.statusPanelTime.innerHTML = '';
+      elements.statusPanelDuration.innerHTML = '';
+      elements.statusPanelInfo.innerHTML = '';
+      
+      elements.dashboard.style.display = 'none';
+      elements.loginForm.style.display = 'block';
+      
+      updateConnectionStatus(true, 'Connected - Please login');
+      showPopup(`<div style="color:#2ed573;text-align:center;"><i class="fas fa-check-circle fa-2x"></i><br><strong>Logout Berhasil!</strong></div>`, 3000);
+    }
+
+    async function writeToDatabaseSheet(data) {
       try {
-        const response = await getGoogleScript('checkMaintenanceStatus');
-        return response.trim() === 'ON';
+        const formData = new FormData();
+        formData.append('action', data.action);
+        formData.append('sheetName', data.sheetName);
+        formData.append('data', JSON.stringify(data.data));
+        const response = await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData });
+        if (response.ok) {
+          const result = await response.text();
+          console.log('Data saved to Google Sheets successfully:', result);
+          return true;
+        } else {
+          saveToLocalBackup(data);
+          return false;
+        }
       } catch (error) {
-        console.error('Error checking maintenance:', error);
+        console.error('Error writing to Google Sheets:', error);
+        saveToLocalBackup(data);
         return false;
       }
     }
 
-    // ============================================
-    // LOGIN SYSTEM
-    // ============================================
-    async function getUserIP() {
+    function saveToLocalBackup(data) {
       try {
-        const response = await fetch('https://api.ipify.org?format=json');
-        const data = await response.json();
-        userIP = data.ip;
-        elements.userIP.textContent = userIP;
-        return userIP;
-      } catch (error) {
-        console.error('Error getting IP:', error);
-        userIP = '127.0.0.1';
-        return userIP;
+        const backups = JSON.parse(localStorage.getItem('databaseBackups') || '[]');
+        backups.push({ data: data, timestamp: new Date().toISOString() });
+        localStorage.setItem('databaseBackups', JSON.stringify(backups));
+      } catch (error) { console.error('Error saving to local backup:', error); }
+    }
+
+    // ==========================================
+    // OPTIMASI START TIME (DENGAN LOADING EFFECT)
+    // ==========================================
+    async function startTime() {
+      if (isRestrictedTime()) {
+        showPopup(`<div style="color:#ffa502;text-align:center;"><i class="fas fa-exclamation-triangle fa-2x"></i><br><strong>IZIN KELUAR TIDAK TERSEDIA!</strong></div>`, 5000);
+        return;
       }
+      
+      // Cek limit cepat di background, tapi UI tidak terblokir
+      checkStartTimeLimit().then(limitCheck => {
+        if (!limitCheck.success) {
+          showPopup(`<div style="color:#ffa502;text-align:center;"><i class="fas fa-exclamation-triangle fa-2x"></i><br><strong>Gagal memeriksa batas izin keluar!</strong><br>${limitCheck.message}</div>`, 5000);
+          return;
+        }
+        updateStartCounterUI(limitCheck);
+      });
+
+      const selectedJobdesk = elements.jobdeskSelect.value;
+      const requireJobdesk = ['ON', 'YES', 'TRUE', '1', 'ACTIVE', 'ENABLE'].includes(accessStatus);
+      
+      if (requireJobdesk && !selectedJobdesk) {
+        elements.jobdeskError.style.display = 'block';
+        showPopup('Silahkan pilih jobdesk terlebih dahulu', 3000);
+        return;
+      }
+      
+      elements.jobdeskError.style.display = 'none';
+      
+      // CEK MANUAL LIMIT LOKAL UNTUK PREVENSI SPAM KLIK
+      const records = JSON.parse(localStorage.getItem('attendanceRecords') || '[]');
+      const today = getFormattedDate(new Date());
+      const hasActiveRecord = records.some(record => 
+        record.tanggal === today && record.username === currentUser.username && record.attendance_status === 'Active'
+      );
+
+      if (hasActiveRecord) {
+        showPopup(`<div style="color:#ffa502;text-align:center;"><i class="fas fa-exclamation-triangle fa-2x"></i><br><strong>Anda sudah sedang keluar!</strong></div>`, 5000);
+        return;
+      }
+
+      try {
+        const now = new Date();
+        const dateStr = getFormattedDate(now);
+        const timeStr = getFormattedTime(now);
+        const dayName = now.toLocaleDateString('id-ID', { weekday: 'long' });
+        const timestamp = now.getTime().toString();
+        
+        const attendanceData = {
+          tanggal: dateStr, hari: dayName, username: currentUser.username, nama: currentUser.name,
+          status: currentUser.role, waktu_mulai: timeStr, waktu_selesai: '', jobdesk: selectedJobdesk || '',
+          ip_address: currentIP, attendance_status: 'Active', session_id: timestamp
+        };
+        
+        // 1. Simpan ke LocalStorage SEKARANG (Instan)
+        attendanceData.session_id = timestamp;
+        records.push(attendanceData);
+        localStorage.setItem('attendanceRecords', JSON.stringify(records));
+        localStorage.setItem('currentSessionId', timestamp);
+        attendanceRecords = records;
+        
+        // 2. Update UI SEKARANG (Instan)
+        if (selectedJobdesk) elements.jobdeskSelect.value = '';
+        updateTimeButtonsUI(true);
+        todayStartCount++; // Optimistic update
+        updateStartCounterUI({
+          success: true, count: todayStartCount, remaining: maxStartLimit - todayStartCount,
+          maxCount: maxStartLimit, hardStop: false
+        });
+        startStatusPanelTimer();
+
+        // 3. Feedback Instan
+        showPopup(`<div style="color:#2ed573;text-align:center;"><i class="fas fa-check-circle fa-2x"></i><br><strong>Izin Keluar Berhasil!</strong><br><small>Menyimpan ke server...</small></div>`, 3000);
+
+        // 4. Kirim ke Database di Background (Tanpa memblokir user)
+        const databaseData = { sheetName: SHEET_NAMES.DATABASE, action: 'insert', data: attendanceData };
+        writeToDatabaseSheet(databaseData).then(dbSuccess => {
+          if (dbSuccess) {
+            console.log("Server sync successful");
+            // Optional: show small silent toast if needed
+          } else {
+            console.log("Server sync failed, saved locally");
+          }
+        });
+
+      } catch (error) {
+        console.error('Error starting izin keluar:', error);
+        showPopup(`<div style="color:#ff4757;text-align:center;"><i class="fas fa-times-circle fa-2x"></i><br><strong>Error Sistem!</strong></div>`, 5000);
+      }
+    }
+
+    // ==========================================
+    // OPTIMASI END TIME (DENGAN LOADING EFFECT)
+    // ==========================================
+    async function endTime() {
+      const now = new Date();
+      const timeStr = getFormattedTime(now);
+      const today = getFormattedDate(now);
+      
+      const records = JSON.parse(localStorage.getItem('attendanceRecords') || '[]');
+      let activeRecordIndex = -1;
+      let activeRecord = null;
+      
+      for (let i = 0; i < records.length; i++) {
+        const record = records[i];
+        if (record.tanggal === today && record.username === currentUser.username && record.attendance_status === 'Active') {
+          activeRecordIndex = i;
+          activeRecord = record;
+          break;
+        }
+      }
+      
+      if (activeRecordIndex === -1) {
+        showPopup(`<div style="color:#ffa502;text-align:center;"><i class="fas fa-exclamation-triangle fa-2x"></i><br><strong>Tidak ada sesi izin keluar aktif!</strong></div>`, 5000);
+        return;
+      }
+      
+      try {
+        // Hitung Durasi
+        const startTimeStr = records[activeRecordIndex].waktu_mulai;
+        const [startHours, startMinutes, startSeconds] = startTimeStr.split(':').map(Number);
+        const [endHours, endMinutes, endSeconds] = timeStr.split(':').map(Number);
+        const startDate = new Date();
+        startDate.setHours(startHours, startMinutes, startSeconds, 0);
+        const endDate = new Date();
+        endDate.setHours(endHours, endMinutes, endSeconds, 0);
+        if (endDate < startDate) endDate.setDate(endDate.getDate() + 1);
+        
+        const durationMs = endDate - startDate;
+        const durationHours = Math.floor(durationMs / (1000 * 60 * 60));
+        const durationMinutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
+        const durationSeconds = Math.floor((durationMs % (1000 * 60)) / 1000);
+
+        // 1. Update LocalStorage SEKARANG (Instan)
+        records[activeRecordIndex].waktu_selesai = timeStr;
+        records[activeRecordIndex].attendance_status = 'Completed';
+        localStorage.setItem('attendanceRecords', JSON.stringify(records));
+        localStorage.removeItem('currentSessionId');
+        
+        // 2. Update UI SEKARANG (Instan)
+        updateTimeButtonsUI(false);
+        updateStatusPanel();
+        
+        // 3. Feedback Instan
+        showPopup(`<div style="color:#2ed573;text-align:center;"><i class="fas fa-check-circle fa-2x"></i><br><strong>Kembali Masuk Berhasil!</strong><br><small>Durasi: ${durationHours}j ${durationMinutes}m ${durationSeconds}d</small><br>Menyimpan ke server...</small></div>`, 3000);
+        
+        // 4. Update Limit di Background
+        setTimeout(async () => {
+          const limitData = await checkStartTimeLimit();
+          updateStartCounterUI(limitData);
+        }, 500);
+
+        // 5. Kirim ke Database di Background
+        const databaseData = { sheetName: SHEET_NAMES.DATABASE, action: 'update', data: records[activeRecordIndex] };
+        writeToDatabaseSheet(databaseData).then(dbSuccess => {
+           console.log(dbSuccess ? "Server sync successful" : "Saved locally");
+        });
+
+      } catch (error) {
+        console.error('Error ending izin keluar:', error);
+        showPopup(`<div style="color:#ff4757;text-align:center;"><i class="fas fa-times-circle fa-2x"></i><br><strong>Error!</strong></div>`, 5000);
+      }
+    }
+
+    function startRealtimeUpdates() {
+      console.log('Starting real-time updates...');
+      elements.realtimeIndicator.style.display = 'flex';
+      realtimeUpdateInterval = setInterval(async () => { await checkForUpdates(); }, 10000);
+      lastUpdateCheck = new Date().toISOString();
+      console.log('Real-time updates started');
+    }
+
+    function stopRealtimeUpdates() {
+      if (realtimeUpdateInterval) {
+        clearInterval(realtimeUpdateInterval);
+        realtimeUpdateInterval = null;
+      }
+      elements.realtimeIndicator.style.display = 'none';
+      console.log('Real-time updates stopped');
+    }
+
+    async function checkForUpdates() {
+      try {
+        console.log('Checking for updates...');
+        const updates = await Promise.allSettled([
+          checkUserDataUpdates(),
+          checkJobdeskUpdates(),
+          checkAccessUpdates(),
+          checkBackgroundUpdates()
+        ]);
+        
+        lastUpdateCheck = new Date().toISOString();
+        updates.forEach((result, index) => {
+          if (result.status === 'fulfilled' && result.value) console.log(`Update ${index} applied successfully`);
+        });
+      } catch (error) { console.error('Error checking for updates:', error); }
+    }
+
+    async function checkUserDataUpdates() {
+      try {
+        const latestData = await fetchGoogleSheetData(SHEET_NAMES.REGISTER, true);
+        if (!latestData || latestData.length === 0) return false;
+        const latestUserData = findUserInRegisterData(latestData, currentUser?.username);
+        if (!latestUserData) {
+          console.log('User not found in latest data, might have been deleted'); return false;
+        }
+        if (!userDataCache) { userDataCache = latestUserData; return false; }
+        const hasChanges = 
+          latestUserData.name !== userDataCache.name ||
+          latestUserData.role !== userDataCache.role ||
+          latestUserData.password !== userDataCache.password;
+        if (hasChanges) {
+          if (currentUser) {
+            currentUser.name = latestUserData.name || currentUser.name;
+            currentUser.role = latestUserData.role || currentUser.role;
+            currentUser.password = latestUserData.password || currentUser.password;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            updateUserUI();
+            showUpdateNotification('Profile data has been updated');
+          }
+          userDataCache = latestUserData;
+          return true;
+        }
+        return false;
+      } catch (error) { console.error('Error checking user data updates:', error); return false; }
+    }
+
+    async function checkJobdeskUpdates() {
+      try {
+        const latestData = await fetchGoogleSheetData(SHEET_NAMES.JOBDESK, true);
+        if (!latestData || latestData.length === 0) return false;
+        const latestJobdeskOptions = extractJobdeskOptions(latestData);
+        if (!jobdeskCache) { jobdeskCache = latestJobdeskOptions; return false; }
+        const hasChanges = JSON.stringify(latestJobdeskOptions) !== JSON.stringify(jobdeskCache);
+        if (hasChanges) {
+          jobdeskList = latestJobdeskOptions;
+          updateJobdeskDropdown(latestJobdeskOptions);
+          jobdeskCache = latestJobdeskOptions;
+          showUpdateNotification('Jobdesk options updated');
+          return true;
+        }
+        return false;
+      } catch (error) { console.error('Error checking jobdesk updates:', error); return false; }
+    }
+
+    async function checkAccessUpdates() {
+      try {
+        const latestData = await fetchGoogleSheetData(SHEET_NAMES.ACCESS, true);
+        if (!latestData || latestData.length === 0) return false;
+        const latestAccessStatus = extractAccessStatus(latestData);
+        if (!accessCache) { accessCache = latestAccessStatus; return false; }
+        const hasChanges = latestAccessStatus !== accessCache;
+        if (hasChanges) {
+          accessStatus = latestAccessStatus;
+          updateAccessUI();
+          accessCache = latestAccessStatus;
+          showUpdateNotification('Access settings updated');
+          return true;
+        }
+        return false;
+      } catch (error) { console.error('Error checking access updates:', error); return false; }
+    }
+
+    async function checkBackgroundUpdates() {
+      try {
+        const latestData = await fetchGoogleSheetData(SHEET_NAMES.BACKGROUND, true);
+        if (!latestData || latestData.length === 0) return false;
+        const latestBackgrounds = extractBackgroundImages(latestData);
+        if (!backgroundCache) { backgroundCache = latestBackgrounds; return false; }
+        const hasChanges = JSON.stringify(latestBackgrounds) !== JSON.stringify(backgroundCache);
+        if (hasChanges) {
+          backgroundImages = latestBackgrounds;
+          backgroundCache = latestBackgrounds;
+          if (latestBackgrounds.length > 0) {
+            elements.backgroundImage.src = latestBackgrounds[0];
+            elements.backgroundImage.classList.add('active');
+          }
+          showUpdateNotification('Background images updated');
+          return true;
+        }
+        return false;
+      } catch (error) { console.error('Error checking background updates:', error); return false; }
+    }
+
+    function findUserInRegisterData(registerData, username) {
+      if (!registerData || !username) return null;
+      for (let i = 0; i < registerData.length; i++) {
+        const row = registerData[i];
+        let rowUsername = '', rowPassword = '', rowName = '', rowRole = '';
+        for (const [key, value] of Object.entries(row)) {
+          const keyLower = key.toLowerCase().trim();
+          const valueStr = String(value).trim();
+          if (keyLower.includes('username') || keyLower.includes('user') || key === 'A' || key === 'Username' || key === 'USERNAME' || keyLower === 'id') rowUsername = valueStr;
+          if (keyLower.includes('password') || keyLower.includes('pass') || key === 'B' || key === 'Password' || key === 'PASSWORD') rowPassword = valueStr;
+          if (keyLower.includes('name') || keyLower.includes('nama') || key === 'C' || key === 'Name' || key === 'NAME' || 
+              keyLower.includes('fullname') || keyLower.includes('staffname') || keyLower.includes('nama lengkap') || keyLower.includes('nama staff') || keyLower.includes('employee name')) rowName = valueStr;
+          if (keyLower.includes('status') || keyLower.includes('role') || keyLower.includes('posisi') || key === 'D' || key === 'Status' || key === 'STATUS' || key === 'Role' || key === 'ROLE' || keyLower.includes('jabatan') || keyLower.includes('position')) rowRole = valueStr;
+        }
+        if (rowUsername.toLowerCase() === 'username' || rowUsername.toLowerCase() === 'user' || rowUsername.toLowerCase() === 'id' || rowUsername === '') continue;
+        if (rowUsername.toLowerCase() === username.toLowerCase()) {
+          const staffName = rowName && rowName.trim() !== '' ? rowName : rowUsername;
+          return { username: rowUsername, password: rowPassword, name: staffName, role: rowRole || 'Staff' };
+        }
+      }
+      return null;
+    }
+
+    function extractJobdeskOptions(jobdeskData) {
+      const options = [];
+      jobdeskData.forEach(row => {
+        for (const [key, value] of Object.entries(row)) {
+          const jobdesk = String(value).trim();
+          if (jobdesk && jobdesk !== '' && !options.includes(jobdesk)) options.push(jobdesk);
+        }
+      });
+      return options;
+    }
+
+    function extractAccessStatus(accessData) {
+      let status = 'OFF';
+      for (let i = 0; i < accessData.length; i++) {
+        const row = accessData[i];
+        for (const [key, value] of Object.entries(row)) {
+          const keyLower = key.toLowerCase();
+          const valueStr = String(value).toUpperCase().trim();
+          if (keyLower.includes('jobdesk') || keyLower.includes('access') || keyLower.includes('setting')) {
+            status = valueStr; break;
+          }
+        }
+        if (status !== 'OFF') break;
+      }
+      return status;
+    }
+
+    function extractBackgroundImages(backgroundData) {
+      const images = [];
+      backgroundData.forEach(row => {
+        for (const [key, value] of Object.entries(row)) {
+          const url = String(value).trim();
+          if (url && (url.startsWith('http://') || url.startsWith('https://'))) images.push(url);
+        }
+      });
+      return images;
+    }
+
+    function updateUserUI() {
+      if (currentUser) {
+        elements.staffNameDisplay.textContent = currentUser.name || currentUser.username;
+        elements.userRoleDisplay.textContent = currentUser.role || 'Staff';
+      }
+    }
+
+    function updateJobdeskDropdown(options) {
+      elements.jobdeskSelect.innerHTML = '<option value="">-- Silahkan Pilih --</option>';
+      options.forEach(option => {
+        const optElement = document.createElement('option');
+        optElement.value = option;
+        optElement.textContent = option;
+        elements.jobdeskSelect.appendChild(optElement);
+      });
+    }
+
+    function updateAccessUI() {
+      const requireJobdesk = ['ON', 'YES', 'TRUE', '1', 'ACTIVE', 'ENABLE'].includes(accessStatus);
+      if (requireJobdesk) elements.jobdeskSection.classList.remove('hidden');
+      else elements.jobdeskSection.classList.add('hidden');
+    }
+
+    function showUpdateNotification(message) {
+      elements.updateMessage.textContent = message;
+      elements.updateNotification.classList.add('show');
+      setTimeout(() => { elements.updateNotification.classList.remove('show'); }, 3000);
+    }
+
+    async function fetchGoogleSheetData(sheetName, background = false) {
+      try {
+        if (!background) showLoading(`Loading ${sheetName}...`);
+        const url = `https://opensheet.elk.sh/${SPREADSHEET_ID}/${sheetName}`;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        const data = await response.json();
+        if (!background) hideLoading();
+        return data;
+      } catch (error) {
+        console.error(`Error loading ${sheetName}:`, error);
+        if (!background) hideLoading();
+        return [];
+      }
+    }
+
+    function updateClock() {
+      const now = new Date();
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      const seconds = now.getSeconds().toString().padStart(2, '0');
+      
+      const clockElement = document.getElementById('MyClockDisplay');
+      if (clockElement) {
+        clockElement.textContent = `${hours}:${minutes}:${seconds}`;
+        if (isRestrictedTime()) {
+          clockElement.style.color = '#ff4757';
+          clockElement.style.textShadow = '0 0 10px rgba(255, 71, 87, 0.8), 0 0 20px rgba(255, 71, 87, 0.4)';
+        } else {
+          clockElement.style.color = '#00f2ff';
+          clockElement.style.textShadow = '0 0 10px rgba(0, 242, 255, 0.5), 0 0 20px rgba(0, 242, 255, 0.3)';
+        }
+      }
+      if (seconds === '00') updateTimeRestriction();
     }
 
     async function login() {
@@ -1587,633 +2328,479 @@
       const password = elements.password.value.trim();
       
       if (!username || !password) {
-        elements.loginError.textContent = 'Username dan password harus diisi';
-        elements.loginError.style.display = 'block';
-        return;
+        showError('Please enter username and password'); return;
       }
       
-      showLoading('Memeriksa login...');
-      
+      showLoading('Checking credentials...');
       try {
-        // Cek maintenance mode dulu
-        const maintenance = await checkMaintenance();
-        if (maintenance) {
-          elements.loginForm.classList.add('hidden');
-          elements.maintenanceMode.classList.remove('hidden');
-          hideLoading();
-          return;
+        const registerData = await fetchGoogleSheetData(SHEET_NAMES.REGISTER);
+        if (registerData.length === 0) {
+          showError('No user data found in system'); hideLoading(); return;
         }
         
-        // Panggil Google Apps Script untuk login
-        const response = await getGoogleScript('checkLogin', {
-          username: username,
-          password: password,
-          ipAddress: userIP
-        });
-        
-        console.log('Login response:', response);
-        
-        // Parse response (bisa string error atau JSON success)
-        try {
-          const result = JSON.parse(response);
-          
-          if (result.success) {
-            // Login berhasil
-            currentUser = {
-              username: result.username,
-              role: result.role,
-              name: result.username // GAS tidak mengembalikan nama, jadi pakai username
-            };
-            
-            // Simpan ke localStorage
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
-            localStorage.setItem('loginTime', new Date().toISOString());
-            
-            // Update UI
-            updateUserInfo();
-            loadDashboard();
-            
-            // Hide login error jika ada
-            elements.loginError.style.display = 'none';
-            
-            // Show success message
-            showSuccess('Login Berhasil', `Selamat datang ${currentUser.name}!`);
-            
-          } else {
-            // Login gagal
-            elements.loginError.textContent = result.message || 'Username atau password salah';
-            elements.loginError.style.display = 'block';
-          }
-          
-        } catch (parseError) {
-          // Jika response bukan JSON (kemungkinan error message langsung)
-          if (response.includes('Whitelist')) {
-            elements.ipWarning.textContent = response;
-            elements.ipWarning.style.display = 'block';
-            elements.loginError.style.display = 'none';
-          } else {
-            elements.loginError.textContent = response || 'Terjadi kesalahan pada sistem';
-            elements.loginError.style.display = 'block';
-            elements.ipWarning.style.display = 'none';
-          }
+        const userFound = findUserInRegisterData(registerData, username);
+        if (!userFound || userFound.password !== password) {
+          showError('❌ Username atau Password salah!'); hideLoading(); return;
         }
         
+        const isWhitelisted = await checkIPWhitelist();
+        if (!isWhitelisted) {
+          elements.ipWhitelistMessage.style.display = 'block';
+          elements.ipWhitelistMessage.innerHTML = `<i class="fas fa-shield-alt"></i> IP Anda (${currentIP}) belum di-whitelist.<br>Silahkan hubungi administrator untuk meng-whitelist IP Anda.`;
+          hideLoading(); return;
+        }
+        
+        currentUser = userFound;
+        userDataCache = userFound;
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        localStorage.setItem('loginTime', new Date().toISOString());
+        
+        await initializeCaches();
+        await loadDashboard();
+        
+        const limitData = await checkStartTimeLimit();
+        updateStartCounterUI(limitData);
+        startStatusPanelTimer();
+        startRealtimeUpdates();
+        
+        updateConnectionStatus(true, `Logged in as ${userFound.name}`);
       } catch (error) {
         console.error('Login error:', error);
-        elements.loginError.textContent = 'Gagal menghubungi server. Coba lagi nanti.';
-        elements.loginError.style.display = 'block';
+        showError(`Login failed: ${error.message}`);
       }
-      
       hideLoading();
     }
 
-    function updateUserInfo() {
-      if (!currentUser) return;
-      
-      // Set avatar dengan inisial
-      const initials = currentUser.name.charAt(0).toUpperCase();
-      elements.userAvatar.textContent = initials;
-      
-      // Set nama dan role
-      elements.userName.textContent = currentUser.name;
-      elements.userRole.textContent = currentUser.role || 'Staff';
-      
-      // Generate session ID
-      const sessionId = 'SESS-' + Date.now().toString(36).toUpperCase();
-      elements.sessionId.textContent = sessionId;
+    async function initializeCaches() {
+      try {
+        const [registerData, jobdeskData, accessData, backgroundData] = await Promise.all([
+          fetchGoogleSheetData(SHEET_NAMES.REGISTER, true),
+          fetchGoogleSheetData(SHEET_NAMES.JOBDESK, true),
+          fetchGoogleSheetData(SHEET_NAMES.ACCESS, true),
+          fetchGoogleSheetData(SHEET_NAMES.BACKGROUND, true)
+        ]);
+        if (currentUser) userDataCache = findUserInRegisterData(registerData, currentUser.username);
+        jobdeskCache = extractJobdeskOptions(jobdeskData);
+        accessCache = extractAccessStatus(accessData);
+        backgroundCache = extractBackgroundImages(backgroundData);
+        console.log('Caches initialized successfully');
+      } catch (error) { console.error('Error initializing caches:', error); }
     }
 
-    // ============================================
-    // DASHBOARD FUNCTIONS
-    // ============================================
-    function loadDashboard() {
-      // Hide other containers
-      elements.maintenanceMode.classList.add('hidden');
-      elements.loginForm.classList.add('hidden');
-      
-      // Show dashboard
-      elements.dashboard.classList.remove('hidden');
-      
-      // Start clock
-      updateClock();
-      clockInterval = setInterval(updateClock, 1000);
-      
-      // Load jobdesk options
-      loadJobdeskOptions();
-      
-      // Check current status
-      checkUserStatus();
-      
-      // Start status updates
-      startStatusUpdates();
-      
-      // Update system status
-      updateSystemStatus('Terhubung');
+    async function checkIPWhitelist() {
+      try {
+        const whitelistData = await fetchGoogleSheetData(SHEET_NAMES.WHITELIST, true);
+        if (whitelistData.length === 0) return true;
+        for (let i = 0; i < whitelistData.length; i++) {
+          const row = whitelistData[i];
+          for (const [key, value] of Object.entries(row)) {
+            const ipFromSheet = String(value).trim();
+            if (!ipFromSheet) continue;
+            if (ipFromSheet === currentIP) return true;
+            if (ipFromSheet.includes('*')) {
+              const ipPattern = ipFromSheet.replace(/\*/g, '.*');
+              const regex = new RegExp(`^${ipPattern}$`);
+              if (regex.test(currentIP)) return true;
+            }
+          }
+        }
+        return false;
+      } catch (error) {
+        console.error('Error checking IP whitelist:', error);
+        return true;
+      }
+    }
+
+    async function loadDashboard() {
+      try {
+        elements.loginForm.style.display = "none";
+        elements.dashboard.style.display = "block";
+        elements.dashboard.classList.remove("hidden");
+        updateUserUI();
+        await loadAccessSettings();
+        await loadJobdeskOptions();
+        updateTimeRestriction();
+        elements.errorMessage.textContent = '';
+        elements.ipWhitelistMessage.style.display = 'none';
+        elements.jobdeskError.style.display = 'none';
+        elements.modalOldPassword.value = '';
+        elements.modalNewPassword.value = '';
+        elements.modalConfirmPassword.value = '';
+        setTimeout(() => { elements.dashboard.scrollIntoView({ behavior: 'smooth' }); }, 100);
+        console.log('Dashboard loaded successfully for staff:', currentUser.name);
+        updateClock();
+        updateStatusPanel();
+      } catch (error) {
+        console.error('Error loading dashboard:', error);
+        elements.loginForm.style.display = "none";
+        elements.dashboard.style.display = "block";
+        elements.dashboard.classList.remove("hidden");
+        updateTimeRestriction();
+      }
+    }
+
+    async function loadAccessSettings() {
+      try {
+        const accessData = await fetchGoogleSheetData(SHEET_NAMES.ACCESS);
+        accessStatus = extractAccessStatus(accessData);
+        accessCache = accessStatus;
+        updateAccessUI();
+      } catch (error) {
+        console.error('Error loading access settings:', error);
+        accessStatus = 'OFF';
+        elements.jobdeskSection.classList.add('hidden');
+      }
     }
 
     async function loadJobdeskOptions() {
       try {
-        const response = await getGoogleScript('getJobdeskOptions');
-        
-        try {
-          const options = JSON.parse(response);
-          if (Array.isArray(options) && options.length > 0) {
-            jobdeskOptions = options;
-            
-            // Clear existing options
-            elements.jobdeskSelect.innerHTML = '<option value="">-- Silahkan Pilih --</option>';
-            
-            // Add new options
-            options.forEach(option => {
-              const optionElement = document.createElement('option');
-              optionElement.value = option;
-              optionElement.textContent = option;
-              elements.jobdeskSelect.appendChild(optionElement);
-            });
-            
-            // Check if jobdesk is required
-            const accessResponse = await getGoogleScript('checkAccess');
-            if (accessResponse.trim() === 'ON') {
-              elements.jobdeskSection.classList.remove('hidden');
-            } else {
-              elements.jobdeskSection.classList.add('hidden');
-            }
-          }
-        } catch (parseError) {
-          console.error('Error parsing jobdesk options:', parseError);
-        }
-      } catch (error) {
-        console.error('Error loading jobdesk options:', error);
-      }
+        const jobdeskData = await fetchGoogleSheetData(SHEET_NAMES.JOBDESK);
+        jobdeskList = extractJobdeskOptions(jobdeskData);
+        jobdeskCache = jobdeskList;
+        updateJobdeskDropdown(jobdeskList);
+      } catch (error) { console.error('Error loading jobdesk options:', error); }
     }
 
-    async function checkUserStatus() {
+    async function loadBackgroundImages() {
       try {
-        // Get today's date
-        const today = new Date().toISOString().split('T')[0];
-        
-        // In a real implementation, you would fetch from Google Sheets
-        // For now, we'll use localStorage
-        const sessions = JSON.parse(localStorage.getItem('userSessions') || '[]');
-        
-        const activeSession = sessions.find(session => 
-          session.username === currentUser.username && 
-          session.date === today && 
-          session.status === 'active'
-        );
-        
-        if (activeSession) {
-          currentSession = activeSession;
-          updateStatusPanel(true);
+        const backgroundData = await fetchGoogleSheetData(SHEET_NAMES.BACKGROUND);
+        backgroundImages = extractBackgroundImages(backgroundData);
+        backgroundCache = backgroundImages;
+        if (backgroundImages.length > 0) {
+          elements.backgroundImage.src = backgroundImages[0];
+          setTimeout(() => { elements.backgroundImage.classList.add('active'); }, 100);
+          if (backgroundImages.length > 1) startBackgroundSlideshow();
         } else {
-          currentSession = null;
-          updateStatusPanel(false);
+          const defaultBackgrounds = [
+            'https://images.unsplash.com/photo-1519681393784-d120267933ba',
+            'https://images.unsplash.com/photo-1506905925346-21bda4d32df4',
+            'https://images.unsplash.com/photo-1540206395-68808572332f'
+          ];
+          elements.backgroundImage.src = defaultBackgrounds[0];
+          elements.backgroundImage.classList.add('active');
+          backgroundImages = defaultBackgrounds;
+          startBackgroundSlideshow();
         }
-        
-        // Check time restrictions
-        checkTimeRestrictions();
-        
       } catch (error) {
-        console.error('Error checking user status:', error);
+        console.error('Error loading background images:', error);
+        elements.backgroundImage.src = 'https://images.unsplash.com/photo-1519681393784-d120267933ba';
+        elements.backgroundImage.classList.add('active');
       }
     }
 
-    function updateStatusPanel(isActive) {
-      if (isActive && currentSession) {
-        // User is currently out
-        elements.statusPanel.classList.add('active');
-        elements.statusIcon.className = 'fas fa-door-open';
-        elements.statusTitle.textContent = 'Sedang Izin Keluar';
-        elements.statusTime.textContent = `Mulai: ${currentSession.startTime}`;
-        
-        // Calculate duration
-        const startTime = new Date(currentSession.startTime);
-        const now = new Date();
-        const diffMs = now - startTime;
-        const diffMins = Math.floor(diffMs / 60000);
-        const diffHours = Math.floor(diffMins / 60);
-        const remainingMins = diffMins % 60;
-        
-        elements.statusDuration.textContent = `${diffHours}j ${remainingMins}m`;
-        elements.statusInfo.textContent = 'Silakan klik "Kembali Masuk" saat sudah kembali';
-        
-        // Update buttons
-        elements.startButton.disabled = true;
-        elements.endButton.disabled = false;
-        
-      } else {
-        // User is in office
-        elements.statusPanel.classList.remove('active');
-        elements.statusIcon.className = 'fas fa-briefcase';
-        elements.statusTitle.textContent = 'Sedang di Kantor';
-        elements.statusTime.textContent = '-';
-        elements.statusDuration.textContent = '-';
-        elements.statusInfo.textContent = 'Silakan klik "Izin Keluar" jika perlu keluar';
-        
-        // Update buttons
-        elements.startButton.disabled = false;
-        elements.endButton.disabled = true;
-        
-        // Check max limit
-        checkMaxLimit();
-      }
+    function startBackgroundSlideshow() {
+      if (backgroundImages.length <= 1) return;
+      setInterval(() => {
+        currentBackgroundIndex = (currentBackgroundIndex + 1) % backgroundImages.length;
+        elements.backgroundImage.classList.remove('active');
+        setTimeout(() => {
+          elements.backgroundImage.src = backgroundImages[currentBackgroundIndex];
+          setTimeout(() => { elements.backgroundImage.classList.add('active'); }, 100);
+        }, 1000);
+      }, 10000);
     }
 
-    function checkTimeRestrictions() {
-      const now = new Date();
-      const hours = now.getHours();
-      const minutes = now.getMinutes();
-      
-      // Check if time is between 23:50 and 00:01
-      if ((hours === 23 && minutes >= 50) || (hours === 0 && minutes <= 1)) {
-        elements.timeRestrictionAlert.classList.remove('hidden');
-        elements.startButton.disabled = true;
+    function updateTimeButtonsUI(isActive) {
+      if (isActive) {
+        elements.startTimeButton.disabled = true;
+        elements.startTimeButton.style.opacity = '0.5';
+        elements.endTimeButton.disabled = false;
+        elements.endTimeButton.style.opacity = '1';
+        elements.startTimeButton.innerHTML = '<i class="fas fa-door-open"></i> Sedang Keluar';
+        elements.endTimeButton.innerHTML = '<i class="fas fa-sign-in-alt"></i> Kembali Masuk';
       } else {
-        elements.timeRestrictionAlert.classList.add('hidden');
-        if (!currentSession) {
-          elements.startButton.disabled = false;
+        if (!isRestrictedTime() && todayStartCount < maxStartLimit && !isBlocked) {
+          elements.startTimeButton.disabled = false;
+          elements.startTimeButton.style.opacity = '1';
+          elements.startTimeButton.innerHTML = '<i class="fas fa-door-open"></i> Izin Keluar';
         }
+        elements.endTimeButton.disabled = true;
+        elements.endTimeButton.style.opacity = '0.5';
+        elements.endTimeButton.innerHTML = '<i class="fas fa-sign-in-alt"></i> Tidak Aktif';
       }
     }
 
-    function checkMaxLimit() {
-      // In a real implementation, check from Google Sheets
-      // For demo, we'll use localStorage
-      const today = new Date().toISOString().split('T')[0];
-      const sessions = JSON.parse(localStorage.getItem('userSessions') || '[]');
-      
-      const todaySessions = sessions.filter(session => 
-        session.username === currentUser.username && 
-        session.date === today && 
-        session.status === 'completed'
-      );
-      
-      if (todaySessions.length >= 4) {
-        elements.maxLimitAlert.classList.remove('hidden');
-        elements.startButton.disabled = true;
+    function updateConnectionStatus(isConnected, message) {
+      if (isConnected) {
+        elements.statusIndicator.className = 'status-indicator status-connected';
+        elements.statusText.textContent = message;
       } else {
-        elements.maxLimitAlert.classList.add('hidden');
+        elements.statusIndicator.className = 'status-indicator status-disconnected';
+        elements.statusText.textContent = message;
       }
     }
 
-    function startStatusUpdates() {
-      if (statusUpdateInterval) {
-        clearInterval(statusUpdateInterval);
-      }
-      
-      statusUpdateInterval = setInterval(() => {
-        checkUserStatus();
-        lastUpdateTime = new Date();
-      }, 30000); // Update every 30 seconds
+    function showLoading(message = 'Loading...') {
+      elements.loadingText.textContent = message;
+      elements.loadingSpinner.style.display = 'flex';
     }
 
-    function updateSystemStatus(status) {
-      elements.systemStatus.textContent = status;
+    function hideLoading() {
+      elements.loadingSpinner.style.display = 'none';
     }
 
-    // ============================================
-    // TIME TRACKING FUNCTIONS
-    // ============================================
-    async function startTime() {
-      if (!currentUser) return;
-      
-      showLoading('Memproses izin keluar...');
-      
+    function showError(message) {
+      elements.errorMessage.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+      elements.errorMessage.style.display = 'block';
+    }
+
+    function showPopup(message, duration = 5000) {
+      elements.popupMessage.innerHTML = message;
+      elements.popupOverlay.style.display = 'flex';
+      setTimeout(() => { if (elements.popupOverlay.style.display === 'flex') hidePopup(); }, duration);
+    }
+
+    function hidePopup() {
+      elements.popupOverlay.style.display = 'none';
+    }
+
+    async function getUserIP() {
       try {
-        const jobdesk = elements.jobdeskSelect.value;
-        const now = new Date();
-        const time = formatTime(now);
-        
-        // Call Google Apps Script
-        const response = await getGoogleScript('logStartTime', {
-          username: currentUser.username,
-          time: time,
-          jobdesk: jobdesk || ''
-        });
-        
-        console.log('Start time response:', response);
-        
-        // Parse response (GAS returns HTML string)
-        if (response.includes('alert-success')) {
-          // Success
-          const today = new Date().toISOString().split('T')[0];
-          
-          // Save to localStorage
-          const sessions = JSON.parse(localStorage.getItem('userSessions') || '[]');
-          sessions.push({
-            username: currentUser.username,
-            date: today,
-            startTime: time,
-            jobdesk: jobdesk,
-            status: 'active'
-          });
-          
-          localStorage.setItem('userSessions', JSON.stringify(sessions));
-          
-          // Update UI
-          checkUserStatus();
-          showSuccess('Izin Keluar Berhasil', 'Data telah dicatat. Selamat beristirahat!');
-          
-        } else if (response.includes('alert-error')) {
-          // Error
-          const errorMatch = response.match(/❌ (.+?)<\/div>/);
-          const errorMessage = errorMatch ? errorMatch[1] : 'Terjadi kesalahan';
-          
-          // Check for specific errors
-          if (response.includes('Cek Sudah Berapa')) {
-            elements.roleLimitTitle.textContent = '⚠️ BATAS ROLE TERCAPAI';
-            elements.roleLimitMessage.textContent = errorMessage;
-            elements.roleLimitAlert.classList.remove('hidden');
-          } else if (response.includes('Sudah 3 Staff')) {
-            elements.staffLimitAlert.classList.remove('hidden');
-          } else if (response.includes('Sudah 4')) {
-            elements.maxLimitMessage.textContent = errorMessage;
-            elements.maxLimitAlert.classList.remove('hidden');
-          } else {
-            showError('Gagal Izin Keluar', errorMessage);
-          }
-        }
-        
+        const response = await fetch('https://api.ipify.org?format=json');
+        const data = await response.json();
+        currentIP = data.ip;
+        elements.currentIPText.textContent = currentIP;
+        return currentIP;
       } catch (error) {
-        console.error('Error starting time:', error);
-        showError('Kesalahan Sistem', 'Gagal menghubungi server. Coba lagi nanti.');
-      }
-      
-      hideLoading();
-    }
-
-    async function endTime() {
-      if (!currentUser) return;
-      
-      showLoading('Memproses kembali masuk...');
-      
-      try {
-        const now = new Date();
-        const time = formatTime(now);
-        
-        // Call Google Apps Script
-        const response = await getGoogleScript('logEndTime', {
-          username: currentUser.username,
-          time: time
-        });
-        
-        console.log('End time response:', response);
-        
-        // Parse response
-        if (response.includes('alert-success')) {
-          // Success
-          const today = new Date().toISOString().split('T')[0];
-          
-          // Update localStorage
-          const sessions = JSON.parse(localStorage.getItem('userSessions') || '[]');
-          const activeIndex = sessions.findIndex(session => 
-            session.username === currentUser.username && 
-            session.date === today && 
-            session.status === 'active'
-          );
-          
-          if (activeIndex !== -1) {
-            sessions[activeIndex].endTime = time;
-            sessions[activeIndex].status = 'completed';
-            localStorage.setItem('userSessions', JSON.stringify(sessions));
-          }
-          
-          // Update UI
-          checkUserStatus();
-          showSuccess('Kembali Masuk Berhasil', 'Selamat datang kembali!');
-          
-        } else if (response.includes('alert-error')) {
-          // Error
-          const errorMatch = response.match(/❌ (.+?)<\/div>/);
-          const errorMessage = errorMatch ? errorMatch[1] : 'Terjadi kesalahan';
-          showError('Gagal Kembali Masuk', errorMessage);
-        }
-        
-      } catch (error) {
-        console.error('Error ending time:', error);
-        showError('Kesalahan Sistem', 'Gagal menghubungi server. Coba lagi nanti.');
-      }
-      
-      hideLoading();
-    }
-
-    // ============================================
-    // PASSWORD MANAGEMENT
-    // ============================================
-    async function changePassword() {
-      const oldPassword = elements.oldPassword.value;
-      const newPassword = elements.newPassword.value;
-      const confirmPassword = elements.confirmPassword.value;
-      
-      // Validation
-      if (!oldPassword || !newPassword || !confirmPassword) {
-        elements.passwordError.textContent = 'Semua field harus diisi';
-        elements.passwordError.classList.remove('hidden');
-        return;
-      }
-      
-      if (newPassword !== confirmPassword) {
-        elements.passwordError.textContent = 'Password baru tidak cocok';
-        elements.passwordError.classList.remove('hidden');
-        return;
-      }
-      
-      if (newPassword.length < 4) {
-        elements.passwordError.textContent = 'Password minimal 4 karakter';
-        elements.passwordError.classList.remove('hidden');
-        return;
-      }
-      
-      showLoading('Mengubah password...');
-      
-      try {
-        const response = await getGoogleScript('updatePassword', {
-          username: currentUser.username,
-          oldPassword: oldPassword,
-          newPassword: newPassword
-        });
-        
-        console.log('Password change response:', response);
-        
-        if (response.includes('berhasil diperbarui')) {
-          elements.passwordSuccess.textContent = 'Password berhasil diubah';
-          elements.passwordSuccess.classList.remove('hidden');
-          elements.passwordError.classList.add('hidden');
-          
-          // Clear form
-          elements.oldPassword.value = '';
-          elements.newPassword.value = '';
-          elements.confirmPassword.value = '';
-          
-          // Hide modal after 2 seconds
-          setTimeout(() => {
-            hideModal('passwordModal');
-            showSuccess('Password Diubah', 'Password Anda telah berhasil diperbarui.');
-          }, 2000);
-          
-        } else {
-          elements.passwordError.textContent = response;
-          elements.passwordError.classList.remove('hidden');
-          elements.passwordSuccess.classList.add('hidden');
-        }
-        
-      } catch (error) {
-        console.error('Error changing password:', error);
-        elements.passwordError.textContent = 'Gagal menghubungi server';
-        elements.passwordError.classList.remove('hidden');
-        elements.passwordSuccess.classList.add('hidden');
-      }
-      
-      hideLoading();
-    }
-
-    function showChangePassword() {
-      // Clear previous messages
-      elements.passwordError.classList.add('hidden');
-      elements.passwordSuccess.classList.add('hidden');
-      elements.oldPassword.value = '';
-      elements.newPassword.value = '';
-      elements.confirmPassword.value = '';
-      
-      showModal('passwordModal');
-    }
-
-    // ============================================
-    // HELPER FUNCTIONS
-    // ============================================
-    function showHelp() {
-      showModal('helpModal');
-    }
-
-    function togglePasswordVisibility(inputId, toggleId) {
-      const input = document.getElementById(inputId);
-      const toggle = document.getElementById(toggleId);
-      
-      if (input.type === 'password') {
-        input.type = 'text';
-        toggle.classList.remove('fa-eye');
-        toggle.classList.add('fa-eye-slash');
-      } else {
-        input.type = 'password';
-        toggle.classList.remove('fa-eye-slash');
-        toggle.classList.add('fa-eye');
+        console.error('Error getting IP address:', error);
+        currentIP = '127.0.0.1';
+        elements.currentIPText.textContent = 'Error getting IP';
+        return currentIP;
       }
     }
 
-    function logout() {
-      // Clear intervals
-      if (clockInterval) clearInterval(clockInterval);
-      if (statusUpdateInterval) clearInterval(statusUpdateInterval);
-      if (backgroundInterval) clearInterval(backgroundInterval);
-      
-      // Clear user data
-      currentUser = null;
-      currentSession = null;
-      localStorage.removeItem('currentUser');
-      localStorage.removeItem('loginTime');
-      
-      // Reset forms
-      elements.username.value = '';
-      elements.password.value = '';
-      elements.loginError.style.display = 'none';
-      elements.ipWarning.style.display = 'none';
-      
-      // Show login form
-      elements.dashboard.classList.add('hidden');
-      elements.maintenanceMode.classList.add('hidden');
-      elements.loginForm.classList.remove('hidden');
-      
-      // Update system status
-      updateSystemStatus('Silakan login');
-      
-      showSuccess('Logout Berhasil', 'Anda telah berhasil logout dari sistem.');
+    function updateDebugInfo(message) {
+      elements.debugInfo.textContent = message;
+      elements.debugInfo.style.display = 'block';
+      setTimeout(() => { elements.debugInfo.style.display = 'none'; }, 5000);
     }
 
-    // ============================================
-    // INITIALIZATION
-    // ============================================
-    async function init() {
-      showLoading('Menyiapkan sistem...');
-      
-      // Initialize background slideshow
-      initBackgroundSlideshow();
-      
-      // Get user IP
-      await getUserIP();
-      
-      // Check maintenance mode
-      const maintenance = await checkMaintenance();
-      if (maintenance) {
-        elements.maintenanceMode.classList.remove('hidden');
-        elements.loginForm.classList.add('hidden');
-        hideLoading();
-        return;
-      }
-      
-      // Check if user is already logged in
+    function testConnection() {
+      updateConnectionStatus(true, 'Testing connection...');
+      setTimeout(() => { updateConnectionStatus(true, 'Connected to Server'); }, 2000);
+    }
+
+    function checkLoginStatus() {
       const savedUser = localStorage.getItem('currentUser');
       const loginTime = localStorage.getItem('loginTime');
-      
       if (savedUser && loginTime) {
-        const loginDate = new Date(loginTime);
-        const now = new Date();
-        const hoursDiff = (now - loginDate) / (1000 * 60 * 60);
-        
-        if (hoursDiff < 8) {
-          // Auto login
-          currentUser = JSON.parse(savedUser);
-          updateUserInfo();
-          loadDashboard();
-          hideLoading();
-          return;
-        } else {
-          // Session expired
-          localStorage.removeItem('currentUser');
-          localStorage.removeItem('loginTime');
+        try {
+          const loginDate = new Date(loginTime);
+          const now = new Date();
+          const hoursDiff = (now - loginDate) / (1000 * 60 * 60);
+          if (hoursDiff < 8) {
+            currentUser = JSON.parse(savedUser);
+            const records = JSON.parse(localStorage.getItem('attendanceRecords') || '[]');
+            const today = getFormattedDate(now);
+            const activeRecord = records.find(r => r.tanggal === today && r.username === currentUser.username && r.attendance_status === 'Active');
+            loadDashboard();
+            if (activeRecord) updateTimeButtonsUI(true);
+            else updateTimeButtonsUI(false);
+            startStatusPanelTimer();
+            startRealtimeUpdates();
+            setTimeout(async () => {
+              const limitData = await checkStartTimeLimit();
+              updateStartCounterUI(limitData);
+            }, 500);
+            console.log('Auto login successful with state restoration');
+            return true;
+          } else {
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('loginTime');
+            return false;
+          }
+        } catch (error) {
+          console.error('Error checking saved login:', error);
+          return false;
         }
       }
-      
-      // Show login form
-      elements.loginForm.classList.remove('hidden');
-      hideLoading();
-      
-      // Update system status
-      updateSystemStatus('Siap');
+      return false;
     }
 
     // ============================================
-    // EVENT LISTENERS
+    // EXPORT UNTUK DEBUGGING
     // ============================================
-    // Login form submission
-    elements.loginFormElement.addEventListener('submit', function(e) {
-      e.preventDefault();
-      login();
-    });
-
-    // Password toggle
-    elements.togglePassword.addEventListener('click', function() {
-      const passwordInput = elements.password;
-      const icon = this.querySelector('i');
-      
-      if (passwordInput.type === 'password') {
-        passwordInput.type = 'text';
-        icon.classList.remove('fa-eye');
-        icon.classList.add('fa-eye-slash');
-      } else {
-        passwordInput.type = 'password';
-        icon.classList.remove('fa-eye-slash');
-        icon.classList.add('fa-eye');
-      }
-    });
-
-    // Password form submission
-    elements.passwordForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      changePassword();
-    });
-
-    // Initialize on load
-    document.addEventListener('DOMContentLoaded', init);
+    window.app = {
+      currentUser, testConnection, checkForUpdates, checkIPWhitelist, showPopup, hidePopup,
+      startTime, endTime, login, logout, startRealtimeUpdates, stopRealtimeUpdates,
+      writeToDatabaseSheet, checkStartTimeLimit, updateStartCounterUI, isRestrictedTime,
+      updateTimeRestriction, isBlocked, isMaxLimitReached, updateStatusPanel,
+      showPasswordChangeModal, changePassword, toggleModalPassword,
+      showLoadingEffect, hideLoadingEffect
+    };
+    
+    console.log('Time Tracker System Ready with Loading Effects!');
   </script>
+  <!-- Bootstrap JS for modal -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"version":"2024.11.0","token":"e3c1c9af36de41759418005494a48906","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"version":"2024.11.0","token":"e3c1c9af36de41759418005494a48906","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
+<script>
+/**
+* Simple keyboard shortcut handler
+*/
+const shortcut = {
+  all_shortcuts: {},
+  add: function(combo, callback, options) {
+    const defaultOpts = {
+      type: "keydown",
+      propagate: false,
+      disable_in_input: false,
+      target: document,
+      keycode: false
+    };
+    const settings = Object.assign({}, defaultOpts, options || {});
+    const target = typeof settings.target === "string"
+      ? document.getElementById(settings.target)
+      : settings.target;
+
+    combo = combo.toLowerCase();
+
+    const handler = function(e) {
+      e = e || window.event;
+
+      // Skip if inside input/textarea and disable_in_input = true
+      if (settings.disable_in_input) {
+        let element = e.target || e.srcElement;
+        if (element.nodeType === 3) element = element.parentNode;
+        if (element.tagName === "INPUT" || element.tagName === "TEXTAREA") return;
+      }
+
+      const code = e.keyCode || e.which;
+      let key = String.fromCharCode(code).toLowerCase();
+      if (code === 188) key = ",";
+      if (code === 190) key = ".";
+
+      const keys = combo.split("+");
+      let matchCount = 0;
+
+      const specialKeys = {
+        esc:27, escape:27, tab:9, space:32, return:13, enter:13,
+        backspace:8, left:37, up:38, right:39, down:40,
+        f1:112,f2:113,f3:114,f4:115,f5:116,f6:117,
+        f7:118,f8:119,f9:120,f10:121,f11:122,f12:123
+      };
+
+      let ctrlReq=false, shiftReq=false, altReq=false, metaReq=false;
+      let ctrl=e.ctrlKey, shift=e.shiftKey, alt=e.altKey, meta=e.metaKey;
+
+      for (let i=0; i<keys.length; i++) {
+        const k = keys[i];
+        if (k === "ctrl" || k === "control") { ctrlReq = true; matchCount++; }
+        else if (k === "shift") { shiftReq = true; matchCount++; }
+        else if (k === "alt") { altReq = true; matchCount++; }
+        else if (k === "meta") { metaReq = true; matchCount++; }
+        else if (k.length > 1) { if (specialKeys[k] === code) matchCount++; }
+        else if (settings.keycode ? settings.keycode === code : key === k) { matchCount++; }
+      }
+
+      if (
+        matchCount === keys.length &&
+        ctrl === ctrlReq && shift === shiftReq &&
+        alt === altReq && meta === metaReq
+      ) {
+        callback(e);
+        if (!settings.propagate) {
+          e.cancelBubble = true;
+          e.returnValue = false;
+          if (e.stopPropagation) e.stopPropagation();
+          if (e.preventDefault) e.preventDefault();
+          return false;
+        }
+      }
+    };
+
+    this.all_shortcuts[combo] = { callback: handler, target, event: settings.type };
+    target.addEventListener(settings.type, handler, false);
+  }
+};
+
+// Fungsi kosong yang tidak melakukan apa-apa
+function doNothing(e) {
+  // Tidak melakukan apapun, hanya mencegah aksi default
+  console.log("Shortcut diblokir: " + (e.key || e.keyCode));
+}
+
+// Fungsi untuk mengatur shortcut
+function setupShortcuts() {
+  // === Shortcut Ctrl+U ===
+  shortcut.add("Ctrl+U", doNothing);
+  
+  // === Shortcut F12 ===
+  shortcut.add("f12", doNothing);
+  
+  // === Tambahkan juga shortcut lainnya ===
+  shortcut.add("Ctrl+Shift+I", doNothing);
+  shortcut.add("Ctrl+Shift+J", doNothing);
+  shortcut.add("Ctrl+Shift+C", doNothing);
+}
+
+// Setup shortcut saat pertama kali
+setupShortcuts();
+
+// Event listener untuk mencegah semua aksi default shortcut developer
+document.addEventListener('keydown', function(e) {
+  // F12 - Developer Tools
+  if (e.keyCode === 123) {
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
+  }
+  
+  // Ctrl+Shift+I - Developer Tools
+  if (e.ctrlKey && e.shiftKey && e.keyCode === 73) {
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
+  }
+  
+  // Ctrl+Shift+J - JavaScript Console
+  if (e.ctrlKey && e.shiftKey && e.keyCode === 74) {
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
+  }
+  
+  // Ctrl+Shift+C - Inspect Element
+  if (e.ctrlKey && e.shiftKey && e.keyCode === 67) {
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
+  }
+  
+  // Ctrl+U - View Source
+  if (e.ctrlKey && e.keyCode === 85) {
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
+  }
+  
+  // Ctrl+S - Save Page
+  if (e.ctrlKey && e.keyCode === 83) {
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
+  }
+});
+
+// Mencegah klik kanan (opsional)
+document.addEventListener('contextmenu', function(e) {
+  e.preventDefault();
+  return false;
+});
+
+// Mencegah drag & drop (opsional, untuk mencegah pengambilan gambar/element)
+document.addEventListener('dragstart', function(e) {
+  e.preventDefault();
+  return false;
+});
+
+// Mencegah seleksi teks (opsional)
+document.addEventListener('selectstart', function(e) {
+  e.preventDefault();
+  return false;
+});
+</script>
 </html>
+
