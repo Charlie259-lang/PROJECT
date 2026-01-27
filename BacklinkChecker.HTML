@@ -255,42 +255,6 @@
             word-break: break-all;
         }
         
-        .promo-section {
-            margin-top: 40px;
-            padding: 25px;
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-            border-radius: 10px;
-            border-left: 4px solid #3b82f6;
-        }
-        
-        .promo-title {
-            font-size: 1.3rem;
-            color: #1e293b;
-            margin-bottom: 15px;
-        }
-        
-        .promo-text {
-            color: #475569;
-            margin-bottom: 20px;
-        }
-        
-        .promo-button {
-            background-color: #3b82f6;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            display: inline-block;
-            text-decoration: none;
-            transition: background-color 0.2s;
-        }
-        
-        .promo-button:hover {
-            background-color: #2563eb;
-        }
-        
         .no-results {
             text-align: center;
             padding: 80px 20px;
@@ -817,15 +781,6 @@
                     </div>
                 `;
             }
-            
-            // Tambahkan promo section
-            html += `
-                <div class="promo-section">
-                    <h3 class="promo-title">Need more? Try Starter plan</h3>
-                    <p class="promo-text">See what people search and spy on competitors. Learn more</p>
-                    <a href="#" class="promo-button">Get started — $29/mo</a>
-                </div>
-            `;
             
             backlinkProfile.innerHTML = html;
             backlinkProfile.style.display = 'block';
