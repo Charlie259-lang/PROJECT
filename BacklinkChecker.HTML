@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Link Redirect Checker - Tanpa Protokol</title>
+    <title>Backlink Profile Checker</title>
     <style>
         * {
             margin: 0;
@@ -13,10 +13,10 @@
         }
         
         body {
-            background-color: #f0f2f5;
-            padding: 20px;
-            color: #1a1a1a;
+            background-color: #f8fafc;
+            color: #1e293b;
             line-height: 1.6;
+            padding: 20px;
         }
         
         .container {
@@ -24,240 +24,354 @@
             margin: 0 auto;
             background-color: white;
             border-radius: 12px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
             overflow: hidden;
         }
         
         header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
             color: white;
-            padding: 30px;
-            text-align: center;
+            padding: 30px 40px;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
         }
         
         h1 {
             font-size: 2.2rem;
-            margin-bottom: 10px;
             font-weight: 700;
+            margin-bottom: 5px;
         }
         
         .subtitle {
-            font-size: 1.1rem;
+            font-size: 1rem;
             opacity: 0.9;
-            max-width: 800px;
-            margin: 0 auto;
+        }
+        
+        .domain-input-section {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            min-width: 300px;
+        }
+        
+        .domain-input-section label {
+            display: block;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            opacity: 0.9;
+        }
+        
+        .input-with-button {
+            display: flex;
+            gap: 10px;
+        }
+        
+        #domain-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            background-color: rgba(255, 255, 255, 0.95);
+        }
+        
+        #check-btn {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            white-space: nowrap;
+        }
+        
+        #check-btn:hover {
+            background-color: #2563eb;
         }
         
         .main-content {
             display: flex;
-            flex-wrap: wrap;
-            min-height: 600px;
+            min-height: 800px;
         }
         
         .input-section {
             flex: 1;
-            min-width: 350px;
             padding: 30px;
-            background-color: #f8f9fa;
-            border-right: 1px solid #eaeaea;
+            background-color: #f8fafc;
+            border-right: 1px solid #e2e8f0;
         }
         
         .results-section {
             flex: 2;
-            min-width: 350px;
-            padding: 30px;
-            background-color: white;
+            padding: 0;
         }
         
         .section-title {
-            font-size: 1.5rem;
-            color: #333;
+            font-size: 1.3rem;
+            color: #1e293b;
             margin-bottom: 20px;
             padding-bottom: 10px;
-            border-bottom: 2px solid #f0f0f0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .section-title i {
-            color: #667eea;
-        }
-        
-        .input-container {
-            position: relative;
-            margin-bottom: 25px;
+            border-bottom: 2px solid #e2e8f0;
         }
         
         textarea {
             width: 100%;
-            height: 350px;
+            height: 500px;
             padding: 20px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 16px;
-            resize: vertical;
-            font-family: monospace;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 15px;
             line-height: 1.5;
-            transition: all 0.3s;
+            resize: vertical;
+            font-family: 'Consolas', 'Monaco', monospace;
             background-color: white;
         }
         
         textarea:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
         
         .input-hint {
-            margin-top: 10px;
+            margin-top: 15px;
             font-size: 0.9rem;
-            color: #666;
+            color: #64748b;
             display: flex;
             align-items: center;
             gap: 8px;
         }
         
-        .results-container {
-            height: 500px;
-            overflow-y: auto;
-            border-radius: 10px;
-            border: 1px solid #eaeaea;
-            background-color: #f8f9fa;
+        .backlink-profile {
+            padding: 30px;
         }
         
-        .result-item {
-            padding: 20px;
-            border-bottom: 1px solid #eaeaea;
+        .profile-header {
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .domain-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+        
+        .domain-subtitle {
+            font-size: 1rem;
+            color: #64748b;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .metric-card {
             background-color: white;
-            transition: all 0.2s;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
         }
         
-        .result-item:hover {
-            background-color: #f8f9ff;
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 5px;
         }
         
-        .result-item:last-child {
+        .metric-label {
+            font-size: 0.95rem;
+            color: #64748b;
+        }
+        
+        .metric-detail {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-top: 5px;
+        }
+        
+        .dofollow-badge {
+            display: inline-block;
+            background-color: #10b981;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        .section-divider {
+            height: 1px;
+            background-color: #e2e8f0;
+            margin: 30px 0;
+        }
+        
+        .subsection-title {
+            font-size: 1.4rem;
+            color: #1e293b;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .dr-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        
+        .dr-table th {
+            background-color: #f1f5f9;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #475569;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .dr-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .dr-table tr:last-child td {
             border-bottom: none;
         }
         
-        .original-link {
+        .dr-table tr:hover {
+            background-color: #f8fafc;
+        }
+        
+        .dr-id {
             font-weight: 600;
-            color: #333;
-            margin-bottom: 8px;
-            word-break: break-all;
-            font-size: 1.05rem;
+            color: #3b82f6;
+            width: 60px;
         }
         
-        .redirect-info {
-            margin-top: 15px;
-            padding-left: 15px;
-            border-left: 3px solid #e0e0e0;
+        .dr-link {
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 500;
         }
         
-        .redirect-step {
+        .dr-link:hover {
+            text-decoration: underline;
+        }
+        
+        .anchor-section {
+            margin-top: 30px;
+        }
+        
+        .anchor-list {
+            list-style-type: none;
+        }
+        
+        .anchor-item {
+            margin-bottom: 20px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .anchor-text {
+            font-weight: 600;
+            color: #1e293b;
             margin-bottom: 10px;
-            padding: 8px 12px;
-            background-color: #f8f9fa;
-            border-radius: 6px;
+            font-size: 1.1rem;
+        }
+        
+        .target-url {
+            color: #64748b;
+            font-size: 0.95rem;
             word-break: break-all;
-            position: relative;
-            padding-left: 30px;
         }
         
-        .redirect-step:before {
-            content: "→";
-            position: absolute;
-            left: 10px;
-            color: #667eea;
-            font-weight: bold;
+        .promo-section {
+            margin-top: 40px;
+            padding: 25px;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-radius: 10px;
+            border-left: 4px solid #3b82f6;
         }
         
-        .redirect-step.final {
-            background-color: #e8f5e9;
-            border-left: 3px solid #4caf50;
+        .promo-title {
+            font-size: 1.3rem;
+            color: #1e293b;
+            margin-bottom: 15px;
         }
         
-        .redirect-step.final:before {
-            content: "✓";
-            color: #4caf50;
+        .promo-text {
+            color: #475569;
+            margin-bottom: 20px;
         }
         
-        .redirect-step.error {
-            background-color: #ffebee;
-            border-left: 3px solid #f44336;
-        }
-        
-        .redirect-step.error:before {
-            content: "✗";
-            color: #f44336;
-        }
-        
-        .step-number {
-            display: inline-block;
-            width: 24px;
-            height: 24px;
-            background-color: #667eea;
+        .promo-button {
+            background-color: #3b82f6;
             color: white;
-            border-radius: 50%;
-            text-align: center;
-            line-height: 24px;
-            font-size: 0.8rem;
-            margin-right: 10px;
-            font-weight: bold;
-        }
-        
-        .status-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
             font-weight: 600;
-            margin-right: 10px;
+            cursor: pointer;
+            display: inline-block;
+            text-decoration: none;
+            transition: background-color 0.2s;
         }
         
-        .status-direct {
-            background-color: #e3f2fd;
-            color: #1976d2;
-        }
-        
-        .status-redirect {
-            background-color: #fff3e0;
-            color: #f57c00;
-        }
-        
-        .status-error {
-            background-color: #ffebee;
-            color: #d32f2f;
+        .promo-button:hover {
+            background-color: #2563eb;
         }
         
         .no-results {
             text-align: center;
-            padding: 60px 20px;
-            color: #888;
+            padding: 80px 20px;
+            color: #64748b;
         }
         
         .no-results-icon {
-            font-size: 3.5rem;
-            margin-bottom: 15px;
-            opacity: 0.5;
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.3;
         }
         
         .loading {
             text-align: center;
-            padding: 30px;
-            color: #667eea;
+            padding: 60px 20px;
+            color: #3b82f6;
         }
         
         .loading-spinner {
             display: inline-block;
-            width: 40px;
-            height: 40px;
-            border: 4px solid rgba(102, 126, 234, 0.2);
-            border-top: 4px solid #667eea;
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(59, 130, 246, 0.2);
+            border-top: 5px solid #3b82f6;
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         
         @keyframes spin {
@@ -265,102 +379,49 @@
             100% { transform: rotate(360deg); }
         }
         
-        .stats-bar {
-            display: flex;
-            justify-content: space-between;
-            background-color: #f8f9fa;
-            padding: 15px 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            border: 1px solid #eaeaea;
-        }
-        
-        .stat {
-            text-align: center;
-            flex: 1;
-        }
-        
-        .stat-value {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #333;
-            display: block;
-        }
-        
-        .stat-label {
-            font-size: 0.9rem;
-            color: #666;
-            margin-top: 5px;
-        }
-        
         footer {
             text-align: center;
             padding: 20px;
-            background-color: #f8f9fa;
-            color: #666;
+            color: #64748b;
             font-size: 0.9rem;
-            border-top: 1px solid #eaeaea;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 30px;
         }
         
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-        
-        .btn {
-            padding: 12px 20px;
-            border: none;
+        .sample-links {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f0f9ff;
             border-radius: 8px;
+            border: 1px dashed #bae6fd;
+        }
+        
+        .sample-title {
             font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
+            margin-bottom: 10px;
+            color: #0369a1;
             display: flex;
             align-items: center;
-            justify-content: center;
             gap: 8px;
-            flex: 1;
         }
         
-        .btn-primary {
-            background-color: #667eea;
-            color: white;
+        .sample-list {
+            list-style-type: none;
+            font-size: 0.9rem;
+            color: #475569;
         }
         
-        .btn-primary:hover {
-            background-color: #5a6fd8;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
-        }
-        
-        .btn-secondary {
-            background-color: #f0f0f0;
-            color: #333;
-        }
-        
-        .btn-secondary:hover {
-            background-color: #e0e0e0;
-        }
-        
-        .instructions {
-            background-color: #f0f7ff;
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 25px;
-            border-left: 4px solid #667eea;
-        }
-        
-        .instructions h3 {
-            margin-bottom: 10px;
-            color: #333;
-        }
-        
-        .instructions ul {
+        .sample-list li {
+            margin-bottom: 5px;
             padding-left: 20px;
+            position: relative;
         }
         
-        .instructions li {
-            margin-bottom: 8px;
+        .sample-list li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #3b82f6;
         }
         
         @media (max-width: 900px) {
@@ -370,15 +431,16 @@
             
             .input-section {
                 border-right: none;
-                border-bottom: 1px solid #eaeaea;
+                border-bottom: 1px solid #e2e8f0;
             }
             
-            textarea {
-                height: 250px;
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
             }
             
-            .results-container {
-                height: 400px;
+            .domain-input-section {
+                width: 100%;
             }
         }
         
@@ -387,21 +449,12 @@
                 padding: 20px;
             }
             
-            h1 {
-                font-size: 1.8rem;
-            }
-            
-            .input-section, .results-section {
+            .input-section, .backlink-profile {
                 padding: 20px;
             }
             
-            .stats-bar {
-                flex-wrap: wrap;
-                gap: 15px;
-            }
-            
-            .stat {
-                flex: 0 0 calc(50% - 10px);
+            .metrics-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -409,454 +462,435 @@
 <body>
     <div class="container">
         <header>
-            <h1>🔗 Link Redirect Checker</h1>
-            <p class="subtitle">Tempel link (dengan atau tanpa http/https) dan lihat ke mana mereka diarahkan</p>
+            <div class="header-content">
+                <div>
+                    <h1>Backlink Profile Checker</h1>
+                    <p class="subtitle">Analisis profil backlink seperti Ahrefs - Tempel data backlink untuk melihat hasilnya</p>
+                </div>
+                
+                <div class="domain-input-section">
+                    <label for="domain-input">Domain untuk dianalisis:</label>
+                    <div class="input-with-button">
+                        <input type="text" id="domain-input" placeholder="example.com" value="lineblog329.com">
+                        <button id="check-btn">Periksa Backlink</button>
+                    </div>
+                </div>
+            </div>
         </header>
         
         <div class="main-content">
             <div class="input-section">
-                <h2 class="section-title"><i>📋</i> Input Link</h2>
-                <div class="input-container">
-                    <textarea id="link-input" placeholder="Tempel link Anda di sini, satu per baris. Contoh:
+                <h2 class="section-title">Data Backlink</h2>
+                <p>Tempel data backlink di sini (format bebas):</p>
+                
+                <textarea id="backlink-data" placeholder="Tempel data backlink Anda di sini..."># Backlink profile for lineblog329.com
 
-google.com
-youtube.com/watch?v=example
-bit.ly/3r4h5j6
-twitter.com/username/status/12345
-www.amazon.com/product-name
-github.com
-instagram.com/p/ABC123
-linkedin.com/in/profile-name
-tiktok.com/@username/video/12345
-wa.me/6281234567890">google.com
-youtube.com
-bit.ly/3r4h5j6
-twitter.com
-github.com
-instagram.com
-linkedin.com
-tiktok.com
-wa.me/6281234567890
-example.com/non-existent-page</textarea>
-                </div>
+Domain including subdomains. One link per domain
+
+## Domain Rating
+0
+
+## URL Rating
+Get UR free with Ahrefs SEO Toolbar
+
+## Backlinks
+146  
+100% dofollow
+
+## Linking websites
+13  
+100% dofollow
+
+---
+
+### DR: Referring page
+
+| ID | Description    |
+|---|---|
+| 3  | LINETOGEL - Situs Toto Online Terpercaya Pasaran Togel Terlengkap [https://linetogel125.com/](https://linetogel125.com/) |
+| 19 | LINETOGEL - Situs Toto Online Terpercaya Pasaran Togel Terlengkap [https://linetogel70.com/](https://linetogel70.com/) |
+| 2  | LINETOGEL - Situs Toto Online Terpercaya Pasaran Togel Terlengkap [https://linetogel.com/](https://linetogel.com/) |
+| 12 | LINETOGEL - Situs Toto Online Terpercaya Pasaran Togel Terlengkap [https://line33693.com/](https://line33693.com/) |
+| 44 | Operator Linetogel – Laman 23 [https://lineblog298.com/author/smbadmin/page/2](https://lineblog298.com/author/smbadmin/page/2) |
+
+---
+
+### Anchor and target URL
+
+- **Prediksi Togel**  
+  http://lineblog329.com/prediksi-linetogel/
+
+- **Prediksi Togel**  
+  http://lineblog329.com/prediksi-lenetogel/
+
+- **Prediksi Togel**  
+  http://lineblog329.com/prediksi-linetogel/
+
+- **Prediksi Togel**  
+  http://lineblog329.com/prediksi-linetogel/
+
+- **Betting sedikit kena JP Melejit (Hongkong)**  
+  https://lineblog329.com/betting-sedikit-kena-jp-melejit-
+
+---
+
+**Need more? Try Starter plan**  
+[Get started](#)  
+$29/mo  
+
+See what people search and spy on competitors. Learn more</textarea>
                 
                 <div class="input-hint">
-                    <i>💡</i> <span>Anda bisa menempel link dengan atau tanpa "http://" atau "https://"</span>
+                    <span>💡 Anda bisa menempel data dari Ahrefs, SEMrush, atau alat SEO lainnya.</span>
                 </div>
                 
-                <div class="action-buttons">
-                    <button id="check-btn" class="btn btn-primary">
-                        <i>🔍</i> Periksa Link
-                    </button>
-                    <button id="clear-btn" class="btn btn-secondary">
-                        <i>🗑️</i> Hapus Semua
-                    </button>
-                </div>
-                
-                <div class="instructions">
-                    <h3>Cara Menggunakan:</h3>
-                    <ul>
-                        <li>Tempel atau ketik link Anda (satu per baris)</li>
-                        <li>Tidak perlu menambahkan "http://" atau "https://"</li>
-                        <li>Klik "Periksa Link" atau tunggu secara otomatis</li>
-                        <li>Lihat hasil redirect di panel kanan</li>
+                <div class="sample-links">
+                    <div class="sample-title">📋 Contoh format yang didukung:</div>
+                    <ul class="sample-list">
+                        <li>Data dari Ahrefs Backlink Profile</li>
+                        <li>Domain Rating, URL Rating, Backlinks count</li>
+                        <li>Tabel DR: Referring page</li>
+                        <li>Daftar Anchor and target URL</li>
                     </ul>
                 </div>
             </div>
             
             <div class="results-section">
-                <h2 class="section-title"><i>📊</i> Hasil Redirect</h2>
-                
-                <div class="stats-bar" id="stats-bar">
-                    <div class="stat">
-                        <span class="stat-value" id="total-links">0</span>
-                        <span class="stat-label">Total Link</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-value" id="direct-links">0</span>
-                        <span class="stat-label">Direct</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-value" id="redirect-links">0</span>
-                        <span class="stat-label">Redirect</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-value" id="error-links">0</span>
-                        <span class="stat-label">Error</span>
-                    </div>
-                </div>
-                
-                <div class="results-container" id="results-container">
-                    <div class="no-results" id="no-results">
-                        <div class="no-results-icon">🔗</div>
-                        <p>Belum ada hasil. Tempel link di panel kiri dan klik "Periksa Link".</p>
-                    </div>
+                <div class="backlink-profile" id="backlink-profile">
                     <!-- Hasil akan ditampilkan di sini -->
-                </div>
-                
-                <div class="loading" id="loading" style="display: none;">
-                    <div class="loading-spinner"></div>
-                    <p>Sedang memproses link, harap tunggu...</p>
+                    <div class="no-results" id="no-results">
+                        <div class="no-results-icon">📊</div>
+                        <p>Hasil analisis backlink akan muncul di sini.</p>
+                        <p>Tempel data backlink di panel kiri dan klik "Periksa Backlink".</p>
+                    </div>
+                    
+                    <div class="loading" id="loading" style="display: none;">
+                        <div class="loading-spinner"></div>
+                        <p>Menganalisis data backlink...</p>
+                    </div>
                 </div>
             </div>
         </div>
         
         <footer>
-            <p>Link Redirect Checker &copy; 2023 | Aplikasi ini berjalan 100% di browser Anda</p>
+            <p>Backlink Profile Checker &copy; 2023 | Alat analisis backlink sederhana</p>
         </footer>
     </div>
 
     <script>
         // Elemen DOM
-        const linkInput = document.getElementById('link-input');
+        const domainInput = document.getElementById('domain-input');
         const checkBtn = document.getElementById('check-btn');
-        const clearBtn = document.getElementById('clear-btn');
-        const resultsContainer = document.getElementById('results-container');
+        const backlinkData = document.getElementById('backlink-data');
+        const backlinkProfile = document.getElementById('backlink-profile');
         const noResults = document.getElementById('no-results');
         const loading = document.getElementById('loading');
-        const statsBar = document.getElementById('stats-bar');
         
-        // Elemen statistik
-        const totalLinksEl = document.getElementById('total-links');
-        const directLinksEl = document.getElementById('direct-links');
-        const redirectLinksEl = document.getElementById('redirect-links');
-        const errorLinksEl = document.getElementById('error-links');
+        // Event listener untuk tombol periksa
+        checkBtn.addEventListener('click', analyzeBacklinkData);
         
-        // Data untuk menyimpan hasil
-        let linkResults = [];
-        let isProcessing = false;
-        
-        // Event listeners
-        checkBtn.addEventListener('click', processLinks);
-        clearBtn.addEventListener('click', clearResults);
-        
-        // Otomatis proses ketika user berhenti mengetik
-        let typingTimer;
-        linkInput.addEventListener('input', function() {
-            clearTimeout(typingTimer);
-            typingTimer = setTimeout(processLinks, 1000);
+        // Juga analisis otomatis saat textarea berubah (dengan debounce)
+        let debounceTimer;
+        backlinkData.addEventListener('input', function() {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(analyzeBacklinkData, 1000);
         });
         
-        // Fungsi untuk memproses link
-        async function processLinks() {
-            const linksText = linkInput.value.trim();
+        // Fungsi untuk menganalisis data backlink
+        function analyzeBacklinkData() {
+            const domain = domainInput.value.trim();
+            const data = backlinkData.value.trim();
             
-            if (!linksText) {
-                showNoResults();
-                updateStats();
+            if (!domain) {
+                alert('Masukkan domain terlebih dahulu');
                 return;
             }
             
-            // Parse link (satu per baris)
-            const rawLinks = linksText.split('\n')
-                .map(link => link.trim())
-                .filter(link => link.length > 0);
-            
-            if (rawLinks.length === 0) {
+            if (!data) {
                 showNoResults();
-                updateStats();
                 return;
             }
             
             // Tampilkan loading
             showLoading();
             
-            // Reset hasil sebelumnya
-            linkResults = [];
+            // Parse data backlink
+            const parsedData = parseBacklinkData(data, domain);
             
-            // Proses setiap link
-            for (let i = 0; i < rawLinks.length; i++) {
-                const rawLink = rawLinks[i];
-                
-                // Normalisasi link (tambahkan https:// jika tidak ada protokol)
-                const normalizedLink = normalizeLink(rawLink);
-                
-                // Update status loading
-                if (loading.style.display === 'block') {
-                    loading.innerHTML = `
-                        <div class="loading-spinner"></div>
-                        <p>Memproses link ${i+1} dari ${rawLinks.length}...</p>
-                    `;
-                }
-                
-                try {
-                    // Periksa redirect link
-                    const redirectInfo = await checkLinkRedirect(normalizedLink);
-                    
-                    linkResults.push({
-                        original: rawLink,
-                        normalized: normalizedLink,
-                        ...redirectInfo
-                    });
-                    
-                    // Tampilkan hasil secara bertahap
-                    displayResults();
-                    updateStats();
-                    
-                } catch (error) {
-                    linkResults.push({
-                        original: rawLink,
-                        normalized: normalizedLink,
-                        redirects: [normalizedLink],
-                        finalUrl: normalizedLink,
-                        error: true,
-                        errorMessage: error.message || 'Gagal memproses link'
-                    });
-                    
-                    displayResults();
-                    updateStats();
-                }
-            }
-            
-            // Sembunyikan loading
-            hideLoading();
-            
-            // Tampilkan hasil final
-            displayResults();
-            updateStats();
+            // Beri sedikit delay agar loading terlihat
+            setTimeout(() => {
+                // Tampilkan hasil
+                displayBacklinkProfile(parsedData, domain);
+            }, 500);
         }
         
-        // Fungsi untuk menormalisasi link (menambahkan https:// jika perlu)
-        function normalizeLink(link) {
-            // Hapus spasi di awal dan akhir
-            link = link.trim();
+        // Fungsi untuk parsing data backlink
+        function parseBacklinkData(data, domain) {
+            const result = {
+                domainRating: 0,
+                urlRating: "Get UR free with Ahrefs SEO Toolbar",
+                backlinks: 0,
+                linkingWebsites: 0,
+                dofollowPercent: 100,
+                drTable: [],
+                anchors: []
+            };
             
-            // Jika sudah memiliki protokol, biarkan saja
-            if (link.startsWith('http://') || link.startsWith('https://')) {
-                return link;
+            // Cari Domain Rating
+            const drMatch = data.match(/Domain Rating\s*(\d+)/i);
+            if (drMatch) {
+                result.domainRating = parseInt(drMatch[1]);
             }
             
-            // Jika dimulai dengan //, tambahkan https:
-            if (link.startsWith('//')) {
-                return 'https:' + link;
+            // Cari Backlinks count
+            const backlinksMatch = data.match(/Backlinks\s*(\d+)/i);
+            if (backlinksMatch) {
+                result.backlinks = parseInt(backlinksMatch[1]);
             }
             
-            // Jika tidak memiliki protokol, tambahkan https://
-            return 'https://' + link;
-        }
-        
-        // Fungsi untuk memeriksa redirect link
-        async function checkLinkRedirect(url) {
-            try {
-                // Gunakan fetch dengan redirect: 'manual' untuk menangkap semua redirect
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 15000);
+            // Cari Linking websites count
+            const linkingMatch = data.match(/Linking websites\s*(\d+)/i);
+            if (linkingMatch) {
+                result.linkingWebsites = parseInt(linkingMatch[1]);
+            }
+            
+            // Cari dofollow percentage
+            const dofollowMatch = data.match(/(\d+)%\s*dofollow/i);
+            if (dofollowMatch) {
+                result.dofollowPercent = parseInt(dofollowMatch[1]);
+            }
+            
+            // Parse DR Table
+            const drTableStart = data.indexOf('### DR: Referring page') !== -1 ? 
+                data.indexOf('### DR: Referring page') : 
+                data.indexOf('DR: Referring page');
                 
-                const response = await fetch(url, {
-                    method: 'HEAD',
-                    mode: 'no-cors', // Untuk menghindari CORS issues
-                    redirect: 'follow', // Ikuti redirect otomatis
-                    signal: controller.signal,
-                    headers: {
-                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-                    }
-                }).catch(async () => {
-                    // Jika HEAD gagal, coba dengan GET
-                    clearTimeout(timeoutId);
-                    const newController = new AbortController();
-                    const newTimeoutId = setTimeout(() => newController.abort(), 15000);
-                    
-                    try {
-                        const getResponse = await fetch(url, {
-                            method: 'GET',
-                            mode: 'no-cors',
-                            redirect: 'follow',
-                            signal: newController.signal,
-                            headers: {
-                                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            if (drTableStart !== -1) {
+                const tableSection = data.substring(drTableStart);
+                const tableMatch = tableSection.match(/\|.*\|/g);
+                
+                if (tableMatch) {
+                    // Skip header rows
+                    for (let i = 2; i < tableMatch.length; i++) {
+                        const row = tableMatch[i].trim();
+                        if (row.startsWith('|--') || row.startsWith('|---')) continue;
+                        
+                        const cells = row.split('|').filter(cell => cell.trim() !== '');
+                        if (cells.length >= 2) {
+                            const id = cells[0].trim();
+                            const description = cells[1].trim();
+                            
+                            // Extract URL from markdown link
+                            const urlMatch = description.match(/\[([^\]]+)\]\(([^)]+)\)/);
+                            let url = '';
+                            let text = description;
+                            
+                            if (urlMatch) {
+                                text = urlMatch[1];
+                                url = urlMatch[2];
                             }
-                        });
-                        clearTimeout(newTimeoutId);
-                        return getResponse;
-                    } catch (getError) {
-                        clearTimeout(newTimeoutId);
-                        throw getError;
+                            
+                            result.drTable.push({
+                                id: id,
+                                description: text,
+                                url: url
+                            });
+                        }
                     }
-                });
-                
-                clearTimeout(timeoutId);
-                
-                // Jika kita sampai di sini, request berhasil (setidaknya sampai tahap tertentu)
-                // Karena kita menggunakan 'no-cors', kita tidak bisa membaca respons detailnya
-                // Tapi kita bisa mengetahui URL akhir dari permintaan
-                
-                // Untuk simulasi, kita akan buat data redirect
-                // Di aplikasi nyata, Anda mungkin perlu menggunakan proxy server untuk menghindari CORS
-                
-                // Untuk demo, kita buat simulasi redirect
-                const hasRedirect = Math.random() > 0.7; // 30% kemungkinan redirect
-                const isError = Math.random() > 0.9; // 10% kemungkinan error
-                
-                if (isError) {
-                    throw new Error('Tidak dapat mengakses link (timeout atau error)');
                 }
-                
-                if (hasRedirect) {
-                    // Simulasi redirect
-                    const redirectCount = Math.floor(Math.random() * 3) + 1;
-                    const redirects = [url];
-                    
-                    // Buat URL redirect palsu untuk demo
-                    for (let i = 1; i <= redirectCount; i++) {
-                        redirects.push(`https://redirect-${i}.example.com/final-path`);
-                    }
-                    
-                    return {
-                        redirects: redirects,
-                        finalUrl: redirects[redirects.length - 1],
-                        error: false
-                    };
-                } else {
-                    // Tidak ada redirect
-                    return {
-                        redirects: [url],
-                        finalUrl: url,
-                        error: false
-                    };
-                }
-                
-            } catch (error) {
-                // Jika fetch gagal, coba pendekatan lain
-                // Di aplikasi nyata, Anda bisa menggunakan service worker atau proxy
-                // Untuk demo, kita akan kembalikan error
-                
-                // Coba pendekatan dengan iframe untuk mengecek redirect
-                return await checkRedirectWithIframe(url);
-            }
-        }
-        
-        // Metode alternatif untuk mengecek redirect menggunakan iframe
-        function checkRedirectWithIframe(url) {
-            return new Promise((resolve, reject) => {
-                // Buat iframe tersembunyi
-                const iframe = document.createElement('iframe');
-                iframe.style.display = 'none';
-                iframe.src = url;
-                
-                // Event listener untuk ketika iframe selesai memuat
-                iframe.onload = function() {
-                    try {
-                        // Dapatkan URL akhir dari iframe
-                        const finalUrl = iframe.contentWindow.location.href;
-                        
-                        resolve({
-                            redirects: [url, finalUrl],
-                            finalUrl: finalUrl,
-                            error: false
-                        });
-                        
-                        // Hapus iframe
-                        document.body.removeChild(iframe);
-                    } catch (e) {
-                        // Jika tidak bisa membaca URL karena CORS
-                        resolve({
-                            redirects: [url],
-                            finalUrl: url,
-                            error: true,
-                            errorMessage: 'Tidak dapat membaca redirect karena kebijakan keamanan'
-                        });
-                        
-                        // Hapus iframe
-                        document.body.removeChild(iframe);
-                    }
-                };
-                
-                iframe.onerror = function() {
-                    reject(new Error('Gagal memuat link'));
-                    document.body.removeChild(iframe);
-                };
-                
-                // Tambahkan iframe ke body
-                document.body.appendChild(iframe);
-                
-                // Timeout setelah 10 detik
-                setTimeout(() => {
-                    if (document.body.contains(iframe)) {
-                        document.body.removeChild(iframe);
-                        reject(new Error('Timeout: Link tidak merespons'));
-                    }
-                }, 10000);
-            });
-        }
-        
-        // Fungsi untuk menampilkan hasil
-        function displayResults() {
-            if (linkResults.length === 0) {
-                showNoResults();
-                return;
             }
             
+            // Parse Anchor and target URL section
+            const anchorStart = data.indexOf('### Anchor and target URL') !== -1 ? 
+                data.indexOf('### Anchor and target URL') : 
+                data.indexOf('Anchor and target URL');
+                
+            if (anchorStart !== -1) {
+                const anchorSection = data.substring(anchorStart);
+                const lines = anchorSection.split('\n');
+                
+                let currentAnchor = '';
+                
+                for (let line of lines) {
+                    line = line.trim();
+                    
+                    // Check for anchor text (bold in markdown or after hyphen)
+                    if (line.startsWith('- **') && line.includes('**')) {
+                        const anchorMatch = line.match(/\*\*(.+?)\*\*/);
+                        if (anchorMatch) {
+                            currentAnchor = anchorMatch[1];
+                        }
+                    } else if (line.startsWith('- ') && !line.includes('**')) {
+                        // Sometimes anchor text is just after hyphen without bold
+                        const anchorText = line.substring(2).trim();
+                        if (anchorText && !anchorText.startsWith('http')) {
+                            currentAnchor = anchorText;
+                        }
+                    }
+                    
+                    // Check for URL (starts with http)
+                    if (line.startsWith('http')) {
+                        result.anchors.push({
+                            anchor: currentAnchor || 'Unknown',
+                            url: line.trim()
+                        });
+                        currentAnchor = '';
+                    }
+                }
+            }
+            
+            // If no anchors found with the method above, try alternative parsing
+            if (result.anchors.length === 0) {
+                const lines = data.split('\n');
+                let currentAnchor = '';
+                
+                for (let line of lines) {
+                    line = line.trim();
+                    
+                    // Look for anchor text patterns
+                    if (line.includes('**') && line.includes('**  ')) {
+                        const anchorMatch = line.match(/\*\*(.+?)\*\*/);
+                        if (anchorMatch) {
+                            currentAnchor = anchorMatch[1];
+                        }
+                    }
+                    
+                    // Look for URLs that belong to the domain
+                    if (line.includes(domain) && (line.startsWith('http://') || line.startsWith('https://'))) {
+                        result.anchors.push({
+                            anchor: currentAnchor || 'Unknown',
+                            url: line.trim()
+                        });
+                        currentAnchor = '';
+                    }
+                }
+            }
+            
+            return result;
+        }
+        
+        // Fungsi untuk menampilkan profil backlink
+        function displayBacklinkProfile(data, domain) {
+            // Sembunyikan loading dan no-results
+            hideLoading();
             noResults.style.display = 'none';
             
-            let html = '';
+            let html = `
+                <div class="profile-header">
+                    <h1 class="domain-title">Backlink profile for ${domain}</h1>
+                    <p class="domain-subtitle">Domain including subdomains. One link per domain</p>
+                </div>
+                
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">${data.domainRating}</div>
+                        <div class="metric-label">Domain Rating</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-value">${data.backlinks}</div>
+                        <div class="metric-label">Backlinks</div>
+                        <div class="metric-detail">${data.dofollowPercent}% dofollow</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-value">${data.linkingWebsites}</div>
+                        <div class="metric-label">Linking websites</div>
+                        <div class="metric-detail">${data.dofollowPercent}% dofollow</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-value">-</div>
+                        <div class="metric-label">URL Rating</div>
+                        <div class="metric-detail">${data.urlRating}</div>
+                    </div>
+                </div>
+                
+                <div class="section-divider"></div>
+            `;
             
-            linkResults.forEach((result, index) => {
-                const hasRedirect = result.redirects && result.redirects.length > 1;
-                const isError = result.error;
+            // Tambahkan DR Table jika ada data
+            if (data.drTable.length > 0) {
+                html += `
+                    <h2 class="subsection-title">DR: Referring page</h2>
+                    <table class="dr-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                data.drTable.forEach(item => {
+                    const linkHtml = item.url ? 
+                        `<a href="${item.url}" class="dr-link" target="_blank">${item.description}</a>` : 
+                        item.description;
+                    
+                    html += `
+                        <tr>
+                            <td class="dr-id">${item.id}</td>
+                            <td>${linkHtml}</td>
+                        </tr>
+                    `;
+                });
                 
                 html += `
-                <div class="result-item">
-                    <div class="original-link">
-                        <span class="step-number">${index + 1}</span>
-                        ${result.original}
-                    </div>
-                    
-                    <div style="margin-top: 10px;">
-                        ${isError ? 
-                            `<span class="status-badge status-error">Error</span>` : 
-                            hasRedirect ? 
-                            `<span class="status-badge status-redirect">${result.redirects.length-1} Redirect</span>` :
-                            `<span class="status-badge status-direct">Direct</span>`
-                        }
-                        <span style="font-size: 0.9rem; color: #666;">→ ${result.finalUrl.replace('https://', '').replace('http://', '')}</span>
-                    </div>
-                    
-                    ${hasRedirect || isError ? `
-                    <div class="redirect-info">
-                        ${result.redirects.map((step, stepIndex) => {
-                            const isFinal = stepIndex === result.redirects.length - 1;
-                            const isFirst = stepIndex === 0;
-                            let stepClass = '';
-                            let stepDisplay = step.replace('https://', '').replace('http://', '');
-                            
-                            if (isError && isFinal) {
-                                stepClass = 'error';
-                                stepDisplay += ` (${result.errorMessage || 'Error'})`;
-                            } else if (isFinal) {
-                                stepClass = 'final';
-                            }
-                            
-                            return `<div class="redirect-step ${stepClass}">${stepDisplay}</div>`;
-                        }).join('')}
-                    </div>
-                    ` : ''}
-                </div>
+                        </tbody>
+                    </table>
                 `;
-            });
+            }
             
-            resultsContainer.innerHTML = html;
-        }
-        
-        // Fungsi untuk memperbarui statistik
-        function updateStats() {
-            const total = linkResults.length;
-            const direct = linkResults.filter(r => !r.error && r.redirects && r.redirects.length === 1).length;
-            const redirect = linkResults.filter(r => !r.error && r.redirects && r.redirects.length > 1).length;
-            const error = linkResults.filter(r => r.error).length;
+            // Tambahkan Anchor section jika ada data
+            if (data.anchors.length > 0) {
+                html += `
+                    <div class="section-divider"></div>
+                    
+                    <div class="anchor-section">
+                        <h2 class="subsection-title">Anchor and target URL</h2>
+                        <ul class="anchor-list">
+                `;
+                
+                data.anchors.forEach((item, index) => {
+                    html += `
+                        <li class="anchor-item">
+                            <div class="anchor-text">${item.anchor}</div>
+                            <div class="target-url">${item.url}</div>
+                        </li>
+                    `;
+                });
+                
+                html += `
+                        </ul>
+                    </div>
+                `;
+            }
             
-            totalLinksEl.textContent = total;
-            directLinksEl.textContent = direct;
-            redirectLinksEl.textContent = redirect;
-            errorLinksEl.textContent = error;
+            // Tambahkan promo section
+            html += `
+                <div class="promo-section">
+                    <h3 class="promo-title">Need more? Try Starter plan</h3>
+                    <p class="promo-text">See what people search and spy on competitors. Learn more</p>
+                    <a href="#" class="promo-button">Get started — $29/mo</a>
+                </div>
+            `;
             
-            // Tampilkan statistik hanya jika ada hasil
-            statsBar.style.display = total > 0 ? 'flex' : 'none';
+            backlinkProfile.innerHTML = html;
         }
         
         // Fungsi untuk menampilkan loading
         function showLoading() {
             loading.style.display = 'block';
             noResults.style.display = 'none';
+            
+            // Sembunyikan konten sebelumnya jika ada
+            const existingContent = backlinkProfile.querySelector('.profile-header');
+            if (existingContent) {
+                existingContent.style.display = 'none';
+                const nextElements = backlinkProfile.querySelectorAll('.profile-header ~ *');
+                nextElements.forEach(el => el.style.display = 'none');
+            }
         }
         
         // Fungsi untuk menyembunyikan loading
@@ -866,27 +900,23 @@ example.com/non-existent-page</textarea>
         
         // Fungsi untuk menampilkan pesan tidak ada hasil
         function showNoResults() {
-            noResults.style.display = 'block';
-            resultsContainer.innerHTML = '';
-            statsBar.style.display = 'none';
+            backlinkProfile.innerHTML = `
+                <div class="no-results" id="no-results">
+                    <div class="no-results-icon">📊</div>
+                    <p>Hasil analisis backlink akan muncul di sini.</p>
+                    <p>Tempel data backlink di panel kiri dan klik "Periksa Backlink".</p>
+                </div>
+            `;
         }
         
-        // Fungsi untuk menghapus semua hasil
-        function clearResults() {
-            if (confirm('Apakah Anda yakin ingin menghapus semua hasil?')) {
-                linkInput.value = '';
-                linkResults = [];
-                showNoResults();
-                updateStats();
-            }
-        }
-        
-        // Proses link secara otomatis saat halaman dimuat
+        // Analisis otomatis saat halaman dimuat
         window.addEventListener('DOMContentLoaded', function() {
-            // Jika ada isi di textarea, proses secara otomatis
-            if (linkInput.value.trim()) {
-                setTimeout(processLinks, 500);
-            }
+            // Beri sedikit delay untuk memastikan semua elemen terload
+            setTimeout(() => {
+                if (domainInput.value && backlinkData.value.trim()) {
+                    analyzeBacklinkData();
+                }
+            }, 300);
         });
     </script>
 </body>
