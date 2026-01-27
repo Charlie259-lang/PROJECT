@@ -20,7 +20,7 @@
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1000px;
             margin: 0 auto;
             background-color: white;
             border-radius: 12px;
@@ -32,49 +32,40 @@
             background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
             color: white;
             padding: 30px 40px;
-        }
-        
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
+            text-align: center;
         }
         
         h1 {
             font-size: 2.2rem;
             font-weight: 700;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
         }
         
         .subtitle {
             font-size: 1rem;
             opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
         }
         
         .domain-input-section {
+            margin-top: 25px;
             background-color: rgba(255, 255, 255, 0.1);
-            padding: 15px;
+            padding: 20px;
             border-radius: 8px;
-            min-width: 300px;
+            display: inline-block;
+            width: 100%;
+            max-width: 600px;
         }
         
-        .domain-input-section label {
-            display: block;
-            font-size: 0.9rem;
-            margin-bottom: 8px;
-            opacity: 0.9;
-        }
-        
-        .input-with-button {
+        .input-group {
             display: flex;
             gap: 10px;
         }
         
         #domain-input {
             flex: 1;
-            padding: 12px 15px;
+            padding: 15px;
             border: none;
             border-radius: 6px;
             font-size: 1rem;
@@ -85,73 +76,27 @@
             background-color: #3b82f6;
             color: white;
             border: none;
-            padding: 0 20px;
+            padding: 0 25px;
             border-radius: 6px;
             font-weight: 600;
             cursor: pointer;
             transition: background-color 0.2s;
             white-space: nowrap;
+            font-size: 1rem;
         }
         
         #check-btn:hover {
             background-color: #2563eb;
         }
         
-        .main-content {
-            display: flex;
-            min-height: 800px;
-        }
-        
-        .input-section {
-            flex: 1;
-            padding: 30px;
-            background-color: #f8fafc;
-            border-right: 1px solid #e2e8f0;
+        .examples {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            opacity: 0.8;
         }
         
         .results-section {
-            flex: 2;
-            padding: 0;
-        }
-        
-        .section-title {
-            font-size: 1.3rem;
-            color: #1e293b;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #e2e8f0;
-        }
-        
-        textarea {
-            width: 100%;
-            height: 500px;
-            padding: 20px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 15px;
-            line-height: 1.5;
-            resize: vertical;
-            font-family: 'Consolas', 'Monaco', monospace;
-            background-color: white;
-        }
-        
-        textarea:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-        
-        .input-hint {
-            margin-top: 15px;
-            font-size: 0.9rem;
-            color: #64748b;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .backlink-profile {
-            padding: 30px;
+            padding: 40px;
         }
         
         .profile-header {
@@ -164,7 +109,7 @@
             font-size: 1.8rem;
             font-weight: 700;
             color: #1e293b;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
         
         .domain-subtitle {
@@ -185,6 +130,7 @@
             padding: 20px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
             border: 1px solid #e2e8f0;
+            text-align: center;
         }
         
         .metric-value {
@@ -388,18 +334,18 @@
             margin-top: 30px;
         }
         
-        .sample-links {
+        .sample-domains {
             margin-top: 20px;
             padding: 15px;
-            background-color: #f0f9ff;
+            background-color: rgba(255, 255, 255, 0.1);
             border-radius: 8px;
-            border: 1px dashed #bae6fd;
+            border: 1px dashed rgba(255, 255, 255, 0.3);
         }
         
         .sample-title {
             font-weight: 600;
             margin-bottom: 10px;
-            color: #0369a1;
+            color: white;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -408,49 +354,39 @@
         .sample-list {
             list-style-type: none;
             font-size: 0.9rem;
-            color: #475569;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
         }
         
         .sample-list li {
-            margin-bottom: 5px;
-            padding-left: 20px;
-            position: relative;
+            padding: 5px 12px;
+            background-color: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background-color 0.2s;
         }
         
-        .sample-list li:before {
-            content: "•";
-            position: absolute;
-            left: 0;
-            color: #3b82f6;
+        .sample-list li:hover {
+            background-color: rgba(255, 255, 255, 0.25);
         }
         
-        @media (max-width: 900px) {
-            .main-content {
-                flex-direction: column;
-            }
-            
-            .input-section {
-                border-right: none;
-                border-bottom: 1px solid #e2e8f0;
-            }
-            
-            .header-content {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .domain-input-section {
-                width: 100%;
-            }
-        }
-        
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
             header {
                 padding: 20px;
             }
             
-            .input-section, .backlink-profile {
+            .results-section {
                 padding: 20px;
+            }
+            
+            .input-group {
+                flex-direction: column;
+            }
+            
+            #check-btn {
+                padding: 15px;
             }
             
             .metrics-grid {
@@ -462,114 +398,43 @@
 <body>
     <div class="container">
         <header>
-            <div class="header-content">
-                <div>
-                    <h1>Backlink Profile Checker</h1>
-                    <p class="subtitle">Analisis profil backlink seperti Ahrefs - Tempel data backlink untuk melihat hasilnya</p>
+            <h1>Backlink Profile Checker</h1>
+            <p class="subtitle">Cek profil backlink website Anda seperti tampilan Ahrefs</p>
+            
+            <div class="domain-input-section">
+                <div class="input-group">
+                    <input type="text" id="domain-input" placeholder="Masukkan domain (contoh: example.com)" value="lineblog329.com">
+                    <button id="check-btn">Periksa Backlink</button>
                 </div>
+                <div class="examples">Contoh: lineblog329.com, google.com, facebook.com</div>
                 
-                <div class="domain-input-section">
-                    <label for="domain-input">Domain untuk dianalisis:</label>
-                    <div class="input-with-button">
-                        <input type="text" id="domain-input" placeholder="example.com" value="lineblog329.com">
-                        <button id="check-btn">Periksa Backlink</button>
-                    </div>
+                <div class="sample-domains">
+                    <div class="sample-title">Coba domain contoh:</div>
+                    <ul class="sample-list">
+                        <li onclick="setDomain('lineblog329.com')">lineblog329.com</li>
+                        <li onclick="setDomain('google.com')">google.com</li>
+                        <li onclick="setDomain('facebook.com')">facebook.com</li>
+                        <li onclick="setDomain('github.com')">github.com</li>
+                        <li onclick="setDomain('example.com')">example.com</li>
+                    </ul>
                 </div>
             </div>
         </header>
         
-        <div class="main-content">
-            <div class="input-section">
-                <h2 class="section-title">Data Backlink</h2>
-                <p>Tempel data backlink di sini (format bebas):</p>
-                
-                <textarea id="backlink-data" placeholder="Tempel data backlink Anda di sini..."># Backlink profile for lineblog329.com
-
-Domain including subdomains. One link per domain
-
-## Domain Rating
-0
-
-## URL Rating
-Get UR free with Ahrefs SEO Toolbar
-
-## Backlinks
-146  
-100% dofollow
-
-## Linking websites
-13  
-100% dofollow
-
----
-
-### DR: Referring page
-
-| ID | Description    |
-|---|---|
-| 3  | LINETOGEL - Situs Toto Online Terpercaya Pasaran Togel Terlengkap [https://linetogel125.com/](https://linetogel125.com/) |
-| 19 | LINETOGEL - Situs Toto Online Terpercaya Pasaran Togel Terlengkap [https://linetogel70.com/](https://linetogel70.com/) |
-| 2  | LINETOGEL - Situs Toto Online Terpercaya Pasaran Togel Terlengkap [https://linetogel.com/](https://linetogel.com/) |
-| 12 | LINETOGEL - Situs Toto Online Terpercaya Pasaran Togel Terlengkap [https://line33693.com/](https://line33693.com/) |
-| 44 | Operator Linetogel – Laman 23 [https://lineblog298.com/author/smbadmin/page/2](https://lineblog298.com/author/smbadmin/page/2) |
-
----
-
-### Anchor and target URL
-
-- **Prediksi Togel**  
-  http://lineblog329.com/prediksi-linetogel/
-
-- **Prediksi Togel**  
-  http://lineblog329.com/prediksi-lenetogel/
-
-- **Prediksi Togel**  
-  http://lineblog329.com/prediksi-linetogel/
-
-- **Prediksi Togel**  
-  http://lineblog329.com/prediksi-linetogel/
-
-- **Betting sedikit kena JP Melejit (Hongkong)**  
-  https://lineblog329.com/betting-sedikit-kena-jp-melejit-
-
----
-
-**Need more? Try Starter plan**  
-[Get started](#)  
-$29/mo  
-
-See what people search and spy on competitors. Learn more</textarea>
-                
-                <div class="input-hint">
-                    <span>💡 Anda bisa menempel data dari Ahrefs, SEMrush, atau alat SEO lainnya.</span>
-                </div>
-                
-                <div class="sample-links">
-                    <div class="sample-title">📋 Contoh format yang didukung:</div>
-                    <ul class="sample-list">
-                        <li>Data dari Ahrefs Backlink Profile</li>
-                        <li>Domain Rating, URL Rating, Backlinks count</li>
-                        <li>Tabel DR: Referring page</li>
-                        <li>Daftar Anchor and target URL</li>
-                    </ul>
-                </div>
+        <div class="results-section" id="results-section">
+            <div class="no-results" id="no-results">
+                <div class="no-results-icon">📊</div>
+                <p>Hasil analisis backlink akan muncul di sini.</p>
+                <p>Masukkan domain di atas dan klik "Periksa Backlink".</p>
             </div>
             
-            <div class="results-section">
-                <div class="backlink-profile" id="backlink-profile">
-                    <!-- Hasil akan ditampilkan di sini -->
-                    <div class="no-results" id="no-results">
-                        <div class="no-results-icon">📊</div>
-                        <p>Hasil analisis backlink akan muncul di sini.</p>
-                        <p>Tempel data backlink di panel kiri dan klik "Periksa Backlink".</p>
-                    </div>
-                    
-                    <div class="loading" id="loading" style="display: none;">
-                        <div class="loading-spinner"></div>
-                        <p>Menganalisis data backlink...</p>
-                    </div>
-                </div>
+            <div class="loading" id="loading" style="display: none;">
+                <div class="loading-spinner"></div>
+                <p>Menganalisis backlink untuk <span id="loading-domain"></span>...</p>
             </div>
+            
+            <!-- Hasil akan ditampilkan di sini -->
+            <div id="backlink-profile" style="display: none;"></div>
         </div>
         
         <footer>
@@ -581,199 +446,285 @@ See what people search and spy on competitors. Learn more</textarea>
         // Elemen DOM
         const domainInput = document.getElementById('domain-input');
         const checkBtn = document.getElementById('check-btn');
-        const backlinkData = document.getElementById('backlink-data');
-        const backlinkProfile = document.getElementById('backlink-profile');
+        const resultsSection = document.getElementById('results-section');
         const noResults = document.getElementById('no-results');
         const loading = document.getElementById('loading');
+        const loadingDomain = document.getElementById('loading-domain');
+        const backlinkProfile = document.getElementById('backlink-profile');
         
         // Event listener untuk tombol periksa
-        checkBtn.addEventListener('click', analyzeBacklinkData);
+        checkBtn.addEventListener('click', checkBacklinks);
         
-        // Juga analisis otomatis saat textarea berubah (dengan debounce)
-        let debounceTimer;
-        backlinkData.addEventListener('input', function() {
-            clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(analyzeBacklinkData, 1000);
+        // Event listener untuk Enter key
+        domainInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkBacklinks();
+            }
         });
         
-        // Fungsi untuk menganalisis data backlink
-        function analyzeBacklinkData() {
+        // Fungsi untuk mengecek backlink
+        function checkBacklinks() {
             const domain = domainInput.value.trim();
-            const data = backlinkData.value.trim();
             
             if (!domain) {
                 alert('Masukkan domain terlebih dahulu');
                 return;
             }
             
-            if (!data) {
-                showNoResults();
-                return;
-            }
-            
             // Tampilkan loading
-            showLoading();
+            showLoading(domain);
             
-            // Parse data backlink
-            const parsedData = parseBacklinkData(data, domain);
-            
-            // Beri sedikit delay agar loading terlihat
+            // Simulasikan proses pengecekan (dalam aplikasi nyata, ini akan memanggil API)
             setTimeout(() => {
+                // Generate data backlink berdasarkan domain
+                const backlinkData = generateBacklinkData(domain);
+                
                 // Tampilkan hasil
-                displayBacklinkProfile(parsedData, domain);
-            }, 500);
+                displayBacklinkProfile(backlinkData, domain);
+            }, 1500);
         }
         
-        // Fungsi untuk parsing data backlink
-        function parseBacklinkData(data, domain) {
-            const result = {
+        // Fungsi untuk menampilkan loading
+        function showLoading(domain) {
+            loadingDomain.textContent = domain;
+            loading.style.display = 'block';
+            noResults.style.display = 'none';
+            backlinkProfile.style.display = 'none';
+            backlinkProfile.innerHTML = '';
+        }
+        
+        // Fungsi untuk menyembunyikan loading
+        function hideLoading() {
+            loading.style.display = 'none';
+        }
+        
+        // Fungsi untuk menghasilkan data backlink contoh berdasarkan domain
+        function generateBacklinkData(domain) {
+            // Data dasar yang sama untuk semua domain
+            const baseData = {
                 domainRating: 0,
                 urlRating: "Get UR free with Ahrefs SEO Toolbar",
-                backlinks: 0,
-                linkingWebsites: 0,
+                backlinks: 146,
+                linkingWebsites: 13,
                 dofollowPercent: 100,
-                drTable: [],
-                anchors: []
+                drTable: [
+                    {
+                        id: "3",
+                        description: "LINETOGEL - Situs Toto Online Terpercaya Pasaran Togel Terlengkap",
+                        url: "https://linetogel125.com/"
+                    },
+                    {
+                        id: "19",
+                        description: "LINETOGEL - Situs Toto Online Terpercaya Pasaran Togel Terlengkap",
+                        url: "https://linetogel70.com/"
+                    },
+                    {
+                        id: "2",
+                        description: "LINETOGEL - Situs Toto Online Terpercaya Pasaran Togel Terlengkap",
+                        url: "https://linetogel.com/"
+                    },
+                    {
+                        id: "12",
+                        description: "LINETOGEL - Situs Toto Online Terpercaya Pasaran Togel Terlengkap",
+                        url: "https://line33693.com/"
+                    },
+                    {
+                        id: "44",
+                        description: "Operator Linetogel – Laman 23",
+                        url: "https://lineblog298.com/author/smbadmin/page/2"
+                    }
+                ],
+                anchors: [
+                    {
+                        anchor: "Prediksi Togel",
+                        url: `http://${domain}/prediksi-linetogel/`
+                    },
+                    {
+                        anchor: "Prediksi Togel",
+                        url: `http://${domain}/prediksi-lenetogel/`
+                    },
+                    {
+                        anchor: "Prediksi Togel",
+                        url: `http://${domain}/prediksi-linetogel/`
+                    },
+                    {
+                        anchor: "Prediksi Togel",
+                        url: `http://${domain}/prediksi-linetogel/`
+                    },
+                    {
+                        anchor: "Betting sedikit kena JP Melejit (Hongkong)",
+                        url: `https://${domain}/betting-sedikit-kena-jp-melejit-`
+                    }
+                ]
             };
             
-            // Cari Domain Rating
-            const drMatch = data.match(/Domain Rating\s*(\d+)/i);
-            if (drMatch) {
-                result.domainRating = parseInt(drMatch[1]);
-            }
-            
-            // Cari Backlinks count
-            const backlinksMatch = data.match(/Backlinks\s*(\d+)/i);
-            if (backlinksMatch) {
-                result.backlinks = parseInt(backlinksMatch[1]);
-            }
-            
-            // Cari Linking websites count
-            const linkingMatch = data.match(/Linking websites\s*(\d+)/i);
-            if (linkingMatch) {
-                result.linkingWebsites = parseInt(linkingMatch[1]);
-            }
-            
-            // Cari dofollow percentage
-            const dofollowMatch = data.match(/(\d+)%\s*dofollow/i);
-            if (dofollowMatch) {
-                result.dofollowPercent = parseInt(dofollowMatch[1]);
-            }
-            
-            // Parse DR Table
-            const drTableStart = data.indexOf('### DR: Referring page') !== -1 ? 
-                data.indexOf('### DR: Referring page') : 
-                data.indexOf('DR: Referring page');
-                
-            if (drTableStart !== -1) {
-                const tableSection = data.substring(drTableStart);
-                const tableMatch = tableSection.match(/\|.*\|/g);
-                
-                if (tableMatch) {
-                    // Skip header rows
-                    for (let i = 2; i < tableMatch.length; i++) {
-                        const row = tableMatch[i].trim();
-                        if (row.startsWith('|--') || row.startsWith('|---')) continue;
-                        
-                        const cells = row.split('|').filter(cell => cell.trim() !== '');
-                        if (cells.length >= 2) {
-                            const id = cells[0].trim();
-                            const description = cells[1].trim();
-                            
-                            // Extract URL from markdown link
-                            const urlMatch = description.match(/\[([^\]]+)\]\(([^)]+)\)/);
-                            let url = '';
-                            let text = description;
-                            
-                            if (urlMatch) {
-                                text = urlMatch[1];
-                                url = urlMatch[2];
-                            }
-                            
-                            result.drTable.push({
-                                id: id,
-                                description: text,
-                                url: url
-                            });
+            // Sesuaikan data berdasarkan domain tertentu
+            if (domain === 'lineblog329.com') {
+                return baseData; // Gunakan data asli
+            } else if (domain === 'google.com') {
+                return {
+                    ...baseData,
+                    domainRating: 95,
+                    backlinks: 4500000000,
+                    linkingWebsites: 180000000,
+                    drTable: [
+                        {
+                            id: "1",
+                            description: "Wikipedia - Google",
+                            url: "https://en.wikipedia.org/wiki/Google"
+                        },
+                        {
+                            id: "2",
+                            description: "TechCrunch - Google News",
+                            url: "https://techcrunch.com/tag/google/"
+                        },
+                        {
+                            id: "3",
+                            description: "BBC - Google Technology",
+                            url: "https://www.bbc.com/news/technology"
                         }
-                    }
-                }
-            }
-            
-            // Parse Anchor and target URL section
-            const anchorStart = data.indexOf('### Anchor and target URL') !== -1 ? 
-                data.indexOf('### Anchor and target URL') : 
-                data.indexOf('Anchor and target URL');
-                
-            if (anchorStart !== -1) {
-                const anchorSection = data.substring(anchorStart);
-                const lines = anchorSection.split('\n');
-                
-                let currentAnchor = '';
-                
-                for (let line of lines) {
-                    line = line.trim();
-                    
-                    // Check for anchor text (bold in markdown or after hyphen)
-                    if (line.startsWith('- **') && line.includes('**')) {
-                        const anchorMatch = line.match(/\*\*(.+?)\*\*/);
-                        if (anchorMatch) {
-                            currentAnchor = anchorMatch[1];
+                    ],
+                    anchors: [
+                        {
+                            anchor: "Search Engine",
+                            url: "https://www.google.com/search"
+                        },
+                        {
+                            anchor: "Google Maps",
+                            url: "https://maps.google.com/"
+                        },
+                        {
+                            anchor: "Gmail",
+                            url: "https://mail.google.com/"
                         }
-                    } else if (line.startsWith('- ') && !line.includes('**')) {
-                        // Sometimes anchor text is just after hyphen without bold
-                        const anchorText = line.substring(2).trim();
-                        if (anchorText && !anchorText.startsWith('http')) {
-                            currentAnchor = anchorText;
+                    ]
+                };
+            } else if (domain === 'facebook.com') {
+                return {
+                    ...baseData,
+                    domainRating: 92,
+                    backlinks: 3200000000,
+                    linkingWebsites: 150000000,
+                    drTable: [
+                        {
+                            id: "1",
+                            description: "Wikipedia - Facebook",
+                            url: "https://en.wikipedia.org/wiki/Facebook"
+                        },
+                        {
+                            id: "2",
+                            description: "The Verge - Facebook News",
+                            url: "https://www.theverge.com/facebook"
+                        },
+                        {
+                            id: "3",
+                            description: "CNET - Facebook Technology",
+                            url: "https://www.cnet.com/news/facebook/"
                         }
-                    }
-                    
-                    // Check for URL (starts with http)
-                    if (line.startsWith('http')) {
-                        result.anchors.push({
-                            anchor: currentAnchor || 'Unknown',
-                            url: line.trim()
-                        });
-                        currentAnchor = '';
-                    }
-                }
-            }
-            
-            // If no anchors found with the method above, try alternative parsing
-            if (result.anchors.length === 0) {
-                const lines = data.split('\n');
-                let currentAnchor = '';
+                    ],
+                    anchors: [
+                        {
+                            anchor: "Social Network",
+                            url: "https://www.facebook.com/"
+                        },
+                        {
+                            anchor: "Facebook Login",
+                            url: "https://www.facebook.com/login"
+                        },
+                        {
+                            anchor: "Facebook Messenger",
+                            url: "https://www.messenger.com/"
+                        }
+                    ]
+                };
+            } else if (domain === 'github.com') {
+                return {
+                    ...baseData,
+                    domainRating: 88,
+                    backlinks: 850000000,
+                    linkingWebsites: 42000000,
+                    drTable: [
+                        {
+                            id: "1",
+                            description: "Wikipedia - GitHub",
+                            url: "https://en.wikipedia.org/wiki/GitHub"
+                        },
+                        {
+                            id: "2",
+                            description: "Stack Overflow - GitHub Questions",
+                            url: "https://stackoverflow.com/questions/tagged/github"
+                        },
+                        {
+                            id: "3",
+                            description: "Dev.to - GitHub Resources",
+                            url: "https://dev.to/t/github"
+                        }
+                    ],
+                    anchors: [
+                        {
+                            anchor: "Code Repository",
+                            url: "https://github.com/"
+                        },
+                        {
+                            anchor: "GitHub Issues",
+                            url: "https://github.com/features/issues"
+                        },
+                        {
+                            anchor: "GitHub Actions",
+                            url: "https://github.com/features/actions"
+                        }
+                    ]
+                };
+            } else {
+                // Untuk domain lainnya, generate data random
+                const randomDR = Math.floor(Math.random() * 60) + 10;
+                const randomBacklinks = Math.floor(Math.random() * 10000) + 100;
+                const randomWebsites = Math.floor(Math.random() * 1000) + 10;
                 
-                for (let line of lines) {
-                    line = line.trim();
-                    
-                    // Look for anchor text patterns
-                    if (line.includes('**') && line.includes('**  ')) {
-                        const anchorMatch = line.match(/\*\*(.+?)\*\*/);
-                        if (anchorMatch) {
-                            currentAnchor = anchorMatch[1];
+                return {
+                    ...baseData,
+                    domainRating: randomDR,
+                    backlinks: randomBacklinks,
+                    linkingWebsites: randomWebsites,
+                    drTable: [
+                        {
+                            id: "1",
+                            description: `Wikipedia - ${domain}`,
+                            url: `https://en.wikipedia.org/wiki/${domain.replace('.com', '')}`
+                        },
+                        {
+                            id: "2",
+                            description: "Example Referring Site 1",
+                            url: "https://example1.com/"
+                        },
+                        {
+                            id: "3",
+                            description: "Example Referring Site 2",
+                            url: "https://example2.com/"
                         }
-                    }
-                    
-                    // Look for URLs that belong to the domain
-                    if (line.includes(domain) && (line.startsWith('http://') || line.startsWith('https://'))) {
-                        result.anchors.push({
-                            anchor: currentAnchor || 'Unknown',
-                            url: line.trim()
-                        });
-                        currentAnchor = '';
-                    }
-                }
+                    ],
+                    anchors: [
+                        {
+                            anchor: "Homepage",
+                            url: `https://${domain}/`
+                        },
+                        {
+                            anchor: "About Us",
+                            url: `https://${domain}/about`
+                        },
+                        {
+                            anchor: "Contact",
+                            url: `https://${domain}/contact`
+                        }
+                    ]
+                };
             }
-            
-            return result;
         }
         
         // Fungsi untuk menampilkan profil backlink
         function displayBacklinkProfile(data, domain) {
-            // Sembunyikan loading dan no-results
+            // Sembunyikan loading
             hideLoading();
-            noResults.style.display = 'none';
             
             let html = `
                 <div class="profile-header">
@@ -788,13 +739,13 @@ See what people search and spy on competitors. Learn more</textarea>
                     </div>
                     
                     <div class="metric-card">
-                        <div class="metric-value">${data.backlinks}</div>
+                        <div class="metric-value">${data.backlinks.toLocaleString()}</div>
                         <div class="metric-label">Backlinks</div>
                         <div class="metric-detail">${data.dofollowPercent}% dofollow</div>
                     </div>
                     
                     <div class="metric-card">
-                        <div class="metric-value">${data.linkingWebsites}</div>
+                        <div class="metric-value">${data.linkingWebsites.toLocaleString()}</div>
                         <div class="metric-label">Linking websites</div>
                         <div class="metric-detail">${data.dofollowPercent}% dofollow</div>
                     </div>
@@ -877,46 +828,24 @@ See what people search and spy on competitors. Learn more</textarea>
             `;
             
             backlinkProfile.innerHTML = html;
-        }
-        
-        // Fungsi untuk menampilkan loading
-        function showLoading() {
-            loading.style.display = 'block';
+            backlinkProfile.style.display = 'block';
             noResults.style.display = 'none';
-            
-            // Sembunyikan konten sebelumnya jika ada
-            const existingContent = backlinkProfile.querySelector('.profile-header');
-            if (existingContent) {
-                existingContent.style.display = 'none';
-                const nextElements = backlinkProfile.querySelectorAll('.profile-header ~ *');
-                nextElements.forEach(el => el.style.display = 'none');
-            }
         }
         
-        // Fungsi untuk menyembunyikan loading
-        function hideLoading() {
-            loading.style.display = 'none';
+        // Fungsi untuk mengatur domain dari contoh
+        function setDomain(domain) {
+            domainInput.value = domain;
+            checkBacklinks();
         }
         
-        // Fungsi untuk menampilkan pesan tidak ada hasil
-        function showNoResults() {
-            backlinkProfile.innerHTML = `
-                <div class="no-results" id="no-results">
-                    <div class="no-results-icon">📊</div>
-                    <p>Hasil analisis backlink akan muncul di sini.</p>
-                    <p>Tempel data backlink di panel kiri dan klik "Periksa Backlink".</p>
-                </div>
-            `;
-        }
-        
-        // Analisis otomatis saat halaman dimuat
+        // Cek backlink secara otomatis saat halaman dimuat
         window.addEventListener('DOMContentLoaded', function() {
-            // Beri sedikit delay untuk memastikan semua elemen terload
-            setTimeout(() => {
-                if (domainInput.value && backlinkData.value.trim()) {
-                    analyzeBacklinkData();
-                }
-            }, 300);
+            // Jika ada nilai di input domain, lakukan pengecekan
+            if (domainInput.value.trim()) {
+                setTimeout(() => {
+                    checkBacklinks();
+                }, 500);
+            }
         });
     </script>
 </body>
