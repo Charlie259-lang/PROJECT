@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backlink Checker dengan Filter</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .input-section, .results-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .input-section {
+            flex: 1;
+        }
+        
+        .results-section {
+            flex: 2;
+        }
+        
+        h2 {
+            color: #182848;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #444;
+        }
+        
+        textarea, input[type="url"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        textarea:focus, input[type="url"]:focus {
+            border-color: #4b6cb7;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(75, 108, 183, 0.2);
+        }
+        
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        .btn {
+            background-color: #4b6cb7;
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn:hover {
+            background-color: #3a5795;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .result-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .stat-box {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px;
+            text-align: center;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #4b6cb7;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        
+        .results-table th {
+            background-color: #f1f5fd;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #182848;
+            border-bottom: 2px solid #e0e7ff;
+        }
+        
+        .results-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .results-table tr:hover {
+            background-color: #f9faff;
+        }
+        
+        .status-active {
+            color: #28a745;
+            font-weight: 600;
+        }
+        
+        .status-replaced {
+            color: #dc3545;
+            font-weight: 600;
+        }
+        
+        .filter-options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 10px 20px;
+            background-color: #e9ecef;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .filter-btn.active {
+            background-color: #4b6cb7;
+            color: white;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+            font-size: 1.1rem;
+        }
+        
+        .no-results i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #ccc;
+        }
+        
+        .instructions {
+            background-color: #f0f7ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 25px;
+            border-left: 4px solid #4b6cb7;
+        }
+        
+        .instructions h3 {
+            margin-bottom: 10px;
+            color: #182848;
+        }
+        
+        .instructions ol {
+            margin-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .replaced-list {
+            background-color: #fff5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .replaced-list h3 {
+            color: #dc3545;
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1><i class="fas fa-link"></i> Backlink Checker dengan Filter</h1>
+        <p class="subtitle">Periksa backlink Anda dan filter link yang sudah diganti sehingga tidak muncul dalam hasil. Data disimpan di browser Anda.</p>
+    </header>
+    
+    <div class="container">
+        <div class="input-section">
+            <h2><i class="fas fa-cog"></i> Konfigurasi Pengecekan</h2>
+            <div class="form-group">
+                <label for="target-url"><i class="fas fa-globe"></i> URL Target (Situs Anda):</label>
+                <input type="url" id="target-url" placeholder="https://contoh.com" value="https://website-saya.com">
+            </div>
+            
+            <div class="form-group">
+                <label for="backlinks"><i class="fas fa-external-link-alt"></i> Daftar Backlink (satu per baris):</label>
+                <textarea id="backlinks" placeholder="https://contoh-backlink1.com
+https://contoh-backlink2.com
+https://contoh-backlink3.com">https://blog-teknologi.com/seo-tips
+https://website-berita.com/artikel-terbaru
+https://forum-digital.com/discussion/12345
+https://portal-umkm.com/panduan-bisnis
+https://situs-edukasi.com/belajar-seo
+https://media-online.net/featured-post
+https://jurnal-ilmiah.com/research-paper
+https://blog-traveler.com/destinasi-favorit
+https://website-usaha.com/testimoni
+https://platform-kreatif.com/project-showcase</textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="replaced-links"><i class="fas fa-exchange-alt"></i> Link yang Sudah Diganti (tidak akan ditampilkan):</label>
+                <textarea id="replaced-links" placeholder="https://link-lama1.com
+https://link-lama2.com">https://forum-digital.com/discussion/12345
+https://media-online.net/featured-post</textarea>
+                <p style="font-size: 0.9rem; color: #666; margin-top: 5px;">Link dalam daftar ini tidak akan muncul dalam hasil pengecekan.</p>
+            </div>
+            
+            <div class="button-group">
+                <button id="check-btn" class="btn"><i class="fas fa-search"></i> Periksa Backlink</button>
+                <button id="clear-btn" class="btn btn-secondary"><i class="fas fa-trash-alt"></i> Hapus Hasil</button>
+            </div>
+        </div>
+        
+        <div class="results-section">
+            <h2><i class="fas fa-chart-bar"></i> Hasil Pengecekan</h2>
+            
+            <div class="filter-options">
+                <button class="filter-btn active" data-filter="all">Semua Link</button>
+                <button class="filter-btn" data-filter="active">Aktif</button>
+                <button class="filter-btn" data-filter="replaced">Telah Diganti</button>
+            </div>
+            
+            <div class="result-stats">
+                <div class="stat-box">
+                    <div class="stat-number" id="total-links">0</div>
+                    <div class="stat-label">Total Backlink</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="active-links">0</div>
+                    <div class="stat-label">Link Aktif</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="replaced-count">0</div>
+                    <div class="stat-label">Telah Diganti</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="filtered-links">0</div>
+                    <div class="stat-label">Ditampilkan</div>
+                </div>
+            </div>
+            
+            <div class="replaced-list" id="replaced-list-container">
+                <h3><i class="fas fa-exclamation-triangle"></i> Link yang Sudah Diganti</h3>
+                <div id="replaced-links-list">
+                    <!-- Daftar link yang sudah diganti akan muncul di sini -->
+                </div>
+            </div>
+            
+            <div id="results-container">
+                <div class="no-results" id="no-results">
+                    <i class="fas fa-search"></i>
+                    <p>Hasil pengecekan akan muncul di sini. Klik "Periksa Backlink" untuk memulai.</p>
+                </div>
+                
+                <table class="results-table" id="results-table" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>URL Backlink</th>
+                            <th>Status</th>
+                            <th>Tanggal Pengecekan</th>
+                        </tr>
+                    </thead>
+                    <tbody id="results-body">
+                        <!-- Hasil pengecekan akan dimasukkan di sini -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="instructions">
+        <h3><i class="fas fa-info-circle"></i> Cara Menggunakan Backlink Checker</h3>
+        <ol>
+            <li>Masukkan URL target (website Anda) di kolom pertama</li>
+            <li>Tempel daftar backlink yang ingin diperiksa (satu URL per baris)</li>
+            <li>Tambahkan URL backlink yang sudah diganti ke daftar "Link yang Sudah Diganti"</li>
+            <li>Klik tombol "Periksa Backlink" untuk memulai analisis</li>
+            <li>Gunakan filter untuk melihat hanya link aktif atau link yang sudah diganti</li>
+            <li>Data akan disimpan secara otomatis di browser Anda</li>
+        </ol>
+    </div>
+    
+    <footer>
+        <p>Backlink Checker dengan Filter &copy; 2023 | Dibuat dengan HTML, CSS, dan JavaScript | Data disimpan secara lokal di browser</p>
+    </footer>
+
+    <script>
+        // Elemen DOM
+        const targetUrlInput = document.getElementById('target-url');
+        const backlinksInput = document.getElementById('backlinks');
+        const replacedLinksInput = document.getElementById('replaced-links');
+        const checkBtn = document.getElementById('check-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        const resultsBody = document.getElementById('results-body');
+        const resultsTable = document.getElementById('results-table');
+        const noResults = document.getElementById('no-results');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const totalLinksEl = document.getElementById('total-links');
+        const activeLinksEl = document.getElementById('active-links');
+        const replacedCountEl = document.getElementById('replaced-count');
+        const filteredLinksEl = document.getElementById('filtered-links');
+        const replacedLinksListEl = document.getElementById('replaced-links-list');
+        const replacedListContainer = document.getElementById('replaced-list-container');
+        
+        // Data hasil pengecekan
+        let backlinkResults = [];
+        let replacedLinks = [];
+        let currentFilter = 'all';
+        
+        // Inisialisasi
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSavedData();
+            updateStats();
+            updateReplacedList();
+            
+            // Sembunyikan container link yang diganti jika tidak ada
+            if (replacedLinks.length === 0) {
+                replacedListContainer.style.display = 'none';
+            }
+        });
+        
+        // Event Listeners
+        checkBtn.addEventListener('click', checkBacklinks);
+        clearBtn.addEventListener('click', clearResults);
+        
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Hapus class active dari semua tombol
+                filterBtns.forEach(b => b.classList.remove('active'));
+                // Tambahkan class active ke tombol yang diklik
+                this.classList.add('active');
+                currentFilter = this.dataset.filter;
+                filterResults();
+            });
+        });
+        
+        // Fungsi untuk memeriksa backlink
+        function checkBacklinks() {
+            const targetUrl = targetUrlInput.value.trim();
+            const backlinksText = backlinksInput.value.trim();
+            const replacedLinksText = replacedLinksInput.value.trim();
+            
+            if (!targetUrl) {
+                alert('Harap masukkan URL target');
+                return;
+            }
+            
+            if (!backlinksText) {
+                alert('Harap masukkan daftar backlink');
+                return;
+            }
+            
+            // Simpan data ke localStorage
+            saveData();
+            
+            // Parsing daftar backlink dan link yang diganti
+            const backlinks = backlinksText.split('\n').map(link => link.trim()).filter(link => link);
+            replacedLinks = replacedLinksText.split('\n').map(link => link.trim()).filter(link => link);
+            
+            // Reset hasil sebelumnya
+            backlinkResults = [];
+            
+            // Proses setiap backlink
+            backlinks.forEach((link, index) => {
+                // Periksa apakah link termasuk dalam daftar yang sudah diganti
+                const isReplaced = replacedLinks.some(replacedLink => 
+                    link.includes(replacedLink) || replacedLink.includes(link)
+                );
+                
+                // Simulasi pengecekan backlink
+                // Di implementasi nyata, ini akan melakukan HTTP request ke setiap URL
+                // Untuk demo, kita acak statusnya
+                const isActive = !isReplaced && Math.random() > 0.3; // 70% kemungkinan aktif jika bukan link yang diganti
+                
+                backlinkResults.push({
+                    id: index + 1,
+                    url: link,
+                    isActive: isActive,
+                    isReplaced: isReplaced,
+                    checkedDate: new Date().toLocaleDateString('id-ID')
+                });
+            });
+            
+            // Tampilkan hasil
+            displayResults();
+            updateStats();
+            updateReplacedList();
+            
+            // Tampilkan container link yang diganti jika ada
+            if (replacedLinks.length > 0) {
+                replacedListContainer.style.display = 'block';
+            }
+        }
+        
+        // Fungsi untuk menampilkan hasil
+        function displayResults() {
+            resultsBody.innerHTML = '';
+            
+            if (backlinkResults.length === 0) {
+                noResults.style.display = 'block';
+                resultsTable.style.display = 'none';
+                return;
+            }
+            
+            // Filter hasil berdasarkan filter aktif
+            const filteredResults = backlinkResults.filter(result => {
+                if (currentFilter === 'active') return result.isActive && !result.isReplaced;
+                if (currentFilter === 'replaced') return result.isReplaced;
+                return true; // 'all'
+            });
+            
+            // Tampilkan hasil yang difilter
+            filteredResults.forEach(result => {
+                const row = document.createElement('tr');
+                
+                // Tentukan status teks dan class
+                let statusText, statusClass;
+                if (result.isReplaced) {
+                    statusText = 'Telah Diganti';
+                    statusClass = 'status-replaced';
+                } else {
+                    statusText = result.isActive ? 'Aktif' : 'Tidak Aktif';
+                    statusClass = result.isActive ? 'status-active' : 'status-replaced';
+                }
+                
+                row.innerHTML = `
+                    <td>${result.id}</td>
+                    <td><a href="${result.url}" target="_blank">${result.url}</a></td>
+                    <td><span class="${statusClass}">${statusText}</span></td>
+                    <td>${result.checkedDate}</td>
+                `;
+                
+                resultsBody.appendChild(row);
+            });
+            
+            noResults.style.display = 'none';
+            resultsTable.style.display = 'table';
+            
+            // Update statistik yang ditampilkan
+            filteredLinksEl.textContent = filteredResults.length;
+        }
+        
+        // Fungsi untuk memfilter hasil
+        function filterResults() {
+            displayResults();
+        }
+        
+        // Fungsi untuk memperbarui statistik
+        function updateStats() {
+            const totalLinks = backlinkResults.length;
+            const activeLinks = backlinkResults.filter(result => result.isActive && !result.isReplaced).length;
+            const replacedCount = backlinkResults.filter(result => result.isReplaced).length;
+            
+            totalLinksEl.textContent = totalLinks;
+            activeLinksEl.textContent = activeLinks;
+            replacedCountEl.textContent = replacedCount;
+            filteredLinksEl.textContent = totalLinks;
+        }
+        
+        // Fungsi untuk memperbarui daftar link yang diganti
+        function updateReplacedList() {
+            replacedLinksListEl.innerHTML = '';
+            
+            if (replacedLinks.length === 0) {
+                replacedLinksListEl.innerHTML = '<p>Tidak ada link yang telah diganti.</p>';
+                return;
+            }
+            
+            const list = document.createElement('ul');
+            list.style.marginLeft = '20px';
+            
+            replacedLinks.forEach(link => {
+                const listItem = document.createElement('li');
+                listItem.style.marginBottom = '5px';
+                listItem.textContent = link;
+                list.appendChild(listItem);
+            });
+            
+            replacedLinksListEl.appendChild(list);
+        }
+        
+        // Fungsi untuk menghapus hasil
+        function clearResults() {
+            if (confirm('Apakah Anda yakin ingin menghapus semua hasil pengecekan?')) {
+                backlinkResults = [];
+                resultsBody.innerHTML = '';
+                noResults.style.display = 'block';
+                resultsTable.style.display = 'none';
+                
+                // Reset statistik
+                totalLinksEl.textContent = '0';
+                activeLinksEl.textContent = '0';
+                replacedCountEl.textContent = '0';
+                filteredLinksEl.textContent = '0';
+                
+                // Hapus data dari localStorage
+                localStorage.removeItem('backlinkCheckerData');
+            }
+        }
+        
+        // Fungsi untuk menyimpan data ke localStorage
+        function saveData() {
+            const data = {
+                targetUrl: targetUrlInput.value,
+                backlinks: backlinksInput.value,
+                replacedLinks: replacedLinksInput.value,
+                results: backlinkResults
+            };
+            
+            localStorage.setItem('backlinkCheckerData', JSON.stringify(data));
+        }
+        
+        // Fungsi untuk memuat data dari localStorage
+        function loadSavedData() {
+            const savedData = localStorage.getItem('backlinkCheckerData');
+            
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                
+                targetUrlInput.value = data.targetUrl || '';
+                backlinksInput.value = data.backlinks || '';
+                replacedLinksInput.value = data.replacedLinks || '';
+                backlinkResults = data.results || [];
+                
+                // Tampilkan hasil yang disimpan jika ada
+                if (backlinkResults.length > 0) {
+                    displayResults();
+                }
+            }
+        }
+        
+        // Simpan data secara otomatis saat input berubah
+        targetUrlInput.addEventListener('input', saveData);
+        backlinksInput.addEventListener('input', saveData);
+        replacedLinksInput.addEventListener('input', function() {
+            saveData();
+            // Update daftar link yang diganti
+            const replacedLinksText = replacedLinksInput.value.trim();
+            replacedLinks = replacedLinksText.split('\n').map(link => link.trim()).filter(link => link);
+            updateReplacedList();
+            
+            // Tampilkan/sembunyikan container
+            if (replacedLinks.length === 0) {
+                replacedListContainer.style.display = 'none';
+            } else {
+                replacedListContainer.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
