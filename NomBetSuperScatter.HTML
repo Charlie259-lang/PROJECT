@@ -22,7 +22,7 @@
             background-attachment: fixed;
             position: relative;
         }
-        /* Overlay gelap pada body - dipertegas */
+        /* Overlay gelap pada background */
         body::before {
             content: "";
             position: fixed;
@@ -30,8 +30,18 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.45); /* lebih gelap */
+            background: rgba(0, 0, 0, 0.45);
             z-index: 0;
+        }
+        /* Canvas untuk kembang api */
+        #fireworks-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* agar tidak mengganggu klik */
+            z-index: 5; /* di atas overlay, di bawah card */
         }
         .card {
             background: rgba(255, 245, 255, 0.9);
@@ -39,16 +49,15 @@
             max-width: 500px;
             width: 100%;
             border-radius: 40px;
-            /* Shadow lebih kompleks dan dramatis */
             box-shadow: 
-                0 40px 60px rgba(0, 0, 0, 0.7),      /* bayangan utama besar */
-                0 15px 25px rgba(0, 0, 0, 0.5),      /* bayangan kedua lebih dekat */
-                0 0 0 2px rgba(255, 255, 255, 0.15) inset; /* inner light */
+                0 40px 60px rgba(0, 0, 0, 0.7),
+                0 15px 25px rgba(0, 0, 0, 0.5),
+                0 0 0 2px rgba(255, 255, 255, 0.15) inset;
             padding: 30px;
             border: 3px solid #f0d0ff;
             position: relative;
             overflow: hidden;
-            z-index: 1;
+            z-index: 10; /* di atas canvas */
         }
         .card::before {
             content: "";
@@ -265,6 +274,9 @@
     </style>
 </head>
 <body>
+    <!-- Canvas untuk kembang api -->
+    <canvas id="fireworks-canvas"></canvas>
+
     <div class="card">
         <!-- Header SUHAN MONYET CERIA -->
         <div class="monkey-header">
@@ -399,6 +411,145 @@
                 errorMsg.textContent = '🍌 Waduh, nominal tidak ada di daftar! Coba lagi.';
             }
         });
+    </script>
+
+    <!-- Script kembang api super meriah Imlek -->
+    <script>
+        (function() {
+            const canvas = document.getElementById('fireworks-canvas');
+            const ctx = canvas.getContext('2d');
+            let width, height;
+            let particles = [];
+            const MAX_PARTICLES = 600;        // lebih banyak partikel
+            const GRAVITY = 0.03;              // gravitasi kecil biar melayang
+            const FIREWORK_CHANCE = 0.06;      // lebih sering muncul
+
+            function resizeCanvas() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+            }
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+
+            function random(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            // Fungsi untuk membuat ledakan di posisi tertentu
+            function createExplosion(x, y, customColor = null) {
+                const count = 50 + Math.floor(Math.random() * 70); // 50-120 partikel
+                const baseHue = customColor !== null ? customColor : Math.random() * 360;
+                for (let i = 0; i < count; i++) {
+                    const angle = random(0, Math.PI * 2);
+                    const speed = random(2, 8);
+                    const hue = (baseHue + random(-30, 30)) % 360;
+                    const color = `hsl(${hue}, 100%, 65%)`;
+                    particles.push({
+                        x: x,
+                        y: y,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed,
+                        life: 1.0,
+                        maxLife: 1.0,
+                        color: color,
+                        size: random(3, 8)      // partikel lebih besar
+                    });
+                }
+            }
+
+            // Ledakan bertingkat (double explosion)
+            function createDoubleExplosion(x, y) {
+                const hue1 = Math.random() * 360;
+                const hue2 = (hue1 + 180) % 360; // complementary color
+                createExplosion(x - 20, y - 20, hue1);
+                createExplosion(x + 20, y + 20, hue2);
+            }
+
+            // Ledakan besar dengan banyak warna
+            function createBigExplosion(x, y) {
+                for (let i = 0; i < 3; i++) {
+                    setTimeout(() => {
+                        createExplosion(x + random(-50, 50), y + random(-30, 30), random(0, 360));
+                    }, i * 50);
+                }
+            }
+
+            // Inisialisasi dengan beberapa ledakan awal
+            function initFireworks() {
+                for (let i = 0; i < 8; i++) {
+                    setTimeout(() => {
+                        const x = random(width * 0.2, width * 0.8);
+                        const y = random(height * 0.1, height * 0.4);
+                        if (i % 3 === 0) createDoubleExplosion(x, y);
+                        else createExplosion(x, y);
+                    }, i * 150);
+                }
+            }
+            setTimeout(initFireworks, 200);
+
+            function update() {
+                // Spawn random firework dengan variasi
+                if (Math.random() < FIREWORK_CHANCE) {
+                    const x = random(width * 0.1, width * 0.9);
+                    const y = random(height * 0.1, height * 0.5);
+                    const r = Math.random();
+                    if (r < 0.3) {
+                        createDoubleExplosion(x, y);
+                    } else if (r < 0.6) {
+                        createBigExplosion(x, y);
+                    } else {
+                        createExplosion(x, y);
+                    }
+                }
+
+                // Update particles
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    const p = particles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += GRAVITY;
+                    p.vx *= 0.99; // sedikit gesekan
+                    p.vy *= 0.99;
+                    p.life -= 0.005; // lebih lambat fade
+                    if (p.life <= 0 || p.y > height + 100 || p.x < -100 || p.x > width + 100) {
+                        particles.splice(i, 1);
+                    }
+                }
+
+                // Limit particles
+                if (particles.length > MAX_PARTICLES) {
+                    particles = particles.slice(-MAX_PARTICLES);
+                }
+            }
+
+            function draw() {
+                ctx.clearRect(0, 0, width, height);
+                ctx.globalCompositeOperation = 'lighter';
+                for (let p of particles) {
+                    ctx.globalAlpha = p.life * 0.9;
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+                    ctx.fill();
+                    // Tambah glitter kecil
+                    ctx.globalAlpha = p.life * 0.4;
+                    ctx.fillStyle = 'white';
+                    ctx.beginPath();
+                    ctx.arc(p.x - 2, p.y - 2, p.size * 0.5 * p.life, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.globalCompositeOperation = 'source-over';
+            }
+
+            function loop() {
+                update();
+                draw();
+                requestAnimationFrame(loop);
+            }
+            loop();
+        })();
     </script>
 </body>
 </html>
