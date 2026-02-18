@@ -22,7 +22,6 @@
             background-attachment: fixed;
             position: relative;
         }
-        /* Overlay gelap pada background */
         body::before {
             content: "";
             position: fixed;
@@ -33,15 +32,14 @@
             background: rgba(0, 0, 0, 0.45);
             z-index: 0;
         }
-        /* Canvas untuk kembang api */
         #fireworks-canvas {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none; /* agar tidak mengganggu klik */
-            z-index: 5; /* di atas overlay, di bawah card */
+            pointer-events: none;
+            z-index: 5;
         }
         .card {
             background: rgba(255, 245, 255, 0.9);
@@ -57,7 +55,7 @@
             border: 3px solid #f0d0ff;
             position: relative;
             overflow: hidden;
-            z-index: 10; /* di atas canvas */
+            z-index: 10;
         }
         .card::before {
             content: "";
@@ -194,12 +192,18 @@
             font-size: 28px;
             color: #a06bd9;
         }
+        .result-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
         .result-value {
-            font-size: 52px;
+            font-size: 42px;
             font-weight: 800;
             color: #311b50;
             line-height: 1.1;
-            margin-top: 10px;
             word-break: break-word;
             text-shadow: 3px 3px 0 #dbb5ff;
             background: #f5eaff;
@@ -207,6 +211,30 @@
             padding: 0 20px 5px 20px;
             border-radius: 40px;
             border: 2px dashed #b384dd;
+            flex: 1;
+        }
+        .copy-btn {
+            background: #7a4d9e;
+            border: none;
+            color: white;
+            font-size: 28px;
+            padding: 12px 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #4a2d6e, 0 8px 15px rgba(0,0,0,0.3);
+            transition: 0.1s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .copy-btn:hover {
+            background: #8f5fd0;
+            transform: translateY(-2px);
+            box-shadow: 0 7px 0 #4a2d6e, 0 12px 20px rgba(0,0,0,0.3);
+        }
+        .copy-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #4a2d6e, 0 5px 10px rgba(0,0,0,0.3);
         }
         .not-found {
             color: #a13d3d;
@@ -274,11 +302,9 @@
     </style>
 </head>
 <body>
-    <!-- Canvas untuk kembang api -->
     <canvas id="fireworks-canvas"></canvas>
 
     <div class="card">
-        <!-- Header SUHAN MONYET CERIA -->
         <div class="monkey-header">
             <div class="monkey-icon">
                 <i class="fas fa-monkey"></i>
@@ -289,44 +315,40 @@
             </div>
         </div>
 
-        <!-- Judul -->
         <h1>🍌 BELI PUTARAN GRATIS SUPER</h1>
 
-        <!-- Teks peringatan di tengah -->
         <div class="subhead">
             <i class="fas fa-crown" style="color:#8a5fd0;"></i> 
             bukan beli putaran gratis ya nyet! 
             <i class="fas fa-crown" style="color:#8a5fd0;"></i>
         </div>
 
-        <!-- Input utama -->
         <div class="input-group">
             <label for="buyInput"><i class="fas fa-gem"></i> Buy Super Spin (Rp)</label>
             <input type="text" id="buyInput" placeholder="Contoh: 400,000 atau 400000" autocomplete="off">
         </div>
 
-        <!-- Hasil stake -->
         <div class="result" id="resultBox">
             <div class="result-label">
                 <i class="fas fa-paw"></i> Stake Bermain :
                 <i class="fas fa-banana" style="margin-left:auto; opacity:0.8;"></i>
             </div>
-            <div class="result-value" id="stakeDisplay">-</div>
+            <div class="result-content">
+                <div class="result-value" id="stakeDisplay">-</div>
+                <button class="copy-btn" id="copyButton" title="Salin ke clipboard"><i class="fas fa-copy"></i></button>
+            </div>
             <div id="errorMessage" class="not-found"></div>
         </div>
 
-        <!-- Hiasan monyet -->
         <div class="monkey-decoration">
             <span><i class="fas fa-monkey"></i>  🍇  <i class="fas fa-monkey"></i></span>
             <span><i class="fas fa-banana"></i>  🐒  <i class="fas fa-banana"></i></span>
         </div>
 
-        <!-- Info note -->
         <div class="info-note">
             <i class="fas fa-check-circle" style="color:#5f2e91;"></i> Pakai koma ya (contoh: 1,500,000).
         </div>
 
-        <!-- Animasi monyet kecil -->
         <div class="footer-animation">
             <i class="fas fa-monkey" style="color:#7a4d9e;"></i>
             <i class="fas fa-leaf" style="color:#6b3f9b;"></i>
@@ -335,94 +357,143 @@
     </div>
 
     <script>
-        // Data lengkap
-        const data = [
-            { buy: 600000000, stake: 1200000 },
-            { buy: 500000000, stake: 1000000 },
-            { buy: 450000000, stake: 900000 },
-            { buy: 400000000, stake: 800000 },
-            { buy: 350000000, stake: 700000 },
-            { buy: 300000000, stake: 600000 },
-            { buy: 250000000, stake: 500000 },
-            { buy: 200000000, stake: 400000 },
-            { buy: 150000000, stake: 300000 },
-            { buy: 100000000, stake: 200000 },
-            { buy: 75000000, stake: 150000 },
-            { buy: 50000000, stake: 100000 },
-            { buy: 45000000, stake: 90000 },
-            { buy: 40000000, stake: 80000 },
-            { buy: 30000000, stake: 60000 },
-            { buy: 25000000, stake: 50000 },
-            { buy: 20000000, stake: 40000 },
-            { buy: 15000000, stake: 30000 },
-            { buy: 10000000, stake: 20000 },
-            { buy: 7500000, stake: 15000 },
-            { buy: 5000000, stake: 10000 },
-            { buy: 4500000, stake: 9000 },
-            { buy: 4000000, stake: 8000 },
-            { buy: 3500000, stake: 7000 },
-            { buy: 3000000, stake: 6000 },
-            { buy: 2500000, stake: 5000 },
-            { buy: 2000000, stake: 4000 },
-            { buy: 1500000, stake: 3000 },
-            { buy: 1000000, stake: 2000 },
-            { buy: 750000, stake: 1500 },
-            { buy: 500000, stake: 1000 },
-            { buy: 400000, stake: 800 },
-            { buy: 300000, stake: 600 },
-            { buy: 200000, stake: 400 },
-            { buy: 100000, stake: 200 }
-        ];
-
+        // Format angka dengan koma
         function formatWithComma(num) {
             return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
         }
 
-        function cleanNumber(str) {
-            return str.replace(/[^\d]/g, '');
-        }
-
-        function findStake(buyNumber) {
-            return data.find(item => item.buy === buyNumber);
+        // Fungsi untuk mendapatkan rentang stake berdasarkan nominal buy
+        function getStakeRange(buy) {
+            if (buy < 400000) {
+                return { error: true, message: "Tidak bisa claim karena tidak sesuai kriteria" };
+            } else if (buy >= 400000 && buy <= 750000) {
+                return { error: false, range: "BET 800 - 1,600" };
+            } else if (buy >= 1000000 && buy <= 2000000) {
+                return { error: false, range: "BET 2,000 - 4,000" };
+            } else if (buy >= 2500000) {
+                return { error: false, range: "BET 5,000 - 7,000" };
+            } else {
+                return { error: true, message: "Nominal tidak termasuk dalam rentang yang tersedia" };
+            }
         }
 
         const buyInput = document.getElementById('buyInput');
         const stakeDisplay = document.getElementById('stakeDisplay');
         const errorMsg = document.getElementById('errorMessage');
+        const copyButton = document.getElementById('copyButton');
 
+        // Event input dengan format otomatis
         buyInput.addEventListener('input', function(e) {
-            const raw = e.target.value;
-            const digits = cleanNumber(raw);
+            const input = e.target;
+            let cursorPos = input.selectionStart;
+            let val = input.value;
 
+            // Hapus semua karakter non-digit
+            let digits = val.replace(/\D/g, '');
             if (digits === '') {
+                input.value = '';
                 stakeDisplay.textContent = '-';
                 errorMsg.textContent = '';
                 return;
             }
 
-            const buyValue = parseInt(digits, 10);
-            const found = findStake(buyValue);
+            // Hitung jumlah koma sebelum perubahan
+            let commaCountBefore = (val.slice(0, cursorPos).match(/,/g) || []).length;
 
-            if (found) {
-                stakeDisplay.textContent = formatWithComma(found.stake);
+            // Format angka dengan koma
+            let num = parseInt(digits, 10);
+            let formatted = num.toLocaleString('en-US');
+            input.value = formatted;
+
+            // Sesuaikan posisi kursor
+            let commaCountAfter = (formatted.slice(0, cursorPos).match(/,/g) || []).length;
+            let newCursorPos = cursorPos + (commaCountAfter - commaCountBefore);
+            newCursorPos = Math.min(newCursorPos, formatted.length);
+            input.setSelectionRange(newCursorPos, newCursorPos);
+
+            // Tentukan rentang stake
+            let result = getStakeRange(num);
+            if (!result.error) {
+                stakeDisplay.textContent = result.range;
                 errorMsg.textContent = '';
             } else {
                 stakeDisplay.textContent = '—';
-                errorMsg.textContent = '🍌 Waduh, nominal tidak ada di daftar! Coba lagi.';
+                errorMsg.textContent = '🍌 ' + result.message;
             }
+        });
+
+        buyInput.addEventListener('blur', function() {
+            let val = this.value;
+            let digits = val.replace(/\D/g, '');
+            if (digits) {
+                this.value = parseInt(digits, 10).toLocaleString('en-US');
+            }
+        });
+
+        // --- TOMBOL COPY DENGAN FALLBACK (execCommand) ---
+        copyButton.addEventListener('click', function() {
+            let textToCopy = stakeDisplay.textContent;
+
+            if (textToCopy === '-' || textToCopy === '—' || textToCopy === '') {
+                alert('Tidak ada teks untuk disalin!');
+                return;
+            }
+
+            // Fungsi copy dengan fallback
+            function copyToClipboard(text) {
+                // Coba Clipboard API modern jika tersedia dan tidak di-blokir
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(text).catch(function(err) {
+                        console.warn('Clipboard API gagal, gunakan fallback:', err);
+                        fallbackCopyText(text);
+                    });
+                } else {
+                    fallbackCopyText(text);
+                }
+            }
+
+            function fallbackCopyText(text) {
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+
+                // Buat textarea tidak terlihat
+                textArea.style.position = 'fixed';
+                textArea.style.top = '-9999px';
+                textArea.style.left = '-9999px';
+                textArea.style.opacity = '0';
+                document.body.appendChild(textArea);
+
+                textArea.focus();
+                textArea.select();
+
+                try {
+                    const successful = document.execCommand('copy');
+                    if (successful) {
+                        alert('Stake berhasil disalin: ' + text);
+                    } else {
+                        alert('Gagal menyalin menggunakan metode alternatif.');
+                    }
+                } catch (err) {
+                    alert('Gagal menyalin teks: ' + err);
+                } finally {
+                    document.body.removeChild(textArea);
+                }
+            }
+
+            copyToClipboard(textToCopy);
         });
     </script>
 
-    <!-- Script kembang api super meriah Imlek -->
+    <!-- Script kembang api super meriah -->
     <script>
         (function() {
             const canvas = document.getElementById('fireworks-canvas');
             const ctx = canvas.getContext('2d');
             let width, height;
             let particles = [];
-            const MAX_PARTICLES = 600;        // lebih banyak partikel
-            const GRAVITY = 0.03;              // gravitasi kecil biar melayang
-            const FIREWORK_CHANCE = 0.06;      // lebih sering muncul
+            const MAX_PARTICLES = 600;
+            const GRAVITY = 0.03;
+            const FIREWORK_CHANCE = 0.06;
 
             function resizeCanvas() {
                 width = window.innerWidth;
@@ -437,9 +508,8 @@
                 return Math.random() * (max - min) + min;
             }
 
-            // Fungsi untuk membuat ledakan di posisi tertentu
             function createExplosion(x, y, customColor = null) {
-                const count = 50 + Math.floor(Math.random() * 70); // 50-120 partikel
+                const count = 50 + Math.floor(Math.random() * 70);
                 const baseHue = customColor !== null ? customColor : Math.random() * 360;
                 for (let i = 0; i < count; i++) {
                     const angle = random(0, Math.PI * 2);
@@ -454,20 +524,18 @@
                         life: 1.0,
                         maxLife: 1.0,
                         color: color,
-                        size: random(3, 8)      // partikel lebih besar
+                        size: random(3, 8)
                     });
                 }
             }
 
-            // Ledakan bertingkat (double explosion)
             function createDoubleExplosion(x, y) {
                 const hue1 = Math.random() * 360;
-                const hue2 = (hue1 + 180) % 360; // complementary color
+                const hue2 = (hue1 + 180) % 360;
                 createExplosion(x - 20, y - 20, hue1);
                 createExplosion(x + 20, y + 20, hue2);
             }
 
-            // Ledakan besar dengan banyak warna
             function createBigExplosion(x, y) {
                 for (let i = 0; i < 3; i++) {
                     setTimeout(() => {
@@ -476,7 +544,6 @@
                 }
             }
 
-            // Inisialisasi dengan beberapa ledakan awal
             function initFireworks() {
                 for (let i = 0; i < 8; i++) {
                     setTimeout(() => {
@@ -490,7 +557,6 @@
             setTimeout(initFireworks, 200);
 
             function update() {
-                // Spawn random firework dengan variasi
                 if (Math.random() < FIREWORK_CHANCE) {
                     const x = random(width * 0.1, width * 0.9);
                     const y = random(height * 0.1, height * 0.5);
@@ -504,21 +570,19 @@
                     }
                 }
 
-                // Update particles
                 for (let i = particles.length - 1; i >= 0; i--) {
                     const p = particles[i];
                     p.x += p.vx;
                     p.y += p.vy;
                     p.vy += GRAVITY;
-                    p.vx *= 0.99; // sedikit gesekan
+                    p.vx *= 0.99;
                     p.vy *= 0.99;
-                    p.life -= 0.005; // lebih lambat fade
+                    p.life -= 0.005;
                     if (p.life <= 0 || p.y > height + 100 || p.x < -100 || p.x > width + 100) {
                         particles.splice(i, 1);
                     }
                 }
 
-                // Limit particles
                 if (particles.length > MAX_PARTICLES) {
                     particles = particles.slice(-MAX_PARTICLES);
                 }
@@ -533,7 +597,6 @@
                     ctx.beginPath();
                     ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
                     ctx.fill();
-                    // Tambah glitter kecil
                     ctx.globalAlpha = p.life * 0.4;
                     ctx.fillStyle = 'white';
                     ctx.beginPath();
