@@ -668,6 +668,13 @@
             return core;
         }
 
+        /**
+         * Hapus angka di akhir nama bank (misal "DANAMON 5" -> "DANAMON")
+         */
+        function removeTrailingNumber(bankName) {
+            return bankName.replace(/\s+\d+$/, '');
+        }
+
         function extractBank(bankSource, nama) {
             if (!bankSource) return '';
             let core = '';
@@ -705,6 +712,9 @@
 
             const knownAgain = findKnownBank(result);
             if (knownAgain) return knownAgain;
+
+            // Bersihkan angka di akhir
+            result = removeTrailingNumber(result);
 
             return result || 'BANK UNKNOWN';
         }
@@ -776,7 +786,20 @@
             ['DEPO','WD','KAS','LAINNYA'].forEach(g => {
                 groups[g].forEach(item => {
                     let bankDisplay = item.bank;
-                    if (!bankDisplay.toLowerCase().startsWith('bank')) bankDisplay = 'BANK ' + bankDisplay;
+                    // Tambahkan "BANK " jika belum
+                    if (!bankDisplay.toLowerCase().startsWith('bank')) {
+                        bankDisplay = 'BANK ' + bankDisplay;
+                    }
+                    // Jika grup bukan LAINNYA, pastikan grup muncul setelah "BANK " tanpa duplikasi
+                    if (g !== 'LAINNYA') {
+                        // Cek apakah setelah "BANK " sudah mengandung grup (case insensitive)
+                        const afterBank = bankDisplay.substring(5).trim().toUpperCase();
+                        if (!afterBank.startsWith(g)) {
+                            const parts = bankDisplay.split(' ');
+                            const bankName = parts.slice(1).join(' ');
+                            bankDisplay = 'BANK ' + g + ' ' + bankName;
+                        }
+                    }
                     blocks.push(
                         `${bankDisplay}\n` +
                         `Nama Rekening : ${item.nama}\n` +
