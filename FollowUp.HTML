@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Follow Up Bank Bermasalah (Ikon 3D)</title>
+    <title>Follow Up Bank Bermasalah (Ikon 3D) - Info via Toast</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <style>
+        /* ===== CSS (sama seperti sebelumnya, dengan tambahan .toast.info) ===== */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -23,6 +24,7 @@
             align-items: center;
             padding: 20px;
             position: relative;
+            background-color: #1a1a2e;
             background-image: url('https://cdn.areabermain.club/assets/cdn/az6/2026/01/31/20260131/4e4f8669c6027205f69ac8a2c0bbaf83/linetogel-bg-imlek2026.webp');
             background-size: cover;
             background-position: center;
@@ -30,7 +32,6 @@
             background-attachment: fixed;
         }
 
-        /* overlay gelap agar teks lebih terbaca */
         body::before {
             content: '';
             position: fixed;
@@ -38,7 +39,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5); /* sesuaikan kegelapan di sini */
+            background-color: rgba(0, 0, 0, 0.6);
             z-index: 0;
         }
 
@@ -53,7 +54,7 @@
             box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3), inset 0 1px 2px rgba(255,255,255,0.3);
             border: 1px solid rgba(255,255,255,0.2);
             position: relative;
-            z-index: 1; /* tampil di atas overlay */
+            z-index: 1;
             animation: containerAppear 0.8s ease-out;
         }
 
@@ -205,6 +206,11 @@
             backdrop-filter: blur(4px);
         }
 
+        .btn:focus-visible {
+            outline: 3px solid #f6b83e;
+            outline-offset: 3px;
+        }
+
         .btn .btn-text {
             position: relative;
             z-index: 2;
@@ -255,7 +261,7 @@
             text-shadow: 0 1px 2px #a45007;
         }
 
-        .btn-primary:hover {
+        .btn-primary:hover:not(:disabled) {
             background: linear-gradient(145deg, #f0a82b, #fc8e6e);
             transform: scale(1.05);
             box-shadow: 0 15px 25px -8px #f6b83e;
@@ -269,7 +275,7 @@
             text-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
 
-        .btn-outline:hover {
+        .btn-outline:hover:not(:disabled) {
             background: rgba(255,255,255,0.25);
             border-color: #fda085;
             color: #fff;
@@ -283,10 +289,16 @@
             text-shadow: 0 1px 2px #0a2a4a;
         }
 
-        .btn-secondary:hover {
+        .btn-secondary:hover:not(:disabled) {
             background: linear-gradient(145deg, #3a5a9c, #0e2a4a);
             transform: scale(1.05);
             box-shadow: 0 15px 25px -8px #1e3c72;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            pointer-events: none;
         }
 
         .btn.loading {
@@ -350,6 +362,12 @@
             border-color: #e74c3c;
         }
 
+        /* Toast info (biru) */
+        .toast.info {
+            background: rgba(52, 152, 219, 0.3);
+            border-color: #3498db;
+        }
+
         .output-area {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(8px);
@@ -385,7 +403,6 @@
             gap: 8px;
         }
 
-        /* Ikon 3D */
         .icon-3d {
             display: inline-block;
             font-size: 1.8rem;
@@ -481,19 +498,30 @@
             color: #fff;
             font-weight: 400;
         }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
     </style>
 </head>
 <body>
 <div class="container">
     <h1>
-        <span>📋</span> FOLLOW UP BANK BERMASALAH <span>📋</span>
+        <span aria-hidden="true">📋</span> FOLLOW UP BANK BERMASALAH <span aria-hidden="true">📋</span>
     </h1>
 
     <!-- INPUT CARD -->
     <div class="card">
         <div class="flex-row">
             <label for="inputData">
-                <i>📥</i> Tempel data mentah (pisah tab, satu bank per baris)
+                <i aria-hidden="true">📥</i> Tempel data mentah (pisah tab, satu bank per baris)
             </label>
             <textarea id="inputData" rows="8" placeholder="Contoh:&#10;23 Jan 2026	Muhamad Rifai/ WD MANDIRI	1680004260350	Muhamad Rifa’i	Rp90,050&#10;20 Nov 2025	BANK KAS DANAMON 5 / Derian	3688289218	Derian	Rp190,854,116"></textarea>
         </div>
@@ -514,11 +542,11 @@
     <div class="output-area">
         <div class="output-header">
             <span>
-                <span class="icon-3d">📄</span> Hasil Follow Up
+                <span class="icon-3d" aria-hidden="true">📄</span> Hasil Follow Up
             </span>
             <span id="countInfo" class="badge">0 entri</span>
         </div>
-        <div class="output-content" id="outputContent">Hasil parsing akan tampil di sini</div>
+        <div class="output-content" id="outputContent" aria-live="polite">Hasil parsing akan tampil di sini</div>
     </div>
 
     <!-- CONTOH & INFO -->
@@ -538,6 +566,13 @@
 <!-- Toast Notification -->
 <div id="toast" class="toast"></div>
 
+<!-- Konfigurasi prioritas bank dalam JSON -->
+<script id="config" type="application/json">
+    {
+        "bankPriorities": ["BCA", "BNI", "BRI", "BSI", "CIMB", "DANAMON", "MAYBANK", "JAGO"]
+    }
+</script>
+
 <script>
     (function() {
         const inputEl = document.getElementById('inputData');
@@ -548,7 +583,22 @@
         const copyBtn = document.getElementById('copyBtn');
         const toast = document.getElementById('toast');
 
-        const bankPriorities = ['BCA', 'BNI', 'BRI', 'BSI', 'CIMB', 'DANAMON', 'MAYBANK', 'JAGO'];
+        // Daftar bank yang dikenal (untuk pencocokan lebih akurat)
+        const knownBanks = [
+            "BCA", "BNI", "BRI", "BSI", "CIMB", "DANAMON", "MAYBANK", "JAGO", 
+            "MANDIRI", "PERMATA", "CIMB NIAGA", "BANK MANDIRI", "BANK PERMATA",
+            "BANK BCA", "BANK BNI", "BANK BRI", "BANK BSI", "BANK DANAMON", "BANK MAYBANK", "BANK JAGO"
+        ];
+
+        // Ambil prioritas bank dari konfigurasi
+        let bankPriorities = [];
+        try {
+            const config = JSON.parse(document.getElementById('config').textContent);
+            bankPriorities = config.bankPriorities || [];
+        } catch (e) {
+            console.warn('Gagal memuat konfigurasi, menggunakan default', e);
+            bankPriorities = ['BCA', 'BNI', 'BRI', 'BSI', 'CIMB', 'DANAMON', 'MAYBANK', 'JAGO'];
+        }
 
         function triggerFadeIn(element) {
             element.classList.add('fade-in');
@@ -557,7 +607,7 @@
 
         function showToast(message, type = 'success', duration = 3000) {
             toast.textContent = message;
-            toast.className = 'toast ' + (type === 'success' ? 'success' : 'error');
+            toast.className = 'toast ' + (type === 'success' ? 'success' : (type === 'error' ? 'error' : 'info'));
             toast.classList.add('show');
             setTimeout(() => {
                 toast.classList.remove('show');
@@ -567,15 +617,42 @@
         function setLoading(button, isLoading) {
             if (isLoading) {
                 button.classList.add('loading');
+                button.disabled = true;
             } else {
                 button.classList.remove('loading');
+                button.disabled = false;
             }
+        }
+
+        /**
+         * Memformat angka menjadi format ribuan dengan koma
+         * Contoh: 90050 -> "90,050"
+         */
+        function formatNumberWithCommas(numStr) {
+            const digits = numStr.replace(/\D/g, '');
+            if (!digits) return '';
+            return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
         }
 
         function formatSaldo(saldo) {
             if (!saldo || saldo.trim() === '') return '';
-            let s = saldo.trim().replace(/^Rp\s*/i, '').replace(/[^\d,]/g, '');
-            return s ? `Rp. ${s},-` : '';
+            const digits = saldo.replace(/\D/g, '');
+            if (!digits) return '';
+            const formatted = formatNumberWithCommas(digits);
+            return `Rp. ${formatted},-`;
+        }
+
+        /**
+         * Mencari nama bank yang dikenal dalam string
+         */
+        function findKnownBank(str) {
+            const upperStr = str.toUpperCase();
+            for (let bank of knownBanks) {
+                if (upperStr.includes(bank.toUpperCase())) {
+                    return bank;
+                }
+            }
+            return null;
         }
 
         function normalizeBankCore(str) {
@@ -589,23 +666,23 @@
             core = core.trim();
             if (!core) return '';
             core = core.replace(/^BANK\s+/i, '').trim();
-            let words = core.split(/\s+/);
-            const stopwords = ['wonder','mobile','online'];
-            if (words.length > 1) {
-                let last = words[words.length-1].toLowerCase();
-                if (/\d/.test(last) || stopwords.includes(last)) words.pop();
-            }
-            let result = words.join(' ');
-            result = normalizeBankCore(result);
-            return result || core;
+            return core;
         }
 
         function extractBank(bankSource, nama) {
             if (!bankSource) return '';
-            bankSource = bankSource.trim();
             let core = '';
-            if (bankSource.includes('/')) {
-                let parts = bankSource.split('/').map(s=>s.trim());
+            const source = bankSource.trim();
+
+            // Coba cari bank yang dikenal terlebih dahulu
+            const known = findKnownBank(source);
+            if (known) {
+                return known;
+            }
+
+            // Jika ada tanda '/'
+            if (source.includes('/')) {
+                let parts = source.split('/').map(s=>s.trim());
                 let left = parts[0], right = parts[1];
                 let leftLower = left.toLowerCase();
                 if (leftLower.includes('bank') || leftLower.includes('depo') || leftLower.includes('kas')) {
@@ -614,44 +691,57 @@
                     core = right;
                 }
             } else {
-                let sisa = bankSource;
+                let sisa = source;
                 if (nama) {
-                    sisa = sisa.replace(new RegExp(nama + '$'), '').trim().replace(/\s+/g, ' ').trim();
+                    const namaEsc = nama.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    sisa = sisa.replace(new RegExp(namaEsc + '$'), '').trim();
                 }
-                if (!sisa) sisa = bankSource;
+                if (!sisa) sisa = source;
                 let words = sisa.split(/\s+/);
                 core = words.slice(0,2).join(' ') || sisa;
             }
-            return trimBankName(core);
+
+            let result = trimBankName(core);
+            if (!result) result = core;
+
+            const knownAgain = findKnownBank(result);
+            if (knownAgain) return knownAgain;
+
+            return result || 'BANK UNKNOWN';
         }
 
         function parseRow(line) {
-            const parts = line.split('\t');
-            if (parts.length < 5) return null;
-            const bankSource = parts[1]?.trim() || '';
-            const nama = parts[3]?.trim() || '';
-            const bank = extractBank(bankSource, nama);
-            const noRek = parts[2]?.trim() || '';
-            const saldoRaw = parts[4]?.trim() || '';
-            return {
-                bank,
-                nama,
-                noRek,
-                saldo: formatSaldo(saldoRaw),
-                keterangan: '',
-                bankSourceLower: bankSource.toLowerCase()
-            };
+            try {
+                const parts = line.split('\t');
+                if (parts.length < 5) return null;
+                const bankSource = parts[1]?.trim() || '';
+                const nama = parts[3]?.trim() || '';
+                const bank = extractBank(bankSource, nama);
+                const noRek = parts[2]?.trim() || '';
+                const saldoRaw = parts[4]?.trim() || '';
+                return {
+                    bank,
+                    nama,
+                    noRek,
+                    saldo: formatSaldo(saldoRaw),
+                    keterangan: '',
+                    bankSourceLower: bankSource.toLowerCase()
+                };
+            } catch (e) {
+                console.warn('Gagal memparse baris:', line, e);
+                return null;
+            }
         }
 
         function getGroup(item) {
             const src = item.bankSourceLower;
-            if (src.includes('depo')) return 'DEPO';
-            if (src.includes('wd')) return 'WD';
-            if (src.includes('kas')) return 'KAS';
+            if (/\b(?:depo|deposit|deposito)\b/.test(src)) return 'DEPO';
+            if (/\b(?:wd|withdraw|withdrawal|penarikan)\b/.test(src)) return 'WD';
+            if (/\b(?:kas|cash|tunai)\b/.test(src)) return 'KAS';
             const b = item.bank.toLowerCase();
-            if (b.includes('depo')) return 'DEPO';
-            if (b.includes('wd')) return 'WD';
-            if (b.includes('kas')) return 'KAS';
+            if (/\b(?:depo|deposit|deposito)\b/.test(b)) return 'DEPO';
+            if (/\b(?:wd|withdraw|withdrawal|penarikan)\b/.test(b)) return 'WD';
+            if (/\b(?:kas|cash|tunai)\b/.test(b)) return 'KAS';
             return 'LAINNYA';
         }
 
@@ -674,9 +764,13 @@
         }
 
         function renderGroupedBlocks(parsedList) {
-            if (!parsedList.length) return 'Tidak ada data valid. Periksa format baris.';
+            if (!parsedList.length) return '';
             const groups = { DEPO: [], WD: [], KAS: [], LAINNYA: [] };
-            parsedList.forEach(item => groups[getGroup(item)]?.push(item) || groups.LAINNYA.push(item));
+            parsedList.forEach(item => {
+                const group = getGroup(item);
+                if (groups[group]) groups[group].push(item);
+                else groups.LAINNYA.push(item);
+            });
             ['DEPO','WD','KAS','LAINNYA'].forEach(g => groups[g] = sortItemsByPriority(groups[g]));
 
             const blocks = [];
@@ -707,7 +801,8 @@
                     setLoading(parseBtn, false);
                     return;
                 }
-                const lines = raw.split('\n').filter(l => l.trim());
+                const lines = raw.split('\n').filter(l => l.trim() !== '');
+                const totalLines = lines.length;
                 const parsed = [];
                 lines.forEach(l => {
                     if (!l.toLowerCase().includes('done')) {
@@ -715,16 +810,22 @@
                         if (row) parsed.push(row);
                     }
                 });
+                const skipped = totalLines - parsed.length;
+                const infoMessage = `✅ Berhasil memproses ${parsed.length} dari ${totalLines} baris` + 
+                                     (skipped > 0 ? ` (${skipped} baris dilewati karena format salah atau mengandung "DONE")` : '');
+                
+                // Tampilkan info sebagai toast (durasi lebih lama 5 detik)
+                showToast(infoMessage, 'info', 5000);
+
                 if (!parsed.length) {
-                    outputEl.innerText = 'Tidak ada data valid (semua baris mungkin mengandung DONE atau format salah).';
+                    outputEl.innerText = 'Tidak ada data valid. Periksa format baris.';
                     countInfo.innerText = '0 entri';
-                    triggerFadeIn(outputEl);
                 } else {
-                    outputEl.innerText = renderGroupedBlocks(parsed);
+                    const blocks = renderGroupedBlocks(parsed);
+                    outputEl.innerText = blocks;
                     countInfo.innerText = parsed.length + ' entri';
-                    triggerFadeIn(outputEl);
-                    showToast('Parsing berhasil!', 'success');
                 }
+                triggerFadeIn(outputEl);
                 setLoading(parseBtn, false);
             }, 300);
         }
