@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rekonsiliasi QRIS 3 Sumber</title>
+  <style>
+    :root { --bg: #f8f9fa; --card: #fff; --border: #e2e8f0; --primary: #2563eb; --danger: #dc2626; --text: #1e293b; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+    body { background: var(--bg); color: var(--text); padding: 20px; line-height: 1.5; }
+    .container { max-width: 900px; margin: auto; background: var(--card); padding: 24px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    h1 { text-align: center; margin-bottom: 16px; font-size: 1.5rem; }
+    .warning { background: #fef3c7; color: #92400e; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; margin-bottom: 16px; text-align: center; }
+    .input-group { margin-bottom: 16px; }
+    label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 0.9rem; }
+    input[type="text"], input[type="password"], input[type="file"] { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem; }
+    .upload-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin-bottom: 20px; }
+    .upload-box { background: #f1f5f9; padding: 16px; border-radius: 8px; border: 1px dashed var(--border); }
+    .upload-box h3 { margin-bottom: 8px; font-size: 1rem; }
+    button { background: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%; font-size: 1rem; transition: 0.2s; }
+    button:hover { opacity: 0.9; }
+    button:disabled { background: #94a3b8; cursor: not-allowed; }
+    #status { margin-top: 16px; text-align: center; font-weight: 500; min-height: 24px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 0.85rem; }
+    th, td { padding: 10px; border-bottom: 1px solid var(--border); text-align: left; }
+    th { background: #f8fafc; position: sticky; top: 0; }
+    .diff-high { color: var(--danger); font-weight: bold; }
+    .export-btn { background: #10b981; margin-top: 12px; display: none; }
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid #fff; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; margin-right: 8px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔍 Rekonsiliasi QRIS (MINERAPAY | ZONAMAIN | IDN)</h1>
+    <div class="warning">⚠️ API Key berjalan di browser. Gunakan untuk file kecil (<300 baris). Untuk produksi, gunakan backend/proxy.</div>
+    
+    <div class="input-group">
+      <label>🔑 API Key AI (OpenAI Compatible)</label>
+      <input type="password" id="apiKey" placeholder="sk-... atau key Groq/Lokal">
+    </div>
+    <div class="input-group">
+      <label>🌐 Base URL API (Opsional)</label>
+      <input type="text" id="baseUrl" value="https://api.openai.com/v1" placeholder="https://api.openai.com/v1">
+    </div>
+
+    <div class="upload-grid">
+      <div class="upload-box"><h3>📦 MINERAPAY</h3><input type="file" id="fileMinera" accept=".csv,.txt,.xlsx,.json"></div>
+      <div class="upload-box"><h3>📦 ZONAMAIN</h3><input type="file" id="fileZona" accept=".csv,.txt,.xlsx,.json"></div>
+      <div class="upload-box"><h3>📦 IDN</h3><input type="file" id="fileIdn" accept=".csv,.txt,.xlsx,.json"></div>
+    </div>
+
+    <button id="btnProcess" onclick="startReconciliation()">🚀 Proses Rekonsiliasi</button>
+    <div id="status"></div>
+
+    <div id="resultContainer" class="hidden">
+      <table id="resultTable">
+        <thead>
+          <tr>
+            <th>TRX ID</th>
+            <th>MINERAPAY</th>
+            <th>ZONAMAIN</th>
+            <th>IDN</th>
+            <th>Selisih (Max)</th>
+            <th>Keterangan</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+      <button class="export-btn" id="btnExport" onclick="exportCSV()">📥 Export CSV</button>
+    </div>
+  </div>
+
+  <!-- SheetJS untuk baca Excel -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script>
+    const statusEl = document.getElementById('status');
+    const btn = document.getElementById('btnProcess');
+    let discrepancies = [];
+
+    function log(msg) { statusEl.innerHTML = `<span class="spinner"></span> ${msg}`; }
+    function success(msg) { statusEl.innerHTML = `✅ ${msg}`; statusEl.style.color = '#059669'; }
+    function error(msg) { statusEl.innerHTML = `❌ ${msg}`; statusEl.style.color = '#dc2626'; }
+
+    async function readFile(file) {
+      if (!file) throw new Error("File tidak dipilih");
+      if (file.name.endsWith('.xlsx')) {
+        const buf = await file.arrayBuffer();
+        const wb = XLSX.read(buf, { type: 'array' });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        return XLSX.utils.sheet_to_csv(ws);
+      }
+      return await file.text();
+    }
+
+    async function parseWithAI(raw, source, key, baseUrl) {
+      // Potong jika terlalu panjang untuk hemat token
+      const trimmed = raw.length > 2500 ? raw.substring(0, 2500) + '\n...(truncated)' : raw;
+      const prompt = `Anda adalah parser data keuangan. Ekstrak data ${source} berikut menjadi JSON array dengan field WAJIB: "trx_id", "amount" (angka), "status" (success/failed/pending), "timestamp". Abaikan header/footer tidak relevan. Jangan buat data fiktif. Output HARUS valid JSON dengan key "transactions".\n\nData:\n${trimmed}`;
+      
+      const res = await fetch(`${baseUrl}/chat/completions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [{ role: 'user', content: prompt }],
+          temperature: 0,
+          response_format: { type: 'json_object' }
+        })
+      });
+      if (!res.ok) throw new Error(`API Error: ${res.status} ${res.statusText}`);
+      const json = await res.json();
+      return JSON.parse(json.choices[0].message.content).transactions || [];
+    }
+
+    function reconcile(dataA, dataB, dataC) {
+      const toMap = (arr) => new Map(arr.map(d => [String(d.trx_id).trim(), d]));
+      const mA = toMap(dataA), mB = toMap(dataB), mC = toMap(dataC);
+      const allIds = new Set([...mA.keys(), ...mB.keys(), ...mC.keys()]);
+      const result = [];
+
+      for (const id of allIds) {
+        const a = mA.get(id) || { amount: 0, status: 'missing' };
+        const b = mB.get(id) || { amount: 0, status: 'missing' };
+        const c = mC.get(id) || { amount: 0, status: 'missing' };
+
+        const dAB = Math.abs((a.amount||0) - (b.amount||0));
+        const dAC = Math.abs((a.amount||0) - (c.amount||0));
+        const dBC = Math.abs((b.amount||0) - (c.amount||0));
+        const maxDiff = Math.max(dAB, dAC, dBC);
+        
+        const statuses = [a.status, b.status, c.status].filter(s => s !== 'missing');
+        const statusMismatch = statuses.length > 0 && new Set(statuses).size > 1;
+
+        if (maxDiff > 1 || statusMismatch) {
+          result.push({
+            trx_id: id,
+            a_amt: a.amount, a_st: a.status,
+            b_amt: b.amount, b_st: b.status,
+            c_amt: c.amount, c_st: c.status,
+            max_diff: maxDiff.toFixed(2),
+            issue: statusMismatch ? 'Status tidak match' : 'Nominal berbeda'
+          });
+        }
+      }
+      return result;
+    }
+
+    async function startReconciliation() {
+      const key = document.getElementById('apiKey').value.trim();
+      const base = document.getElementById('baseUrl').value.trim() || 'https://api.openai.com/v1';
+      if (!key) return error('Masukkan API Key terlebih dahulu');
+
+      btn.disabled = true;
+      try {
+        log('Membaca file...');
+        const rawA = await readFile(document.getElementById('fileMinera').files[0]);
+        const rawB = await readFile(document.getElementById('fileZona').files[0]);
+        const rawC = await readFile(document.getElementById('fileIdn').files[0]);
+
+        log('AI mem-parsing MINERAPAY...');
+        const dataA = await parseWithAI(rawA, 'MINERAPAY', key, base);
+        log('AI mem-parsing ZONAMAIN...');
+        const dataB = await parseWithAI(rawB, 'ZONAMAIN', key, base);
+        log('AI mem-parsing IDN...');
+        const dataC = await parseWithAI(rawC, 'IDN', key, base);
+
+        success(`Parsing selesai. Menghitung selisih...`);
+        discrepancies = reconcile(dataA, dataB, dataC);
+        renderTable(discrepancies);
+      } catch (err) {
+        error(err.message);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    function renderTable(data) {
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = '';
+      if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#059669;">✅ Tidak ditemukan selisih. Semua data match!</td></tr>';
+        document.getElementById('resultContainer').classList.remove('hidden');
+        document.getElementById('btnExport').style.display = 'none';
+        return;
+      }
+
+      data.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${row.trx_id}</td>
+          <td>Rp ${row.a_amt?.toLocaleString('id-ID') || '-'} <br><small>${row.a_st}</small></td>
+          <td>Rp ${row.b_amt?.toLocaleString('id-ID') || '-'} <br><small>${row.b_st}</small></td>
+          <td>Rp ${row.c_amt?.toLocaleString('id-ID') || '-'} <br><small>${row.c_st}</small></td>
+          <td class="${row.max_diff > 10 ? 'diff-high' : ''}">Rp ${row.max_diff}</td>
+          <td>${row.issue}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('resultContainer').classList.remove('hidden');
+      document.getElementById('btnExport').style.display = 'block';
+      success(`Ditemukan ${data.length} transaksi berselisih.`);
+    }
+
+    function exportCSV() {
+      if (!discrepancies.length) return;
+      let csv = 'TRX_ID,MINERAPAY_AMOUNT,MINERAPAY_STATUS,ZONAMAIN_AMOUNT,ZONAMAIN_STATUS,IDN_AMOUNT,IDN_STATUS,MAX_SELISIH,KETERANGAN\n';
+      discrepancies.forEach(r => {
+        csv += `${r.trx_id},${r.a_amt||0},${r.a_st},${r.b_amt||0},${r.b_st},${r.c_amt||0},${r.c_st},${r.max_diff},${r.issue}\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `selisih_qris_${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>
