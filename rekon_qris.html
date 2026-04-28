@@ -12,9 +12,10 @@
     .container { max-width: 1100px; margin: auto; background: var(--card); padding: 24px; border-radius: 14px; box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
     h1 { text-align: center; margin-bottom: 12px; font-size: 1.6rem; }
     .warning { background: #fff3cd; color: #856404; padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 18px; text-align: center; border: 1px solid #ffeaa7; }
-    .input-group { margin-bottom: 16px; }
-    label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 0.9rem; }
-    select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; background: #f8fafc; }
+    .controls { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+    label { font-weight: 500; font-size: 0.9rem; }
+    select { padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; background: #f8fafc; }
+    .demo-toggle { display: flex; align-items: center; gap: 8px; background: #f0fdf4; padding: 8px 12px; border-radius: 8px; border: 1px solid #bbf7d0; cursor: pointer; }
     .sources-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 20px; }
     .source-box { background: #f8fafc; padding: 16px; border-radius: 10px; border: 1px solid var(--border); position: relative; }
     .source-box h3 { margin-bottom: 10px; font-size: 1rem; display: flex; justify-content: space-between; align-items: center; }
@@ -26,7 +27,6 @@
     button.process { background: var(--primary); color: white; border: none; padding: 14px 20px; border-radius: 10px; font-weight: 600; cursor: pointer; width: 100%; font-size: 1rem; transition: 0.2s; margin-bottom: 8px; }
     button.process:hover { background: #1d4ed8; }
     button.process:disabled { background: #94a3b8; cursor: not-allowed; }
-    button.test { background: #64748b; padding: 10px 16px; font-size: 0.9rem; margin-bottom: 12px; }
     #status { margin-top: 12px; text-align: center; font-weight: 500; min-height: 24px; padding: 8px; border-radius: 6px; background: #f8fafc; }
     table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 0.85rem; }
     th, td { padding: 10px 8px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
@@ -45,38 +45,39 @@
 <body>
   <div class="container">
     <h1>🔍 Rekonsiliasi QRIS (MINERAPAY | ZONAMAIN | IDN)</h1>
-    <div class="warning">⚠️ API Key sudah terpasang. Jika muncul 401, cek saldo/validitas key di dashboard OpenRouter.</div>
+    <div class="warning">⚠️ API Key sudah diupdate. Jika masih 401, pastikan akun OpenRouter sudah <strong>verified email</strong> & punya <strong>payment method</strong> di billing.</div>
     
-    <div class="input-group">
-      <label>🤖 Model AI</label>
+    <div class="controls">
+      <label>🤖 Model AI:</label>
       <select id="modelSelect">
-        <option value="openai/gpt-4o-mini">gpt-4o-mini (Cepat & Akurat)</option>
-        <option value="meta-llama/llama-3.1-8b-instruct">Llama 3.1 8B (Hemat)</option>
-        <option value="google/gemma-2-9b-it">Gemma 2 9B (Alternatif)</option>
+        <option value="openai/gpt-4o-mini">gpt-4o-mini</option>
+        <option value="meta-llama/llama-3.1-8b-instruct">Llama 3.1 8B</option>
       </select>
+      <label class="demo-toggle">
+        <input type="checkbox" id="demoMode"> 🧪 Mode Demo (Tanpa API)
+      </label>
     </div>
 
-    <button class="test" id="btnTestKey" onclick="testApiKey()">🔍 Test API Key & Koneksi</button>
     <div id="status"></div>
 
     <div class="sources-grid">
       <div class="source-box" id="box-minera">
         <h3>📦 MINERAPAY <div><button class="btn-clipboard" onclick="pasteFromClipboard('paste-minera')">📋 Paste</button><button class="btn-clear" onclick="clearSource('paste-minera')">✖</button></div></h3>
-        <textarea id="paste-minera" placeholder="Paste data CSV/Excel/TXT di sini..."></textarea>
+        <textarea id="paste-minera" placeholder="Paste data atau gunakan Mode Demo..."></textarea>
         <div class="drop-zone" onclick="document.getElementById('file-minera').click()">📁 Drop file atau klik</div>
         <input type="file" id="file-minera" class="hidden" accept=".csv,.txt,.xlsx,.json" onchange="handleFile(this, 'paste-minera')">
       </div>
 
       <div class="source-box" id="box-zona">
         <h3>📦 ZONAMAIN <div><button class="btn-clipboard" onclick="pasteFromClipboard('paste-zona')">📋 Paste</button><button class="btn-clear" onclick="clearSource('paste-zona')">✖</button></div></h3>
-        <textarea id="paste-zona" placeholder="Paste data CSV/Excel/TXT di sini..."></textarea>
+        <textarea id="paste-zona" placeholder="Paste data atau gunakan Mode Demo..."></textarea>
         <div class="drop-zone" onclick="document.getElementById('file-zona').click()">📁 Drop file atau klik</div>
         <input type="file" id="file-zona" class="hidden" accept=".csv,.txt,.xlsx,.json" onchange="handleFile(this, 'paste-zona')">
       </div>
 
       <div class="source-box" id="box-idn">
         <h3>📦 IDN <div><button class="btn-clipboard" onclick="pasteFromClipboard('paste-idn')">📋 Paste</button><button class="btn-clear" onclick="clearSource('paste-idn')">✖</button></div></h3>
-        <textarea id="paste-idn" placeholder="Paste data CSV/Excel/TXT di sini..."></textarea>
+        <textarea id="paste-idn" placeholder="Paste data atau gunakan Mode Demo..."></textarea>
         <div class="drop-zone" onclick="document.getElementById('file-idn').click()">📁 Drop file atau klik</div>
         <input type="file" id="file-idn" class="hidden" accept=".csv,.txt,.xlsx,.json" onchange="handleFile(this, 'paste-idn')">
       </div>
@@ -104,8 +105,9 @@
   </div>
 
   <script>
+    // 🔑 GANTI KEY DI SINI JIKA PERLU
     const CONFIG = {
-      API_KEY: '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',
+      API_KEY: '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',
       API_URL: 'https://openrouter.ai/api/v1',
       REFERER: window.location.href
     };
@@ -149,20 +151,25 @@
     }
     function clearSource(targetId) { document.getElementById(targetId).value = ''; }
 
-    // 🔑 TEST API KEY
-    async function testApiKey() {
-      log('Mengecek koneksi API & validitas key...', 'loading');
-      try {
-        const res = await fetch(`${CONFIG.API_URL}/auth/key`, {
-          headers: { 'Authorization': `Bearer ${CONFIG.API_KEY}`, 'HTTP-Referer': CONFIG.REFERER }
-        });
-        const data = await res.json();
-        if (res.ok) {
-          log(`✅ Key Valid! Model default: ${data.data?.default_model || 'gpt-4o-mini'}. Saldo/Credit: cek dashboard.`, 'success');
-        } else {
-          log(`❌ Error ${res.status}: ${data.error?.message || 'Key tidak valid/habis kredit'}`, 'error');
-        }
-      } catch (e) { log(`❌ Gagal koneksi: ${e.message}`, 'error'); }
+    // DATA DEMO (Bypass API)
+    function getDemoData() {
+      return {
+        minera: [
+          { order_id: 'ORD001', user_id: 'U100', amount: 50000, status: 'success' },
+          { order_id: 'ORD002', user_id: 'U101', amount: 75000, status: 'success' },
+          { order_id: 'ORD003', user_id: 'U102', amount: 100000, status: 'failed' }
+        ],
+        zona: [
+          { order_id: 'ORD001', user_id: 'U100', amount: 50000, status: 'success' },
+          { order_id: 'ORD002', user_id: 'U101', amount: 74500, status: 'success' },
+          { order_id: 'ORD999', user_id: 'U200', amount: 20000, status: 'pending' }
+        ],
+        idn: [
+          { order_id: '', user_id: 'U100', amount: 50000, status: 'success' },
+          { order_id: '', user_id: 'U101', amount: 75000, status: 'success' },
+          { order_id: '', user_id: 'U100', amount: 50000, status: 'success' }
+        ]
+      };
     }
 
     async function parseWithAI(raw, source, model) {
@@ -176,7 +183,11 @@
       });
       
       const json = await res.json();
-      if (!res.ok) throw new Error(json.error?.message || `API Error ${res.status}`);
+      if (!res.ok) {
+        const msg = json.error?.message || `HTTP ${res.status}`;
+        if (res.status === 401) throw new Error("401 Unauthorized: Key invalid atau akun belum ada payment method. Cek https://openrouter.ai/billing");
+        throw new Error(`API Error: ${msg}`);
+      }
       const parsed = JSON.parse(json.choices[0].message.content);
       return Array.isArray(parsed) ? parsed : (parsed.transactions || []);
     }
@@ -203,10 +214,9 @@
       // 2. ZONAMAIN ↔ IDN (User ID + Nominal)
       const idnByUserAmt = new Map();
       idn.forEach(i => { if(i.user_id) { const k=`${norm(i.user_id)}_${round100(i.amount)}`; if(!idnByUserAmt.has(k)) idnByUserAmt.set(k,[]); idnByUserAmt.get(k).push(i); } });
-      const zUsed = new Set();
       for (const z of zona) {
         if (!z.user_id) continue;
-        const key = `${norm(z.user_id)}_${round100(z.amount)}`; zUsed.add(key);
+        const key = `${norm(z.user_id)}_${round100(z.amount)}`;
         const matches = idnByUserAmt.get(key) || [];
         if (matches.length === 0) add('Z ↔ I (UserID+Nominal)', `${z.user_id} | Rp${amt(z.amount).toLocaleString('id-ID')}`, null, z, null, amt(z.amount), 'Tidak match di IDN');
         else if (matches.length > 1) add('Z ↔ I (UserID+Nominal)', `${z.user_id} | Rp${amt(z.amount).toLocaleString('id-ID')}`, null, z, matches[0], 0, `Duplikat ${matches.length}x di IDN`);
@@ -221,22 +231,38 @@
     }
 
     async function startReconciliation() {
-      const model = document.getElementById('modelSelect').value;
-      const rawA = document.getElementById('paste-minera').value.trim();
-      const rawB = document.getElementById('paste-zona').value.trim();
-      const rawC = document.getElementById('paste-idn').value.trim();
-      if (!rawA || !rawB || !rawC) return log('⚠️ Data ketiga sumber wajib diisi (paste/drop)', 'error');
+      const isDemo = document.getElementById('demoMode').checked;
+      let dA, dB, dC;
 
-      btn.disabled = true; document.getElementById('resultContainer').classList.add('hidden');
+      btn.disabled = true; 
+      document.getElementById('resultContainer').classList.add('hidden');
       try {
-        log('AI parsing MINERAPAY...', 'loading'); const dA = await parseWithAI(rawA, 'MINERAPAY', model);
-        log('AI parsing ZONAMAIN...', 'loading'); const dB = await parseWithAI(rawB, 'ZONAMAIN', model);
-        log('AI parsing IDN...', 'loading'); const dC = await parseWithAI(rawC, 'IDN', model);
+        if (isDemo) {
+          log('🧪 Mode Demo: Menggunakan data sampel...', 'loading');
+          await new Promise(r => setTimeout(r, 600));
+          const demo = getDemoData();
+          dA = demo.minera; dB = demo.zona; dC = demo.idn;
+        } else {
+          const model = document.getElementById('modelSelect').value;
+          const rawA = document.getElementById('paste-minera').value.trim();
+          const rawB = document.getElementById('paste-zona').value.trim();
+          const rawC = document.getElementById('paste-idn').value.trim();
+          if (!rawA || !rawB || !rawC) return log('⚠️ Data ketiga sumber wajib diisi (non-demo)', 'error');
+
+          log('AI parsing MINERAPAY...', 'loading'); dA = await parseWithAI(rawA, 'MINERAPAY', model);
+          log('AI parsing ZONAMAIN...', 'loading'); dB = await parseWithAI(rawB, 'ZONAMAIN', model);
+          log('AI parsing IDN...', 'loading'); dC = await parseWithAI(rawC, 'IDN', model);
+        }
+
         log(`Parsing selesai (${dA.length} | ${dB.length} | ${dC.length}). Menghitung selisih...`, 'success');
         discrepancies = reconcile(dA, dB, dC);
         renderTable(discrepancies);
-      } catch (e) { log(`❌ ${e.message}`, 'error'); console.error(e); }
-      finally { btn.disabled = false; }
+      } catch (e) { 
+        log(`❌ ${e.message}`, 'error'); 
+        console.error(e); 
+      } finally { 
+        btn.disabled = false; 
+      }
     }
 
     function renderTable(data) {
