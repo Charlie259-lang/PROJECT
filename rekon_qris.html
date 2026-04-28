@@ -45,7 +45,7 @@
 <body>
   <div class="container">
     <h1>🔍 Rekonsiliasi QRIS (MINERAPAY | ZONAMAIN | IDN)</h1>
-    <div class="warning">⚠️ API Key sudah diupdate. Jika masih 401, pastikan akun OpenRouter sudah <strong>verified email</strong> & punya <strong>payment method</strong> di billing.</div>
+    <div class="warning">⚠️ Format data sudah disesuaikan. MINERAPAY→ZONAMAIN match by Order ID.</div>
     
     <div class="controls">
       <label>🤖 Model AI:</label>
@@ -63,21 +63,21 @@
     <div class="sources-grid">
       <div class="source-box" id="box-minera">
         <h3>📦 MINERAPAY <div><button class="btn-clipboard" onclick="pasteFromClipboard('paste-minera')">📋 Paste</button><button class="btn-clear" onclick="clearSource('paste-minera')">✖</button></div></h3>
-        <textarea id="paste-minera" placeholder="Paste data atau gunakan Mode Demo..."></textarea>
+        <textarea id="paste-minera" placeholder="Paste data MINERAPAY (tab-separated)..."></textarea>
         <div class="drop-zone" onclick="document.getElementById('file-minera').click()">📁 Drop file atau klik</div>
         <input type="file" id="file-minera" class="hidden" accept=".csv,.txt,.xlsx,.json" onchange="handleFile(this, 'paste-minera')">
       </div>
 
       <div class="source-box" id="box-zona">
         <h3>📦 ZONAMAIN <div><button class="btn-clipboard" onclick="pasteFromClipboard('paste-zona')">📋 Paste</button><button class="btn-clear" onclick="clearSource('paste-zona')">✖</button></div></h3>
-        <textarea id="paste-zona" placeholder="Paste data atau gunakan Mode Demo..."></textarea>
+        <textarea id="paste-zona" placeholder="Paste data ZONAMAIN (tab-separated)..."></textarea>
         <div class="drop-zone" onclick="document.getElementById('file-zona').click()">📁 Drop file atau klik</div>
         <input type="file" id="file-zona" class="hidden" accept=".csv,.txt,.xlsx,.json" onchange="handleFile(this, 'paste-zona')">
       </div>
 
       <div class="source-box" id="box-idn">
         <h3>📦 IDN <div><button class="btn-clipboard" onclick="pasteFromClipboard('paste-idn')">📋 Paste</button><button class="btn-clear" onclick="clearSource('paste-idn')">✖</button></div></h3>
-        <textarea id="paste-idn" placeholder="Paste data atau gunakan Mode Demo..."></textarea>
+        <textarea id="paste-idn" placeholder="Paste data IDN..."></textarea>
         <div class="drop-zone" onclick="document.getElementById('file-idn').click()">📁 Drop file atau klik</div>
         <input type="file" id="file-idn" class="hidden" accept=".csv,.txt,.xlsx,.json" onchange="handleFile(this, 'paste-idn')">
       </div>
@@ -105,7 +105,6 @@
   </div>
 
   <script>
-    // 🔑 GANTI KEY DI SINI JIKA PERLU
     const CONFIG = {
       API_KEY: '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',
       API_URL: 'https://openrouter.ai/api/v1',
@@ -151,30 +150,93 @@
     }
     function clearSource(targetId) { document.getElementById(targetId).value = ''; }
 
-    // DATA DEMO (Bypass API)
     function getDemoData() {
       return {
         minera: [
-          { order_id: 'ORD001', user_id: 'U100', amount: 50000, status: 'success' },
-          { order_id: 'ORD002', user_id: 'U101', amount: 75000, status: 'success' },
-          { order_id: 'ORD003', user_id: 'U102', amount: 100000, status: 'failed' }
+          { order_id: 'af7077f8-9275-4ab4-8f53-bc60a571ef6f', user_id: 'U100', amount: 150000, status: 'success' },
+          { order_id: 'bd06fe2a-6b9d-4965-a3df-e8c98c941527', user_id: 'U101', amount: 450000, status: 'success' }
         ],
         zona: [
-          { order_id: 'ORD001', user_id: 'U100', amount: 50000, status: 'success' },
-          { order_id: 'ORD002', user_id: 'U101', amount: 74500, status: 'success' },
-          { order_id: 'ORD999', user_id: 'U200', amount: 20000, status: 'pending' }
+          { order_id: 'af7077f8-9275-4ab4-8f53-bc60a571ef6f', user_id: 'U100', amount: 150000, status: 'success' },
+          { order_id: 'bd06fe2a-6b9d-4965-a3df-e8c98c941527', user_id: 'U101', amount: 450000, status: 'success' }
         ],
         idn: [
-          { order_id: '', user_id: 'U100', amount: 50000, status: 'success' },
-          { order_id: '', user_id: 'U101', amount: 75000, status: 'success' },
-          { order_id: '', user_id: 'U100', amount: 50000, status: 'success' }
+          { order_id: '', user_id: 'U100', amount: 150000, status: 'success' },
+          { order_id: '', user_id: 'U101', amount: 450000, status: 'success' }
         ]
       };
     }
 
     async function parseWithAI(raw, source, model) {
-      const trimmed = raw.length > 3000 ? raw.substring(0, 3000) + '\n...(data dipotong)' : raw;
-      const prompt = `Anda adalah parser data transaksi QRIS. Ekstrak data ${source} menjadi JSON array. Setiap objek WAJIB punya: "order_id", "user_id", "amount" (angka), "status" (success/failed/pending). Abaikan header/footer. Jangan buat data. Output HARUS valid JSON dengan key "transactions".\n\nData:\n${trimmed}`;
+      let prompt = '';
+      
+      if (source === 'MINERAPAY') {
+        prompt = `Anda adalah parser data MINERAPAY. Data format: TAB-separated values.
+Struktur kolom (berurutan):
+1. Transaction UUID
+2. Order ID (UUID) ← INI YANG PENTING
+3. Amount (angka tanpa koma)
+4. Fee
+5. Net Amount
+6. Payment Type (QRIS)
+7. Status (success/failed/pending)
+8-14. Kolom kosong/extra
+15. Timestamp created
+16-20. Timestamp lainnya
+21. User info (format: username||hash)
+22. Currency (IDR)
+23-25. Extra UUID/IP
+
+Tugas: Ekstrak menjadi JSON array. Setiap objek WAJIB punya:
+- "order_id": ambil dari kolom ke-2 (UUID format)
+- "amount": ambil dari kolom ke-3 (angka)
+- "status": ambil dari kolom ke-7 (success/failed/pending)
+- "user_id": ambil dari kolom ke-21 (extract username sebelum ||)
+
+Data mentah (TAB-separated):
+${raw.substring(0, 3000)}
+
+Output HARUS valid JSON dengan key "transactions". Jangan buat data fiktif.`;
+      }
+      else if (source === 'ZONAMAIN') {
+        prompt = `Anda adalah parser data ZONAMAIN. Data format: TAB-separated values.
+Struktur kolom (berurutan):
+1. Timestamp
+2. Site/Game name
+3. Provider (MINERAPAY)
+4. Order ID (UUID) ← INI YANG PENTING
+5. User phone/ID (dengan tanda ')
+6. Provider name
+7. Username
+8. Payment method
+9. Amount (dengan koma, contoh: 450,000.00)
+10. Fee (dengan koma)
+11. Net Amount (dengan koma)
+
+Tugas: Ekstrak menjadi JSON array. Setiap objek WAJIB punya:
+- "order_id": ambil dari kolom ke-4 (UUID format)
+- "amount": ambil dari kolom ke-9 (hapus koma, jadi angka)
+- "status": "success" (asumsikan success jika ada di data)
+- "user_id": ambil dari kolom ke-7 (username)
+
+Data mentah (TAB-separated):
+${raw.substring(0, 3000)}
+
+Output HARUS valid JSON dengan key "transactions". Jangan buat data fiktif.`;
+      }
+      else if (source === 'IDN') {
+        prompt = `Anda adalah parser data IDN Play/QRIS. Ekstrak data menjadi JSON array.
+Setiap objek WAJIB punya:
+- "order_id": ID transaksi (jika ada)
+- "user_id": User ID/member ID
+- "amount": nominal transaksi (angka, hapus koma/simbol)
+- "status": success/failed/pending
+
+Data mentah:
+${raw.substring(0, 3000)}
+
+Output HARUS valid JSON dengan key "transactions". Jangan buat data fiktif.`;
+      }
       
       const res = await fetch(`${CONFIG.API_URL}/chat/completions`, {
         method: 'POST',
@@ -185,7 +247,7 @@
       const json = await res.json();
       if (!res.ok) {
         const msg = json.error?.message || `HTTP ${res.status}`;
-        if (res.status === 401) throw new Error("401 Unauthorized: Key invalid atau akun belum ada payment method. Cek https://openrouter.ai/billing");
+        if (res.status === 401) throw new Error("401: Key invalid atau belum payment method. Cek https://openrouter.ai/billing");
         throw new Error(`API Error: ${msg}`);
       }
       const parsed = JSON.parse(json.choices[0].message.content);
@@ -247,7 +309,7 @@
           const rawA = document.getElementById('paste-minera').value.trim();
           const rawB = document.getElementById('paste-zona').value.trim();
           const rawC = document.getElementById('paste-idn').value.trim();
-          if (!rawA || !rawB || !rawC) return log('⚠️ Data ketiga sumber wajib diisi (non-demo)', 'error');
+          if (!rawA || !rawB || !rawC) return log('⚠️ Data ketiga sumber wajib diisi', 'error');
 
           log('AI parsing MINERAPAY...', 'loading'); dA = await parseWithAI(rawA, 'MINERAPAY', model);
           log('AI parsing ZONAMAIN...', 'loading'); dB = await parseWithAI(rawB, 'ZONAMAIN', model);
