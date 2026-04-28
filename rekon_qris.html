@@ -14,12 +14,11 @@
     .warning { background: #fff3cd; color: #856404; padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 18px; text-align: center; border: 1px solid #ffeaa7; }
     .input-group { margin-bottom: 16px; }
     label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 0.9rem; }
-    input, select, textarea { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; background: #f8fafc; transition: 0.2s; }
-    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+    select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; background: #f8fafc; }
     .sources-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 20px; }
     .source-box { background: #f8fafc; padding: 16px; border-radius: 10px; border: 1px solid var(--border); position: relative; }
     .source-box h3 { margin-bottom: 10px; font-size: 1rem; display: flex; justify-content: space-between; align-items: center; }
-    textarea { min-height: 120px; resize: vertical; font-family: monospace; font-size: 0.85rem; }
+    textarea { min-height: 120px; resize: vertical; font-family: monospace; font-size: 0.85rem; width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: #fff; }
     .drop-zone { margin-top: 8px; padding: 10px; border: 2px dashed #cbd5e1; border-radius: 8px; text-align: center; cursor: pointer; color: var(--muted); transition: 0.2s; }
     .drop-zone:hover, .drop-zone.dragover { border-color: var(--primary); background: #eff6ff; color: var(--primary); }
     .btn-clipboard { background: #f1f5f9; border: 1px solid var(--border); padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; margin-left: auto; }
@@ -41,12 +40,8 @@
 <body>
   <div class="container">
     <h1>🔍 Rekonsiliasi QRIS (MINERAPAY | ZONAMAIN | IDN)</h1>
-    <div class="warning">⚠️ API Key berjalan di browser. Segera <strong>regenerate</strong> setelah tes. Untuk produksi, gunakan backend proxy.</div>
+    <div class="warning">⚠️ API Key sudah terpasang otomatis. Jangan bagikan file ini ke publik untuk keamanan akun.</div>
     
-    <div class="input-group">
-      <label>🔑 OpenRouter API Key</label>
-      <input type="password" id="apiKey" value="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">
-    </div>
     <div class="input-group">
       <label>🤖 Model AI</label>
       <select id="modelSelect">
@@ -101,6 +96,13 @@
   </div>
 
   <script>
+    // 🔑 KONFIGURASI INTERNAL
+    const CONFIG = {
+      API_KEY: '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',
+      API_URL: 'https://openrouter.ai/api/v1/chat/completions',
+      REFERER: window.location.href
+    };
+
     const statusEl = document.getElementById('status');
     const btn = document.getElementById('btnProcess');
     let discrepancies = [];
@@ -158,16 +160,16 @@
       document.getElementById(targetId).value = '';
     }
 
-    async function parseWithAI(raw, source, key, model) {
+    async function parseWithAI(raw, source, model) {
       const trimmed = raw.length > 3000 ? raw.substring(0, 3000) + '\n...(data dipotong untuk efisiensi token)' : raw;
       const prompt = `Anda adalah parser data transaksi QRIS. Ekstrak data mentah ${source} berikut menjadi JSON array. Setiap objek WAJIB punya: "trx_id" (unik), "amount" (angka, tanpa simbol), "status" (success/failed/pending/refunded), "timestamp" (ISO atau kosong). Abaikan header/footer tidak relevan. Jangan buat data. Output HARUS valid JSON dengan key "transactions".\n\nData:\n${trimmed}`;
       
-      const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      const res = await fetch(CONFIG.API_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${key}`,
-          'HTTP-Referer': window.location.href,
+          'Authorization': `Bearer ${CONFIG.API_KEY}`,
+          'HTTP-Referer': CONFIG.REFERER,
           'X-Title': 'QRIS Reconciler'
         },
         body: JSON.stringify({
@@ -180,7 +182,6 @@
       if (!res.ok) throw new Error(`API Error: ${res.status} ${res.statusText}`);
       const json = await res.json();
       const content = json.choices[0].message.content;
-      // Fallback jika AI tidak wrap di "transactions"
       let parsed = JSON.parse(content);
       return Array.isArray(parsed) ? parsed : (parsed.transactions || []);
     }
@@ -202,4 +203,92 @@
         const maxDiff = Math.max(dAB, dAC, dBC);
         
         const statuses = [a.status, b.status, c.status].filter(s => s !== 'missing');
-        const statusMismatch = statuses.length > 0 &&
+        const statusMismatch = statuses.length > 0 && new Set(statuses).size > 1;
+
+        if (maxDiff > 1 || statusMismatch) {
+          result.push({
+            trx_id: id,
+            a_amt: a.amount, a_st: a.status,
+            b_amt: b.amount, b_st: b.status,
+            c_amt: c.amount, c_st: c.status,
+            max_diff: maxDiff.toFixed(2),
+            issue: statusMismatch ? 'Status tidak match' : 'Nominal berbeda'
+          });
+        }
+      }
+      return result.sort((a,b) => b.max_diff - a.max_diff);
+    }
+
+    async function startReconciliation() {
+      const model = document.getElementById('modelSelect').value;
+      const rawA = document.getElementById('paste-minera').value.trim();
+      const rawB = document.getElementById('paste-zona').value.trim();
+      const rawC = document.getElementById('paste-idn').value.trim();
+      
+      if (!rawA || !rawB || !rawC) return error('Data ketiga sumber wajib diisi (paste/drop file)');
+
+      btn.disabled = true;
+      document.getElementById('resultContainer').classList.add('hidden');
+      try {
+        log('AI mem-parsing MINERAPAY...');
+        const dataA = await parseWithAI(rawA, 'MINERAPAY', model);
+        log('AI mem-parsing ZONAMAIN...');
+        const dataB = await parseWithAI(rawB, 'ZONAMAIN', model);
+        log('AI mem-parsing IDN...');
+        const dataC = await parseWithAI(rawC, 'IDN', model);
+
+        success(`Parsing selesai (${dataA.length} | ${dataB.length} | ${dataC.length}). Menghitung selisih...`);
+        discrepancies = reconcile(dataA, dataB, dataC);
+        renderTable(discrepancies);
+      } catch (err) {
+        error(err.message);
+        console.error(err);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    function renderTable(data) {
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = '';
+      if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:#10b981; font-weight:500;">✅ Tidak ditemukan selisih. Semua data match sempurna!</td></tr>';
+        document.getElementById('resultContainer').classList.remove('hidden');
+        document.getElementById('btnExport').style.display = 'none';
+        return;
+      }
+
+      data.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>${row.trx_id}</strong></td>
+          <td>Rp ${(row.a_amt||0).toLocaleString('id-ID')}<br><small style="color:${row.a_st==='success'?'#10b981':row.a_st==='failed'?'#dc2626':'#f59e0b'}">${row.a_st}</small></td>
+          <td>Rp ${(row.b_amt||0).toLocaleString('id-ID')}<br><small style="color:${row.b_st==='success'?'#10b981':row.b_st==='failed'?'#dc2626':'#f59e0b'}">${row.b_st}</small></td>
+          <td>Rp ${(row.c_amt||0).toLocaleString('id-ID')}<br><small style="color:${row.c_st==='success'?'#10b981':row.c_st==='failed'?'#dc2626':'#f59e0b'}">${row.c_st}</small></td>
+          <td class="${row.max_diff > 500 ? 'diff-high' : ''}">Rp ${row.max_diff}</td>
+          <td>${row.issue}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('resultContainer').classList.remove('hidden');
+      document.getElementById('btnExport').style.display = 'block';
+      success(`Ditemukan ${data.length} transaksi berselisih. Urutkan dari selisih terbesar.`);
+    }
+
+    function exportCSV() {
+      if (!discrepancies.length) return;
+      let csv = 'TRX_ID,MINERAPAY_AMOUNT,MINERAPAY_STATUS,ZONAMAIN_AMOUNT,ZONAMAIN_STATUS,IDN_AMOUNT,IDN_STATUS,MAX_SELISIH,KETERANGAN\n';
+      discrepancies.forEach(r => {
+        csv += `"${r.trx_id}",${r.a_amt||0},${r.a_st},${r.b_amt||0},${r.b_st},${r.c_amt||0},${r.c_st},${r.max_diff},"${r.issue}"\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `selisih_qris_${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>
