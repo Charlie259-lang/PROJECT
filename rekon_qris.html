@@ -4,54 +4,82 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Rekonsiliasi QRIS 3 Sumber</title>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
-    :root { --bg: #f8f9fa; --card: #fff; --border: #e2e8f0; --primary: #2563eb; --danger: #dc2626; --text: #1e293b; }
+    :root { --bg: #f1f5f9; --card: #ffffff; --border: #e2e8f0; --primary: #2563eb; --danger: #dc2626; --success: #10b981; --text: #0f172a; --muted: #64748b; }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
     body { background: var(--bg); color: var(--text); padding: 20px; line-height: 1.5; }
-    .container { max-width: 900px; margin: auto; background: var(--card); padding: 24px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-    h1 { text-align: center; margin-bottom: 16px; font-size: 1.5rem; }
-    .warning { background: #fef3c7; color: #92400e; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; margin-bottom: 16px; text-align: center; }
+    .container { max-width: 950px; margin: auto; background: var(--card); padding: 24px; border-radius: 14px; box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
+    h1 { text-align: center; margin-bottom: 12px; font-size: 1.6rem; }
+    .warning { background: #fff3cd; color: #856404; padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 18px; text-align: center; border: 1px solid #ffeaa7; }
     .input-group { margin-bottom: 16px; }
     label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 0.9rem; }
-    input[type="text"], input[type="password"], input[type="file"] { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem; }
-    .upload-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin-bottom: 20px; }
-    .upload-box { background: #f1f5f9; padding: 16px; border-radius: 8px; border: 1px dashed var(--border); }
-    .upload-box h3 { margin-bottom: 8px; font-size: 1rem; }
-    button { background: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%; font-size: 1rem; transition: 0.2s; }
-    button:hover { opacity: 0.9; }
-    button:disabled { background: #94a3b8; cursor: not-allowed; }
+    input, select, textarea { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; background: #f8fafc; transition: 0.2s; }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+    .sources-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 20px; }
+    .source-box { background: #f8fafc; padding: 16px; border-radius: 10px; border: 1px solid var(--border); position: relative; }
+    .source-box h3 { margin-bottom: 10px; font-size: 1rem; display: flex; justify-content: space-between; align-items: center; }
+    textarea { min-height: 120px; resize: vertical; font-family: monospace; font-size: 0.85rem; }
+    .drop-zone { margin-top: 8px; padding: 10px; border: 2px dashed #cbd5e1; border-radius: 8px; text-align: center; cursor: pointer; color: var(--muted); transition: 0.2s; }
+    .drop-zone:hover, .drop-zone.dragover { border-color: var(--primary); background: #eff6ff; color: var(--primary); }
+    .btn-clipboard { background: #f1f5f9; border: 1px solid var(--border); padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; margin-left: auto; }
+    .btn-clear { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 0.8rem; margin-left: 8px; }
+    button.process { background: var(--primary); color: white; border: none; padding: 14px 20px; border-radius: 10px; font-weight: 600; cursor: pointer; width: 100%; font-size: 1rem; transition: 0.2s; }
+    button.process:hover { background: #1d4ed8; }
+    button.process:disabled { background: #94a3b8; cursor: not-allowed; }
     #status { margin-top: 16px; text-align: center; font-weight: 500; min-height: 24px; }
     table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 0.85rem; }
-    th, td { padding: 10px; border-bottom: 1px solid var(--border); text-align: left; }
+    th, td { padding: 12px 10px; border-bottom: 1px solid var(--border); text-align: left; }
     th { background: #f8fafc; position: sticky; top: 0; }
     .diff-high { color: var(--danger); font-weight: bold; }
-    .export-btn { background: #10b981; margin-top: 12px; display: none; }
-    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid #fff; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; margin-right: 8px; }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .export-btn { background: var(--success); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 12px; display: none; }
     .hidden { display: none; }
+    .spinner { display: inline-block; width: 18px; height: 18px; border: 3px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 1s linear infinite; margin-right: 8px; vertical-align: middle; }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>🔍 Rekonsiliasi QRIS (MINERAPAY | ZONAMAIN | IDN)</h1>
-    <div class="warning">⚠️ API Key berjalan di browser. Gunakan untuk file kecil (<300 baris). Untuk produksi, gunakan backend/proxy.</div>
+    <div class="warning">⚠️ API Key berjalan di browser. Segera <strong>regenerate</strong> setelah tes. Untuk produksi, gunakan backend proxy.</div>
     
     <div class="input-group">
-      <label>🔑 API Key AI (OpenAI Compatible)</label>
-      <input type="password" id="apiKey" placeholder="sk-... atau key Groq/Lokal">
+      <label>🔑 OpenRouter API Key</label>
+      <input type="password" id="apiKey" value="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">
     </div>
     <div class="input-group">
-      <label>🌐 Base URL API (Opsional)</label>
-      <input type="text" id="baseUrl" value="https://api.openai.com/v1" placeholder="https://api.openai.com/v1">
+      <label>🤖 Model AI</label>
+      <select id="modelSelect">
+        <option value="openai/gpt-4o-mini">gpt-4o-mini (Cepat & Akurat)</option>
+        <option value="meta-llama/llama-3.1-8b-instruct">Llama 3.1 8B (Hemat)</option>
+        <option value="google/gemma-2-9b-it">Gemma 2 9B (Alternatif)</option>
+      </select>
     </div>
 
-    <div class="upload-grid">
-      <div class="upload-box"><h3>📦 MINERAPAY</h3><input type="file" id="fileMinera" accept=".csv,.txt,.xlsx,.json"></div>
-      <div class="upload-box"><h3>📦 ZONAMAIN</h3><input type="file" id="fileZona" accept=".csv,.txt,.xlsx,.json"></div>
-      <div class="upload-box"><h3>📦 IDN</h3><input type="file" id="fileIdn" accept=".csv,.txt,.xlsx,.json"></div>
+    <div class="sources-grid">
+      <div class="source-box" id="box-minera">
+        <h3>📦 MINERAPAY <div><button class="btn-clipboard" onclick="pasteFromClipboard('paste-minera')">📋 Paste</button><button class="btn-clear" onclick="clearSource('paste-minera')">✖</button></div></h3>
+        <textarea id="paste-minera" placeholder="Paste data CSV/Excel/TXT di sini..."></textarea>
+        <div class="drop-zone" onclick="document.getElementById('file-minera').click()">📁 Drop file atau klik</div>
+        <input type="file" id="file-minera" class="hidden" accept=".csv,.txt,.xlsx,.json" onchange="handleFile(this, 'paste-minera')">
+      </div>
+
+      <div class="source-box" id="box-zona">
+        <h3>📦 ZONAMAIN <div><button class="btn-clipboard" onclick="pasteFromClipboard('paste-zona')">📋 Paste</button><button class="btn-clear" onclick="clearSource('paste-zona')">✖</button></div></h3>
+        <textarea id="paste-zona" placeholder="Paste data CSV/Excel/TXT di sini..."></textarea>
+        <div class="drop-zone" onclick="document.getElementById('file-zona').click()">📁 Drop file atau klik</div>
+        <input type="file" id="file-zona" class="hidden" accept=".csv,.txt,.xlsx,.json" onchange="handleFile(this, 'paste-zona')">
+      </div>
+
+      <div class="source-box" id="box-idn">
+        <h3>📦 IDN <div><button class="btn-clipboard" onclick="pasteFromClipboard('paste-idn')">📋 Paste</button><button class="btn-clear" onclick="clearSource('paste-idn')">✖</button></div></h3>
+        <textarea id="paste-idn" placeholder="Paste data CSV/Excel/TXT di sini..."></textarea>
+        <div class="drop-zone" onclick="document.getElementById('file-idn').click()">📁 Drop file atau klik</div>
+        <input type="file" id="file-idn" class="hidden" accept=".csv,.txt,.xlsx,.json" onchange="handleFile(this, 'paste-idn')">
+      </div>
     </div>
 
-    <button id="btnProcess" onclick="startReconciliation()">🚀 Proses Rekonsiliasi</button>
+    <button class="process" id="btnProcess" onclick="startReconciliation()">🚀 Proses Rekonsiliasi</button>
     <div id="status"></div>
 
     <div id="resultContainer" class="hidden">
@@ -62,7 +90,7 @@
             <th>MINERAPAY</th>
             <th>ZONAMAIN</th>
             <th>IDN</th>
-            <th>Selisih (Max)</th>
+            <th>Selisih Max</th>
             <th>Keterangan</th>
           </tr>
         </thead>
@@ -72,38 +100,78 @@
     </div>
   </div>
 
-  <!-- SheetJS untuk baca Excel -->
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script>
     const statusEl = document.getElementById('status');
     const btn = document.getElementById('btnProcess');
     let discrepancies = [];
 
-    function log(msg) { statusEl.innerHTML = `<span class="spinner"></span> ${msg}`; }
-    function success(msg) { statusEl.innerHTML = `✅ ${msg}`; statusEl.style.color = '#059669'; }
+    function log(msg) { statusEl.innerHTML = `<span class="spinner"></span> ${msg}`; statusEl.style.color = '#2563eb'; }
+    function success(msg) { statusEl.innerHTML = `✅ ${msg}`; statusEl.style.color = '#10b981'; }
     function error(msg) { statusEl.innerHTML = `❌ ${msg}`; statusEl.style.color = '#dc2626'; }
 
-    async function readFile(file) {
-      if (!file) throw new Error("File tidak dipilih");
-      if (file.name.endsWith('.xlsx')) {
-        const buf = await file.arrayBuffer();
-        const wb = XLSX.read(buf, { type: 'array' });
-        const ws = wb.Sheets[wb.SheetNames[0]];
-        return XLSX.utils.sheet_to_csv(ws);
-      }
-      return await file.text();
+    // Drag & Drop Setup
+    document.querySelectorAll('.drop-zone').forEach(zone => {
+      zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+      zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+      zone.addEventListener('drop', e => {
+        e.preventDefault();
+        zone.classList.remove('dragover');
+        const file = e.dataTransfer.files[0];
+        if (file) handleFileInput(file, zone.previousElementSibling.id);
+      });
+    });
+
+    function handleFile(input, targetId) {
+      if (input.files[0]) handleFileInput(input.files[0], targetId);
     }
 
-    async function parseWithAI(raw, source, key, baseUrl) {
-      // Potong jika terlalu panjang untuk hemat token
-      const trimmed = raw.length > 2500 ? raw.substring(0, 2500) + '\n...(truncated)' : raw;
-      const prompt = `Anda adalah parser data keuangan. Ekstrak data ${source} berikut menjadi JSON array dengan field WAJIB: "trx_id", "amount" (angka), "status" (success/failed/pending), "timestamp". Abaikan header/footer tidak relevan. Jangan buat data fiktif. Output HARUS valid JSON dengan key "transactions".\n\nData:\n${trimmed}`;
+    async function handleFileInput(file, targetId) {
+      log(`Membaca ${file.name}...`);
+      try {
+        let text = '';
+        if (file.name.endsWith('.xlsx')) {
+          const buf = await file.arrayBuffer();
+          const wb = XLSX.read(buf, { type: 'array' });
+          const ws = wb.Sheets[wb.SheetNames[0]];
+          text = XLSX.utils.sheet_to_csv(ws);
+        } else {
+          text = await file.text();
+        }
+        document.getElementById(targetId).value = text;
+        success(`File ${file.name} berhasil dimuat.`);
+      } catch (err) {
+        error(`Gagal membaca file: ${err.message}`);
+      }
+    }
+
+    async function pasteFromClipboard(targetId) {
+      try {
+        const text = await navigator.clipboard.readText();
+        document.getElementById(targetId).value = text;
+        success('Data dari clipboard berhasil ditempel.');
+      } catch (err) {
+        error('Gagal akses clipboard. Gunakan Ctrl+V manual.');
+      }
+    }
+
+    function clearSource(targetId) {
+      document.getElementById(targetId).value = '';
+    }
+
+    async function parseWithAI(raw, source, key, model) {
+      const trimmed = raw.length > 3000 ? raw.substring(0, 3000) + '\n...(data dipotong untuk efisiensi token)' : raw;
+      const prompt = `Anda adalah parser data transaksi QRIS. Ekstrak data mentah ${source} berikut menjadi JSON array. Setiap objek WAJIB punya: "trx_id" (unik), "amount" (angka, tanpa simbol), "status" (success/failed/pending/refunded), "timestamp" (ISO atau kosong). Abaikan header/footer tidak relevan. Jangan buat data. Output HARUS valid JSON dengan key "transactions".\n\nData:\n${trimmed}`;
       
-      const res = await fetch(`${baseUrl}/chat/completions`, {
+      const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${key}`,
+          'HTTP-Referer': window.location.href,
+          'X-Title': 'QRIS Reconciler'
+        },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
+          model,
           messages: [{ role: 'user', content: prompt }],
           temperature: 0,
           response_format: { type: 'json_object' }
@@ -111,7 +179,10 @@
       });
       if (!res.ok) throw new Error(`API Error: ${res.status} ${res.statusText}`);
       const json = await res.json();
-      return JSON.parse(json.choices[0].message.content).transactions || [];
+      const content = json.choices[0].message.content;
+      // Fallback jika AI tidak wrap di "transactions"
+      let parsed = JSON.parse(content);
+      return Array.isArray(parsed) ? parsed : (parsed.transactions || []);
     }
 
     function reconcile(dataA, dataB, dataC) {
@@ -131,92 +202,4 @@
         const maxDiff = Math.max(dAB, dAC, dBC);
         
         const statuses = [a.status, b.status, c.status].filter(s => s !== 'missing');
-        const statusMismatch = statuses.length > 0 && new Set(statuses).size > 1;
-
-        if (maxDiff > 1 || statusMismatch) {
-          result.push({
-            trx_id: id,
-            a_amt: a.amount, a_st: a.status,
-            b_amt: b.amount, b_st: b.status,
-            c_amt: c.amount, c_st: c.status,
-            max_diff: maxDiff.toFixed(2),
-            issue: statusMismatch ? 'Status tidak match' : 'Nominal berbeda'
-          });
-        }
-      }
-      return result;
-    }
-
-    async function startReconciliation() {
-      const key = document.getElementById('apiKey').value.trim();
-      const base = document.getElementById('baseUrl').value.trim() || 'https://api.openai.com/v1';
-      if (!key) return error('Masukkan API Key terlebih dahulu');
-
-      btn.disabled = true;
-      try {
-        log('Membaca file...');
-        const rawA = await readFile(document.getElementById('fileMinera').files[0]);
-        const rawB = await readFile(document.getElementById('fileZona').files[0]);
-        const rawC = await readFile(document.getElementById('fileIdn').files[0]);
-
-        log('AI mem-parsing MINERAPAY...');
-        const dataA = await parseWithAI(rawA, 'MINERAPAY', key, base);
-        log('AI mem-parsing ZONAMAIN...');
-        const dataB = await parseWithAI(rawB, 'ZONAMAIN', key, base);
-        log('AI mem-parsing IDN...');
-        const dataC = await parseWithAI(rawC, 'IDN', key, base);
-
-        success(`Parsing selesai. Menghitung selisih...`);
-        discrepancies = reconcile(dataA, dataB, dataC);
-        renderTable(discrepancies);
-      } catch (err) {
-        error(err.message);
-      } finally {
-        btn.disabled = false;
-      }
-    }
-
-    function renderTable(data) {
-      const tbody = document.getElementById('tableBody');
-      tbody.innerHTML = '';
-      if (data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#059669;">✅ Tidak ditemukan selisih. Semua data match!</td></tr>';
-        document.getElementById('resultContainer').classList.remove('hidden');
-        document.getElementById('btnExport').style.display = 'none';
-        return;
-      }
-
-      data.forEach(row => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${row.trx_id}</td>
-          <td>Rp ${row.a_amt?.toLocaleString('id-ID') || '-'} <br><small>${row.a_st}</small></td>
-          <td>Rp ${row.b_amt?.toLocaleString('id-ID') || '-'} <br><small>${row.b_st}</small></td>
-          <td>Rp ${row.c_amt?.toLocaleString('id-ID') || '-'} <br><small>${row.c_st}</small></td>
-          <td class="${row.max_diff > 10 ? 'diff-high' : ''}">Rp ${row.max_diff}</td>
-          <td>${row.issue}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-
-      document.getElementById('resultContainer').classList.remove('hidden');
-      document.getElementById('btnExport').style.display = 'block';
-      success(`Ditemukan ${data.length} transaksi berselisih.`);
-    }
-
-    function exportCSV() {
-      if (!discrepancies.length) return;
-      let csv = 'TRX_ID,MINERAPAY_AMOUNT,MINERAPAY_STATUS,ZONAMAIN_AMOUNT,ZONAMAIN_STATUS,IDN_AMOUNT,IDN_STATUS,MAX_SELISIH,KETERANGAN\n';
-      discrepancies.forEach(r => {
-        csv += `${r.trx_id},${r.a_amt||0},${r.a_st},${r.b_amt||0},${r.b_st},${r.c_amt||0},${r.c_st},${r.max_diff},${r.issue}\n`;
-      });
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = `selisih_qris_${new Date().toISOString().slice(0,10)}.csv`;
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-  </script>
-</body>
-</html>
+        const statusMismatch = statuses.length > 0 &&
