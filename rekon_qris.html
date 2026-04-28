@@ -3,72 +3,73 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rekonsiliasi QRIS - Final</title>
+  <title>Rekonsiliasi QRIS - AI Powered</title>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
-    :root { --bg: #f1f5f9; --card: #fff; --border: #e2e8f0; --primary: #2563eb; --danger: #dc2626; --success: #10b981; --text: #0f172a; }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, sans-serif; }
-    body { background: var(--bg); color: var(--text); padding: 20px; }
-    .container { max-width: 1100px; margin: auto; background: var(--card); padding: 24px; border-radius: 14px; box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
-    h1 { text-align: center; margin-bottom: 16px; }
-    .alert { padding: 12px; border-radius: 8px; margin-bottom: 16px; font-size: 0.9rem; }
-    .alert-warn { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
-    .alert-err { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
-    .alert-ok { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
-    .api-box { background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 16px; }
-    .api-box input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-family: monospace; }
+    :root { --bg: #f8fafc; --card: #ffffff; --border: #e2e8f0; --primary: #2563eb; --danger: #dc2626; --success: #10b981; --text: #0f172a; --muted: #64748b; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+    body { background: var(--bg); color: var(--text); padding: 20px; line-height: 1.5; }
+    .container { max-width: 1100px; margin: auto; background: var(--card); padding: 24px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.06); }
+    h1 { text-align: center; margin-bottom: 8px; font-size: 1.8rem; }
+    .subtitle { text-align: center; color: var(--muted); margin-bottom: 20px; font-size: 0.95rem; }
+    .alert { padding: 12px 16px; border-radius: 10px; margin-bottom: 16px; font-size: 0.9rem; border: 1px solid transparent; }
+    .alert-warn { background: #fffbeb; color: #92400e; border-color: #fde68a; }
+    .api-box { background: #f1f5f9; padding: 14px; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .api-box code { background: #e2e8f0; padding: 4px 8px; border-radius: 6px; font-size: 0.85rem; word-break: break-all; }
+    .btn-test { background: #475569; color: white; border: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; }
+    .btn-test:hover { background: #334155; }
     .controls { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
-    select { padding: 10px; border: 1px solid var(--border); border-radius: 8px; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 20px; }
-    .box { background: #f8fafc; padding: 16px; border-radius: 10px; border: 1px solid var(--border); }
-    .box h3 { display: flex; justify-content: space-between; margin-bottom: 10px; }
-    textarea { width: 100%; min-height: 120px; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-family: monospace; font-size: 0.85rem; }
-    .drop { margin-top: 8px; padding: 10px; border: 2px dashed #cbd5e1; border-radius: 8px; text-align: center; cursor: pointer; color: #64748b; }
-    .drop:hover { border-color: var(--primary); background: #eff6ff; color: var(--primary); }
-    .btn { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; }
-    .btn-clip { background: #f1f5f9; border: 1px solid var(--border); }
-    .btn-clear { background: none; color: var(--danger); }
-    .btn-test { background: #64748b; color: white; padding: 10px 16px; border-radius: 8px; margin-bottom: 8px; }
-    .btn-go { background: var(--primary); color: white; padding: 14px; border-radius: 10px; font-weight: 600; width: 100%; margin-bottom: 8px; }
+    select { padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: white; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-bottom: 20px; }
+    .box { background: #f8fafc; padding: 16px; border-radius: 12px; border: 1px solid var(--border); }
+    .box h3 { display: flex; justify-content: space-between; margin-bottom: 10px; color: var(--primary); font-size: 1.05rem; }
+    textarea { width: 100%; min-height: 130px; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-family: ui-monospace, SFMono-Regular, monospace; font-size: 0.85rem; resize: vertical; background: white; }
+    .drop { margin-top: 8px; padding: 10px; border: 2px dashed #cbd5e1; border-radius: 8px; text-align: center; cursor: pointer; color: var(--muted); transition: 0.2s; }
+    .drop:hover, .drop.dragover { border-color: var(--primary); background: #eff6ff; color: var(--primary); }
+    .btn { padding: 6px 10px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 500; }
+    .btn-clip { background: #e2e8f0; color: var(--text); }
+    .btn-clear { background: transparent; color: var(--danger); }
+    .btn-go { background: var(--primary); color: white; padding: 14px; border-radius: 10px; font-weight: 600; width: 100%; font-size: 1.05rem; cursor: pointer; border: none; margin-top: 4px; }
     .btn-go:hover { background: #1d4ed8; }
     .btn-go:disabled { background: #94a3b8; cursor: not-allowed; }
-    .btn-export { background: var(--success); color: white; padding: 12px 20px; border-radius: 8px; margin-top: 12px; display: none; }
-    #status { text-align: center; padding: 8px; border-radius: 6px; font-weight: 500; min-height: 24px; }
+    #status { text-align: center; padding: 10px; border-radius: 8px; font-weight: 500; margin: 12px 0; min-height: 40px; display: flex; align-items: center; justify-content: center; gap: 8px; }
     table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 0.85rem; }
-    th, td { padding: 10px 8px; border-bottom: 1px solid var(--border); text-align: left; }
-    th { background: #f8fafc; position: sticky; top: 0; }
+    th, td { padding: 10px 8px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: middle; }
+    th { background: #f8fafc; position: sticky; top: 0; font-weight: 600; }
     .diff { color: var(--danger); font-weight: bold; }
+    .match { color: var(--success); }
+    .export-btn { background: var(--success); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 16px; }
     .hidden { display: none; }
-    .spinner { display: inline-block; width: 18px; height: 18px; border: 3px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 1s linear infinite; margin-right: 8px; }
+    .spinner { display: inline-block; width: 18px; height: 18px; border: 3px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 1s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .debug { background: #1e293b; color: #e2e8f0; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 0.8rem; overflow-x: auto; margin-top: 12px; }
-    code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; }
+    .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; background: #e0e7ff; color: #3730a3; }
+    code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 0.9em; }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>🔍 Rekonsiliasi QRIS</h1>
+    <p class="subtitle">MINERAPAY ↔ ZONAMAIN ↔ IDN | AI Parsing + Deterministic Matching</p>
     
     <div class="alert alert-warn">
-      💡 Jika masih error, centang <strong>📴 Mode Offline</strong> untuk bypass API.
+      ⚠️ API Key sudah terpasang. Jika muncul <code>401</code> atau <code>User not found</code>, pastikan akun OpenRouter sudah <strong>verifikasi email</strong> & memiliki <strong>kredit > $0</strong>.
     </div>
 
     <div class="api-box">
-      <label>🔑 API Key:</label>
-      <input type="password" id="apiKey" value="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" readonly>
-      <button class="btn btn-test" onclick="testKey()">🔍 Test API</button>
-      <div id="apiStatus"></div>
-      <div id="apiDebug" class="debug hidden"></div>
+      <span>🔑 Key:</span>
+      <code>sk-or-v1-95fed9...8698</code>
+      <button class="btn-test" onclick="testKey()">🔍 Test Koneksi</button>
+      <span id="apiStatus" style="font-size:0.85rem; color:var(--muted);"></span>
     </div>
 
     <div class="controls">
       <label>🤖 Model:</label>
       <select id="model">
-        <option value="openai/gpt-4o-mini">gpt-4o-mini</option>
+        <option value="openai/gpt-4o-mini">gpt-4o-mini (Default)</option>
         <option value="meta-llama/llama-3.1-8b-instruct">Llama 3.1 8B</option>
       </select>
-      <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
-        <input type="checkbox" id="offline"> 📴 Mode Offline
+      <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.9rem;">
+        <input type="checkbox" id="offline"> 📴 Fallback Offline (Jika AI Gagal)
       </label>
     </div>
 
@@ -78,29 +79,31 @@
       <div class="box">
         <h3>📦 MINERAPAY 
           <div>
-            <button class="btn btn-clip" onclick="paste('m')">📋</button>
+            <button class="btn btn-clip" onclick="paste('m')">📋 Paste</button>
             <button class="btn btn-clear" onclick="clr('m')">✖</button>
           </div>
         </h3>
-        <textarea id="m" placeholder="Paste data MINERAPAY..."></textarea>
+        <textarea id="m" placeholder="Paste data MINERAPAY (TAB-separated)..."></textarea>
         <div class="drop" onclick="document.getElementById('fm').click()">📁 Drop file</div>
         <input type="file" id="fm" class="hidden" accept=".csv,.txt,.xlsx" onchange="file(this,'m')">
       </div>
+
       <div class="box">
         <h3>📦 ZONAMAIN 
           <div>
-            <button class="btn btn-clip" onclick="paste('z')">📋</button>
+            <button class="btn btn-clip" onclick="paste('z')">📋 Paste</button>
             <button class="btn btn-clear" onclick="clr('z')">✖</button>
           </div>
         </h3>
-        <textarea id="z" placeholder="Paste data ZONAMAIN..."></textarea>
+        <textarea id="z" placeholder="Paste data ZONAMAIN (TAB-separated)..."></textarea>
         <div class="drop" onclick="document.getElementById('fz').click()">📁 Drop file</div>
         <input type="file" id="fz" class="hidden" accept=".csv,.txt,.xlsx" onchange="file(this,'z')">
       </div>
+
       <div class="box">
         <h3>📦 IDN 
           <div>
-            <button class="btn btn-clip" onclick="paste('i')">📋</button>
+            <button class="btn btn-clip" onclick="paste('i')">📋 Paste</button>
             <button class="btn btn-clear" onclick="clr('i')">✖</button>
           </div>
         </h3>
@@ -110,116 +113,222 @@
       </div>
     </div>
 
-    <button class="btn-go" id="btn" onclick="run()">🚀 Proses</button>
+    <button class="btn-go" id="btn" onclick="run()">🚀 Proses Rekonsiliasi</button>
 
     <div id="res" class="hidden">
-      <h3 style="margin:24px 0 12px;">🎯 Hasil</h3>
-      <table>
-        <thead><tr><th>Rule</th><th>Ref</th><th>MINERAPAY</th><th>ZONAMAIN</th><th>IDN</th><th>Selisih</th><th>Ket</th></tr></thead>
+      <h3 style="margin: 24px 0 12px;">📊 Hasil Matching</h3>
+      <div id="summary" style="padding: 12px; background: #f8fafc; border-radius: 8px; margin-bottom: 12px; font-size: 0.9rem;"></div>
+      <table id="tbl">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Rule</th>
+            <th>Reference</th>
+            <th>MINERAPAY</th>
+            <th>ZONAMAIN</th>
+            <th>IDN</th>
+            <th>Selisih</th>
+            <th>Keterangan</th>
+          </tr>
+        </thead>
         <tbody id="tb"></tbody>
       </table>
-      <button class="btn-export" id="exp" onclick="csv()">📥 Export CSV</button>
+      <button class="export-btn" onclick="csv()">📥 Export CSV</button>
     </div>
   </div>
 
   <script>
-    let KEY = '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';
-    const URL = 'https://openrouter.ai/api/v1';
-    let data = [];
+    // 🔑 KONFIGURASI API
+    const CONFIG = {
+      KEY: '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',
+      URL: 'https://openrouter.ai/api/v1',
+      REF: window.location.href
+    };
 
-    function log(m,t='info') {
-      const s = document.getElementById('status');
-      s.style.background = t==='ok'?'#d1fae5':t==='err'?'#fee2e2':'#f8fafc';
+    let hasil = [];
+    const $ = id => document.getElementById(id);
+    const log = (m, t='info') => {
+      const s = $('status');
+      s.style.background = t==='ok'?'#d1fae5':t==='err'?'#fee2e2':'#eff6ff';
       s.style.color = t==='ok'?'#065f46':t==='err'?'#991b1b':'#2563eb';
-      s.innerHTML = t==='load'?'<span class="spinner"></span>'+m:m;
-    }
+      s.innerHTML = t==='load' ? `<span class="spinner"></span> ${m}` : m;
+    };
 
+    // TEST API
     async function testKey() {
-      const st = document.getElementById('apiStatus');
-      const dbg = document.getElementById('apiDebug');
-      st.innerHTML = '<span class="spinner"></span> Testing...';
-      dbg.classList.add('hidden');
+      $('apiStatus').innerHTML = '<span class="spinner"></span> Checking...';
       try {
-        const r = await fetch(`${URL}/auth/key`, {headers:{'Authorization':`Bearer ${KEY}`,'HTTP-Referer':location.href}});
+        const r = await fetch(`${CONFIG.URL}/auth/key`, {headers:{'Authorization':`Bearer ${CONFIG.KEY}`,'HTTP-Referer':CONFIG.REF}});
         const j = await r.json();
         if(r.ok) {
-          st.innerHTML = `<div class="alert alert-ok">✅ Valid! Email: ${j.data?.email||'N/A'}, Credit: ${j.data?.credit||'?'}</div>`;
+          $('apiStatus').innerHTML = `<span style="color:#10b981">✅ Valid | Credit: ${j.data?.credit||'?'}</span>`;
         } else {
-          st.innerHTML = `<div class="alert alert-err">❌ ${r.status}: ${j.error?.message}</div>`;
-          dbg.textContent = JSON.stringify(j,null,2);
-          dbg.classList.remove('hidden');
+          $('apiStatus').innerHTML = `<span style="color:#dc2626">❌ ${j.error?.message||r.status}</span>`;
         }
-      } catch(e) {
-        st.innerHTML = `<div class="alert alert-err">❌ ${e.message}</div>`;
-      }
+      } catch(e) { $('apiStatus').innerHTML = `<span style="color:#dc2626">❌ ${e.message}</span>`; }
     }
 
-    document.querySelectorAll('.drop').forEach(d=>{
-      d.addEventListener('dragover',e=>{e.preventDefault();d.classList.add('dragover');});
-      d.addEventListener('dragleave',()=>d.classList.remove('dragover'));
-      d.addEventListener('drop',e=>{e.preventDefault();d.classList.remove('dragover');if(e.dataTransfer.files[0])fileInput(e.dataTransfer.files[0],d.previousElementSibling.id);});
+    // FILE / CLIPBOARD HANDLERS
+    document.querySelectorAll('.drop').forEach(d => {
+      d.addEventListener('dragover', e => { e.preventDefault(); d.classList.add('dragover'); });
+      d.addEventListener('dragleave', () => d.classList.remove('dragover'));
+      d.addEventListener('drop', e => {
+        e.preventDefault(); d.classList.remove('dragover');
+        if(e.dataTransfer.files[0]) fileInput(e.dataTransfer.files[0], d.previousElementSibling.id);
+      });
     });
 
-    function file(inp,tid){if(inp.files[0])fileInput(inp.files[0],tid);}
-    async function fileInput(f,tid){
-      log(`Reading ${f.name}...`,'load');
-      try{
-        let t = f.name.endsWith('.xlsx')?XLSX.utils.sheet_to_csv(XLSX.read(await f.arrayBuffer(),{type:'array'}).Sheets[XLSX.read(await f.arrayBuffer(),{type:'array'}).SheetNames[0]]):await f.text();
-        document.getElementById(tid).value = t;
-        log(`Loaded ${f.name}`,'ok');
-      }catch(e){log(`Error: ${e.message}`,'err');}
+    function file(inp, tid) { if(inp.files[0]) fileInput(inp.files[0], tid); }
+    async function fileInput(f, tid) {
+      log(`Reading ${f.name}...`, 'load');
+      try {
+        let t = f.name.endsWith('.xlsx') 
+          ? XLSX.utils.sheet_to_csv(XLSX.read(await f.arrayBuffer(), {type:'array'}).Sheets[XLSX.read(await f.arrayBuffer(), {type:'array'}).SheetNames[0]])
+          : await f.text();
+        $(tid).value = t;
+        log(`✅ ${f.name} loaded`, 'ok');
+      } catch(e) { log(`❌ ${e.message}`, 'err'); }
     }
-    async function paste(tid){try{document.getElementById(tid).value=await navigator.clipboard.readText();log('Pasted','ok');}catch{log('Clipboard denied','err');}}
-    function clr(tid){document.getElementById(tid).value='';}
+    async function paste(tid) {
+      try { $(tid).value = await navigator.clipboard.readText(); log('✅ Pasted', 'ok'); }
+      catch { log('❌ Clipboard denied', 'err'); }
+    }
+    function clr(tid) { $(tid).value = ''; }
 
-    // OFFLINE PARSERS
-    function parseM(t){return t.trim().split('\n').filter(l=>l).map(l=>{const c=l.split('\t');return{order_id:(c[1]||'').trim(),user_id:((c[20]||'').split('||')[0]||'').trim(),amount:parseFloat(c[2])||0,status:(c[6]||'success').trim()}}).filter(d=>d.order_id);}
-    function parseZ(t){return t.trim().split('\n').filter(l=>l).map(l=>{const c=l.split('\t');return{order_id:(c[3]||'').trim(),user_id:(c[6]||'').trim(),amount:parseFloat((c[8]||'0').replace(/,/g,''))||0,status:'success'}}).filter(d=>d.order_id);}
-    function parseI(t){return t.trim().split('\n').filter(l=>l).map((l,idx)=>({order_id:`IDN_${idx}`,user_id:`U${idx}`,amount:parseFloat(l.replace(/[^0-9.]/g,''))||0,status:'success'}));}
-
-    async function parseAI(txt,src,mod){
-      const p = src==='MINERAPAY'?`Parse MINERAPAY TAB data. Col[1]=order_id, [2]=amount, [6]=status, [20]=user. Output {transactions:[{order_id,user_id,amount,status}]}. Data:${txt.slice(0,3000)}`:src==='ZONAMAIN'?`Parse ZONAMAIN TAB data. Col[3]=order_id, [6]=user, [8]=amount. Output {transactions:[{order_id,user_id,amount,status}]}. Data:${txt.slice(0,3000)}`:`Parse IDN. Output {transactions:[{order_id,user_id,amount,status}]}. Data:${txt.slice(0,3000)}`;
-      const r = await fetch(`${URL}/chat/completions`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${KEY}`,'HTTP-Referer':location.href,'X-Title':'QRIS'},body:JSON.stringify({model:mod,messages:[{role:'user',content:p}],temperature:0,response_format:{type:'json_object'}})});
+    // AI PARSER
+    async function parseAI(txt, src, mod) {
+      const p = src==='MINERAPAY' 
+        ? `Parse MINERAPAY TAB data. Col[1]=order_id(UUID), [2]=amount, [6]=status, [20]=user_info. Output {transactions:[{order_id,user_id,amount,status}]}. Data:\n${txt.slice(0,3500)}`
+        : src==='ZONAMAIN'
+        ? `Parse ZONAMAIN TAB data. Col[3]=order_id(UUID), [6]=username, [8]=amount(with comma). Output {transactions:[{order_id,user_id,amount,status}]}. Data:\n${txt.slice(0,3500)}`
+        : `Parse IDN data. Extract order_id/user_id/amount/status. Output {transactions:[{order_id,user_id,amount,status}]}. Data:\n${txt.slice(0,3500)}`;
+      
+      const r = await fetch(`${CONFIG.URL}/chat/completions`, {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json', 'Authorization':`Bearer ${CONFIG.KEY}`, 'HTTP-Referer':CONFIG.REF, 'X-Title':'QRIS Reconciler' },
+        body: JSON.stringify({ model:mod, messages:[{role:'user',content:p}], temperature:0, response_format:{type:'json_object'} })
+      });
       const j = await r.json();
-      if(!r.ok) throw new Error(j.error?.message||`API ${r.status}`);
+      if(!r.ok) throw new Error(j.error?.message || `API ${r.status}`);
       const parsed = JSON.parse(j.choices[0].message.content);
-      return parsed.transactions||[];
+      return parsed.transactions || [];
     }
 
-    function reconcile(A,B){
-      const res=[],norm=v=>String(v||'').trim().toLowerCase(),amt=v=>parseFloat(v)||0,add=(rule,ref,m,z,sel,iss)=>res.push({rule,ref,m,z,sel,iss});
+    // OFFLINE FALLBACK PARSERS
+    function parseM_off(t){return t.trim().split('\n').filter(l=>l).map(l=>{const c=l.split('\t');return{order_id:(c[1]||'').trim(),user_id:((c[20]||'').split('||')[0]||'').trim(),amount:parseFloat(c[2])||0,status:(c[6]||'success').trim()}}).filter(d=>d.order_id);}
+    function parseZ_off(t){return t.trim().split('\n').filter(l=>l).map(l=>{const c=l.split('\t');return{order_id:(c[3]||'').trim(),user_id:(c[6]||'').trim(),amount:parseFloat((c[8]||'0').replace(/,/g,''))||0,status:'success'}}).filter(d=>d.order_id);}
+    function parseI_off(t){return t.trim().split('\n').filter(l=>l).map((l,idx)=>({order_id:`IDN_${idx}`,user_id:`U${idx}`,amount:parseFloat(l.replace(/[^0-9.]/g,''))||0,status:'success'}));}
+
+    // RECONCILIATION ENGINE
+    function reconcile(A, B, C) {
+      const res=[], norm=v=>String(v||'').trim().toLowerCase(), amt=v=>parseFloat(v)||0;
+      const add=(rule,ref,m,z,i,sel,iss)=>res.push({rule,ref,m,z,i,sel,iss});
+
+      // 1. MINERAPAY ↔ ZONAMAIN (Order ID)
       const bMap=new Map(B.filter(x=>x.order_id).map(x=>[norm(x.order_id),x])),aUsed=new Set();
-      A.forEach(a=>{if(!a.order_id)return;const id=norm(a.order_id);aUsed.add(id);const b=bMap.get(id);if(!b)add('M↔Z',id,a,null,amt(a.amount),'Not in Z');else if(Math.abs(amt(a.amount)-amt(b.amount))>0.01)add('M↔Z',id,a,b,Math.abs(amt(a.amount)-amt(b.amount)),'Amount mismatch');});
-      B.filter(b=>b.order_id&&!aUsed.has(norm(b.order_id))).forEach(b=>add('M↔Z',norm(b.order_id),null,b,amt(b.amount),'Not in M'));
+      A.forEach(a=>{
+        if(!a.order_id)return;
+        const id=norm(a.order_id); aUsed.add(id);
+        const b=bMap.get(id);
+        if(!b) add('M↔Z', id, a, null, null, amt(a.amount), 'Not in ZONAMAIN');
+        else if(Math.abs(amt(a.amount)-amt(b.amount))>0.5) add('M↔Z', id, a, b, null, Math.abs(amt(a.amount)-amt(b.amount)), 'Amount mismatch');
+      });
+      B.filter(b=>b.order_id&&!aUsed.has(norm(b.order_id))).forEach(b=>add('M↔Z', norm(b.order_id), null, b, null, amt(b.amount), 'Not in MINERAPAY'));
+
+      // 2. ZONAMAIN ↔ IDN (User ID + Amount)
+      const cMap=new Map();
+      C.forEach(c=>{if(c.user_id){const k=`${norm(c.user_id)}_${Math.round(amt(c.amount)*100)}`; if(!cMap.has(k))cMap.set(k,[]); cMap.get(k).push(c);}});
+      B.forEach(b=>{
+        if(!b.user_id)return;
+        const k=`${norm(b.user_id)}_${Math.round(amt(b.amount)*100)}`;
+        const matches=cMap.get(k)||[];
+        if(matches.length===0) add('Z↔I', `${b.user_id}|Rp${amt(b.amount)}`, null, b, null, amt(b.amount), 'Not in IDN');
+        else if(matches.length>1) add('Z↔I', `${b.user_id}|Rp${amt(b.amount)}`, null, b, matches[0], 0, `Duplikat ${matches.length}x di IDN`);
+      });
+
+      // 3. MINERAPAY ↔ IDN (Batch Amount Count)
+      const cntA={}, cntC={};
+      A.forEach(a=>{const k=Math.round(amt(a.amount)*100); cntA[k]=(cntA[k]||0)+1;});
+      C.forEach(c=>{const k=Math.round(amt(c.amount)*100); cntC[k]=(cntC[k]||0)+1;});
+      Object.keys(cntA).forEach(k=>{
+        if(cntA[k]!==(cntC[k]||0)) {
+          add('M↔I', `Batch Rp${(k/100).toLocaleString('id-ID')}`, {amount:k/100}, null, {amount:k/100}, Math.abs(cntA[k]-(cntC[k]||0)), `Count beda: M=${cntA[k]}, I=${cntC[k]||0}`);
+        }
+      });
+
       return res.sort((x,y)=>y.sel-x.sel);
     }
 
-    async function run(){
-      const off=document.getElementById('offline').checked;
-      const [a,b,c]=[document.getElementById('m'),document.getElementById('z'),document.getElementById('i')].map(e=>e.value.trim());
-      if(!a||!b||!c)return log('⚠️ Fill all 3 sources','err');
-      document.getElementById('btn').disabled=true;
-      document.getElementById('res').classList.add('hidden');
-      try{
+    // MAIN EXECUTION
+    async function run() {
+      const off=$('offline').checked;
+      const [a,b,c]=[$('m'),$('z'),$('i')].map(e=>e.value.trim());
+      if(!a||!b||!c) return log('⚠️ Isi ketiga sumber data','err');
+
+      $('btn').disabled=true; $('res').classList.add('hidden');
+      try {
         let dA,dB,dC;
-        if(off){log('Offline mode...','load');dA=parseM(a);dB=parseZ(b);dC=parseI(c);}
-        else{const mod=document.getElementById('model').value;log('Parsing with AI...','load');dA=await parseAI(a,'MINERAPAY',mod);dB=await parseAI(b,'ZONAMAIN',mod);dC=await parseAI(c,'IDN',mod);}
-        log(`Parsed: M=${dA.length}, Z=${dB.length}. Matching...`,'ok');
-        data=reconcile(dA,dB);
+        if(off) {
+          log(' Mode Offline: Parsing manual...','load');
+          dA=parseM_off(a); dB=parseZ_off(b); dC=parseI_off(c);
+        } else {
+          const mod=$('model').value;
+          log('🤖 AI Parsing...','load');
+          dA=await parseAI(a,'MINERAPAY',mod);
+          dB=await parseAI(b,'ZONAMAIN',mod);
+          dC=await parseAI(c,'IDN',mod);
+        }
+        log(`✅ Parsed: M=${dA.length}, Z=${dB.length}, I=${dC.length}. Matching...`,'ok');
+        hasil = reconcile(dA,dB,dC);
         render();
-      }catch(e){log(`❌ ${e.message}`,'err');if(e.message.includes('User')||e.message.includes('401'))log('💡 Enable Offline Mode or fix API key','err');}
-      finally{document.getElementById('btn').disabled=false;}
+      } catch(e) {
+        log(`❌ ${e.message}`,'err');
+        if(e.message.includes('User')||e.message.includes('401')) {
+          log('💡 Aktifkan "Fallback Offline" atau cek credit OpenRouter','err');
+        }
+      } finally { $('btn').disabled=false; }
     }
 
-    function render(){
-      const tb=document.getElementById('tb');tb.innerHTML='';
-      if(!data.length){tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:20px;color:#10b981">✅ All match!</td></tr>';}
-      else{data.forEach(r=>{const f=d=>d?`Rp ${(parseFloat(d.amount)||0).toLocaleString('id-ID')}`:'-';const tr=document.createElement('tr');tr.innerHTML=`<td><code>${r.rule}</code></td><td><code>${r.ref}</code></td><td>${f(r.m)}</td><td>${f(r.z)}</td><td>-</td><td class="${r.sel>100?'diff':''}">Rp ${r.sel.toLocaleString('id-ID')}</td><td>${r.iss}</td>`;tb.appendChild(tr);});}
-      document.getElementById('res').classList.remove('hidden');
-      document.getElementById('exp').style.display=data.length?'block':'none';
+    function render() {
+      const tb=$('tb'), sum=$('summary'); tb.innerHTML='';
+      const match=hasil.filter(h=>h.sel<0.5 && !h.iss.includes('Not') && !h.iss.includes('Duplikat')).length;
+      const issue=hasil.length-match;
+      sum.innerHTML=`<strong>📊 Summary:</strong> ✅ Match: ${match} | ⚠️ Issue: ${issue} | 💰 Total Selisih: Rp ${hasil.reduce((a,b)=>a+b.sel,0).toLocaleString('id-ID')}`;
+      
+      if(!hasil.length) tb.innerHTML='<tr><td colspan="8" style="text-align:center;padding:20px;color:#10b981">✅ Semua data match sempurna!</td></tr>';
+      else {
+        hasil.forEach((h,i)=>{
+          const f=d=>d?`Rp ${(parseFloat(d.amount)||0).toLocaleString('id-ID')}<br><small>${d.status||d.user_id||''}</small>`:'<span style="color:#94a3b8">-</span>';
+          const tr=document.createElement('tr');
+          if(h.sel>0) tr.style.background='#fef2f2';
+          tr.innerHTML=`
+            <td>${i+1}</td>
+            <td><span class="badge">${h.rule}</span></td>
+            <td><code>${h.ref}</code></td>
+            <td>${f(h.m)}</td>
+            <td>${f(h.z)}</td>
+            <td>${f(h.i)}</td>
+            <td class="${h.sel>100?'diff':''}">Rp ${h.sel.toLocaleString('id-ID')}</td>
+            <td>${h.iss}</td>`;
+          tb.appendChild(tr);
+        });
+      }
+      $('res').classList.remove('hidden');
+      $('tbl').scrollIntoView({behavior:'smooth'});
     }
 
-    function csv(){if(!data.length)return;let c='RULE,REF,MINERAPAY,ZONAMAIN,SELISIH,KET\n';data.forEach(r=>{c+=`"${r.rule}","${r.ref}",${r.m?.amount||0},${r.z?.amount||0},${r.sel},"${r.iss}"\n`;});const b=new Blob([c],{type:'text/csv'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=`qris_${new Date().toISOString().slice(0,10)}.csv`;a.click();URL.revokeObjectURL(u);}
+    function csv() {
+      if(!hasil.length) return;
+      let c='NO,RULE,REFERENCE,MINERAPAY,ZONAMAIN,IDN,SELISIH,KETERANGAN\n';
+      hasil.forEach((h,i)=>{
+        c+=`${i+1},"${h.rule}","${h.ref}",${h.m?.amount||0},${h.z?.amount||0},${h.i?.amount||0},${h.sel},"${h.iss}"\n`;
+      });
+      const b=new Blob([c],{type:'text/csv'}),u=URL.createObjectURL(b),a=document.createElement('a');
+      a.href=u; a.download=`rekonsiliasi_qris_${new Date().toISOString().slice(0,10)}.csv`; a.click(); URL.revokeObjectURL(u);
+    }
+
+    // Auto-test key on load (silent)
+    window.addEventListener('load', () => setTimeout(testKey, 500));
   </script>
 </body>
 </html>
