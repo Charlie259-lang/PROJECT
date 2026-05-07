@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Withdraw List Formatter - Failed Status</title>
+    <title>Withdraw List Formatter - Pending Status</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
             padding: 20px;
             min-height: 100vh;
         }
         .container {
-            max-width: 1200px;
+            max-width: 1000px;
             margin: 0 auto;
             background: white;
             border-radius: 16px;
@@ -21,7 +21,7 @@
             padding: 30px;
         }
         h1 {
-            color: #667eea;
+            color: #f5576c;
             margin-bottom: 10px;
             text-align: center;
         }
@@ -36,7 +36,7 @@
             padding: 20px;
             background: #f8f9fa;
             border-radius: 12px;
-            border-left: 4px solid #667eea;
+            border-left: 4px solid #f5576c;
         }
         .section-title {
             font-weight: 600;
@@ -57,7 +57,7 @@
             resize: vertical;
             transition: border-color 0.3s;
         }
-        textarea:focus { outline: none; border-color: #667eea; }
+        textarea:focus { outline: none; border-color: #f5576c; }
         .btn-group {
             display: flex;
             gap: 12px;
@@ -66,7 +66,7 @@
         }
         button {
             padding: 12px 24px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
             color: white;
             border: none;
             border-radius: 8px;
@@ -79,7 +79,7 @@
         }
         button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 5px 20px rgba(245, 87, 108, 0.4);
         }
         button:active { transform: translateY(0); }
         button.secondary { background: #6c757d; }
@@ -115,7 +115,7 @@
         .stat-value {
             font-size: 24px;
             font-weight: bold;
-            color: #667eea;
+            color: #f5576c;
         }
         .stat-label { font-size: 12px; color: #666; }
         .hidden { display: none; }
@@ -144,19 +144,19 @@
 </head>
 <body>
     <div class="container">
-        <h1>📋 Withdraw List Formatter</h1>
-        <p class="subtitle">Extract data failed → Format untuk Google Sheets</p>
+        <h1>⏳ Withdraw List Formatter</h1>
+        <p class="subtitle">Extract data pending → Format untuk Google Sheets</p>
 
         <!-- Input Section -->
         <div class="section">
-            <div class="section-title">📥 Paste Data Withdraw List</div>
+            <div class="section-title">📥 Paste Data Withdraw List (Pending)</div>
             <p style="font-size:13px;color:#666;margin-bottom:10px;">
-                Salin data dari tabel withdraw (status <strong>failed</strong>) dan paste di bawah ini. 
+                Salin data dari tabel withdraw (status <strong>pending</strong>) dan paste di bawah ini. 
                 Data harus dalam format tab-separated.
             </p>
             <textarea id="inputData" placeholder="Paste data di sini...
 Contoh format per baris:
-07/05/2026 19:47:04	failed	SMB5 (minerapayline@gmail.com)	LIT-xxx	OVO	085226324612	KHAIRIL IMDAD	Rp3,000,000	Rp1,600	(-Rp3,001,600)"></textarea>
+07/05/2026 22:53:07	pending	SMB5 (minerapayline@gmail.com)	LIT-3d93ca8b-3d67-446c-91ce-aa49c1f315eb	Bank Mandiri	1840004747851	SUNARWI	Rp200,000	Rp1,600	(-Rp201,600)"></textarea>
             <div class="btn-group">
                 <button onclick="processData()">🔄 Proses Data</button>
                 <button class="secondary" onclick="clearAll()">🗑️ Hapus Semua</button>
@@ -170,8 +170,8 @@ Contoh format per baris:
                 <div class="stat-label">Total Baris</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value" id="failedCount">0</div>
-                <div class="stat-label">Status Failed</div>
+                <div class="stat-value" id="pendingCount">0</div>
+                <div class="stat-label">Status Pending</div>
             </div>
             <div class="stat-card">
                 <div class="stat-value" id="processedCount">0</div>
@@ -183,8 +183,8 @@ Contoh format per baris:
         <div class="section">
             <div class="section-title">📤 Hasil Format (Siap Copy ke Google Sheets)</div>
             <p style="font-size:12px;color:#666;margin:10px 0;">
-                🔁 Data diurutkan <strong>dari terbawah ke teratas</strong> sesuai input asli.
-                Prefix <strong>"Bank"</strong> pada payment method otomatis dihapus.
+                🔁 Data diurutkan <strong>dari terbawah ke teratas</strong> sesuai input asli.<br>
+                📋 Output: <code>Kolom A</code>=Timestamp | <code>Kolom B</code>=Transaction ID | <code>Kolom C</code>=Amount | <code>Kolom D</code>=Fee
             </p>
             <div class="btn-group">
                 <button class="success" onclick="copyToClipboard()">📋 Copy Hasil</button>
@@ -197,11 +197,10 @@ Contoh format per baris:
     </div>
 
     <script>
-        // Fungsi untuk membersihkan nama payment method
-        function cleanPaymentMethod(method) {
-            if (!method) return '';
-            // Hapus "Bank " di awal string, tidak case-sensitive
-            return method.replace(/^Bank\s+/i, '').trim();
+        // Fungsi untuk membersihkan nominal: Rp200,000 → 200,000
+        function cleanAmount(amount) {
+            if (!amount) return '';
+            return amount.replace('Rp', '').trim();
         }
 
         function processData() {
@@ -213,35 +212,35 @@ Contoh format per baris:
 
             const lines = input.split('\n').filter(line => line.trim());
             const results = [];
-            let failedCount = 0;
+            let pendingCount = 0;
 
             lines.forEach((line, index) => {
                 const fields = line.split('\t');
                 
-                // Validasi: minimal field & status failed (index 1)
-                if (fields.length >= 8 && fields[1]?.toLowerCase().trim() === 'failed') {
-                    failedCount++;
+                // Validasi: minimal field & status pending (index 1)
+                if (fields.length >= 9 && fields[1]?.toLowerCase().trim() === 'pending') {
+                    pendingCount++;
                     
-                    // [0]timestamp [1]status [2]account [3]txid [4]payment [5]phone [6]name [7]amount
-                    const paymentMethodRaw = fields[4]?.trim() || '';
-                    const paymentMethod = cleanPaymentMethod(paymentMethodRaw);  // → Kolom A
-                    const transactionId = fields[3]?.trim() || '';                // → Kolom C
-                    const amountRaw = fields[7]?.trim() || 'Rp0';                 // → Kolom D & G
-                    const name = fields[6]?.trim() || '';                         // → Kolom E
+                    // Mapping field sesuai struktur data input (0-based index)
+                    // [0]timestamp [1]status [2]account [3]txid [4]payment [5]phone [6]name [7]amount [8]fee [9]total
+                    const timestamp = fields[0]?.trim() || '';              // → Kolom A
+                    const transactionId = fields[3]?.trim() || '';          // → Kolom B
+                    const amountRaw = fields[7]?.trim() || 'Rp0';           // → Kolom C
+                    const feeRaw = fields[8]?.trim() || 'Rp0';              // → Kolom D
                     
-                    const amountClean = amountRaw.replace('Rp', '').trim();
-                    const amountNegative = '-' + amountClean;
+                    // Bersihkan nominal: hapus "Rp"
+                    const amountClean = cleanAmount(amountRaw);
+                    const feeClean = cleanAmount(feeRaw);
                     
+                    // Format output tab-separated untuk Google Sheets (4 kolom)
                     const outputLine = [
-                        paymentMethod,        // A
-                        '',                    // B (kosong)
-                        transactionId,         // C
-                        amountClean,           // D
-                        name,                  // E
-                        '',                    // F (kosong)
-                        amountNegative         // G
+                        timestamp,          // A
+                        transactionId,      // B
+                        amountClean,        // C
+                        feeClean            // D
                     ].join('\t');
                     
+                    // Simpan dengan index asli untuk sorting
                     results.push({ index, line: outputLine });
                 }
             });
@@ -250,16 +249,18 @@ Contoh format per baris:
             results.sort((a, b) => b.index - a.index);
             const finalOutput = results.map(r => r.line);
 
+            // Update stats
             document.getElementById('totalRows').textContent = lines.length;
-            document.getElementById('failedCount').textContent = failedCount;
+            document.getElementById('pendingCount').textContent = pendingCount;
             document.getElementById('processedCount').textContent = finalOutput.length;
             document.getElementById('statsSection').classList.remove('hidden');
 
+            // Tampilkan hasil
             const output = document.getElementById('outputData');
             if (finalOutput.length > 0) {
                 output.textContent = finalOutput.join('\n');
             } else {
-                output.innerHTML = '<em style="color:#dc3545;">❌ Tidak ditemukan data dengan status "failed"</em>';
+                output.innerHTML = '<em style="color:#dc3545;">❌ Tidak ditemukan data dengan status "pending"</em>';
             }
         }
 
@@ -273,6 +274,7 @@ Contoh format per baris:
             navigator.clipboard.writeText(output).then(() => {
                 showNotification('✅ Berhasil disalin ke clipboard!');
             }).catch(() => {
+                // Fallback untuk browser lama
                 const textarea = document.createElement('textarea');
                 textarea.value = output;
                 document.body.appendChild(textarea);
@@ -303,7 +305,7 @@ Contoh format per baris:
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = `withdraw_failed_${new Date().toISOString().slice(0,10)}.csv`;
+            link.download = `withdraw_pending_${new Date().toISOString().slice(0,10)}.csv`;
             link.click();
             URL.revokeObjectURL(url);
             showNotification('📥 File CSV berhasil didownload!');
@@ -326,6 +328,7 @@ Contoh format per baris:
             }, 2500);
         }
 
+        // Shortcut: Ctrl+Enter untuk proses
         document.getElementById('inputData').addEventListener('keydown', function(e) {
             if (e.ctrlKey && e.key === 'Enter') {
                 processData();
