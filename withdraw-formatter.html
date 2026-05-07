@@ -5,11 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Withdraw List Formatter - Failed Status</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -88,12 +84,8 @@
             transform: translateY(-2px);
             box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
         }
-        button:active {
-            transform: translateY(0);
-        }
-        button.secondary {
-            background: #6c757d;
-        }
+        button:active { transform: translateY(0); }
+        button.secondary { background: #6c757d; }
         button.success {
             background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
         }
@@ -145,9 +137,7 @@
             border-radius: 4px;
             font-family: monospace;
         }
-        .hidden {
-            display: none;
-        }
+        .hidden { display: none; }
         .copy-success {
             position: fixed;
             top: 20px;
@@ -180,16 +170,15 @@
         <div class="section">
             <div class="section-title">📥 Paste Data Withdraw List</div>
             <p style="font-size:13px;color:#666;margin-bottom:10px;">
-                Salin data dari tabel withdraw (status failed) dan paste di bawah ini. 
-                Data harus dalam format tab-separated seperti contoh.
+                Salin data dari tabel withdraw (status <strong>failed</strong>) dan paste di bawah ini. 
+                Data harus dalam format tab-separated.
             </p>
-            <textarea id="inputData" placeholder="Contoh:
-07/05/2026 19:47:04	failed	SMB5 (minerapayline@gmail.com)	LIT-6cffca3d-cfd4-4dba-9bc6-f06e873d056c	OVO	085226324612	KHAIRIL IMDAD	Rp3,000,000	Rp1,600	(-Rp3,001,600)
-07/05/2026 18:39:08	failed	SMB5 (minerapayline@gmail.com)	LIT-851167bc-e668-415c-ab6d-d41abf9a5123	Dana	082224256471		Rp60,000	Rp1,600	(-Rp61,600)"></textarea>
+            <textarea id="inputData" placeholder="Paste data di sini...
+Contoh format per baris:
+07/05/2026 19:47:04	failed	SMB5 (minerapayline@gmail.com)	LIT-xxx	OVO	085226324612	KHAIRIL IMDAD	Rp3,000,000	Rp1,600	(-Rp3,001,600)"></textarea>
             <div class="btn-group">
                 <button onclick="processData()">🔄 Proses Data</button>
                 <button class="secondary" onclick="clearAll()">🗑️ Hapus Semua</button>
-                <button class="secondary" onclick="loadSample()">📄 Load Contoh</button>
             </div>
         </div>
 
@@ -218,7 +207,7 @@
                 <code>Kolom B</code> : <em>(kosong)</em><br>
                 <code>Kolom C</code> : Transaction ID (LIT-xxx)<br>
                 <code>Kolom D</code> : Nominal penarikan (tanpa Rp, contoh: 60,000)<br>
-                <code>Kolom E</code> : Nama penerima (jika ada)<br>
+                <code>Kolom E</code> : Nama penerima (jika ada, jika tidak kosongkan)<br>
                 <code>Kolom F</code> : <em>(kosong)</em><br>
                 <code>Kolom G</code> : Nominal minus (contoh: -3,000,000)
             </div>
@@ -227,6 +216,9 @@
         <!-- Output Section -->
         <div class="section">
             <div class="section-title">📤 Hasil Format (Siap Copy ke Google Sheets)</div>
+            <p style="font-size:12px;color:#666;margin:10px 0;">
+                🔁 Data diurutkan <strong>dari terbawah ke teratas</strong> sesuai input asli.
+            </p>
             <div class="btn-group">
                 <button class="success" onclick="copyToClipboard()">📋 Copy Hasil</button>
                 <button class="secondary" onclick="downloadCSV()">💾 Download CSV</button>
@@ -238,7 +230,6 @@
     </div>
 
     <script>
-        // Fungsi utama: Memproses data input
         function processData() {
             const input = document.getElementById('inputData').value.trim();
             if (!input) {
@@ -250,58 +241,61 @@
             const results = [];
             let failedCount = 0;
 
-            // Filter & parse setiap baris
-            lines.forEach(line => {
+            // Parse setiap baris dan filter status failed
+            lines.forEach((line, index) => {
                 const fields = line.split('\t');
                 
-                // Validasi minimal field & status failed
+                // Validasi: minimal field & status failed (index 1)
                 if (fields.length >= 8 && fields[1]?.toLowerCase().trim() === 'failed') {
                     failedCount++;
                     
-                    // Extract field sesuai index (0-based)
-                    const paymentMethod = fields[4]?.trim() || '';           // Kolom A
-                    const transactionId = fields[3]?.trim() || '';            // Kolom C
-                    const amountRaw = fields[7]?.trim() || 'Rp0';             // Field amount: Rp3,000,000
-                    const name = fields[6]?.trim() || '';                     // Kolom E (opsional)
+                    // Mapping field sesuai struktur data input (0-based index)
+                    // [0]timestamp [1]status [2]account [3]txid [4]payment [5]phone [6]name [7]amount [8]fee [9]total
+                    const paymentMethod = fields[4]?.trim() || '';           // → Kolom A
+                    const transactionId = fields[3]?.trim() || '';            // → Kolom C
+                    const amountRaw = fields[7]?.trim() || 'Rp0';             // Rp3,000,000
+                    const name = fields[6]?.trim() || '';                     // → Kolom E (opsional)
                     
                     // Bersihkan nominal: Rp3,000,000 → 3,000,000
                     const amountClean = amountRaw.replace('Rp', '').trim();
-                    const amountNegative = '-' + amountClean;                 // Kolom G
+                    const amountNegative = '-' + amountClean;                 // → Kolom G
                     
-                    // Format output: Tab-separated untuk Google Sheets
+                    // Format output tab-separated untuk Google Sheets
                     const outputLine = [
                         paymentMethod,        // A
                         '',                    // B (kosong)
                         transactionId,         // C
                         amountClean,           // D
-                        name,                  // E (bisa kosong)
+                        name,                  // E
                         '',                    // F (kosong)
                         amountNegative         // G
                     ].join('\t');
                     
-                    results.push(outputLine);
+                    // Simpan dengan index asli untuk sorting
+                    results.push({ index, line: outputLine });
                 }
             });
 
-            // Reverse: dari terbawah ke teratas (sesuai request)
-            results.reverse();
+            // 🔁 URUTAN: dari terbawah ke teratas (reverse berdasarkan posisi asli di input)
+            // Data yang posisinya paling bawah di input akan muncul paling atas di output
+            results.sort((a, b) => b.index - a.index);
+            const finalOutput = results.map(r => r.line);
 
             // Update stats
             document.getElementById('totalRows').textContent = lines.length;
             document.getElementById('failedCount').textContent = failedCount;
-            document.getElementById('processedCount').textContent = results.length;
+            document.getElementById('processedCount').textContent = finalOutput.length;
             document.getElementById('statsSection').classList.remove('hidden');
 
             // Tampilkan hasil
             const output = document.getElementById('outputData');
-            if (results.length > 0) {
-                output.textContent = results.join('\n');
+            if (finalOutput.length > 0) {
+                output.textContent = finalOutput.join('\n');
             } else {
                 output.innerHTML = '<em style="color:#dc3545;">❌ Tidak ditemukan data dengan status "failed"</em>';
             }
         }
 
-        // Copy hasil ke clipboard
         function copyToClipboard() {
             const output = document.getElementById('outputData').textContent;
             if (!output || output.includes('Tidak ditemukan')) {
@@ -311,8 +305,8 @@
             
             navigator.clipboard.writeText(output).then(() => {
                 showNotification('✅ Berhasil disalin ke clipboard!');
-            }).catch(err => {
-                // Fallback untuk browser lama
+            }).catch(() => {
+                // Fallback
                 const textarea = document.createElement('textarea');
                 textarea.value = output;
                 document.body.appendChild(textarea);
@@ -323,7 +317,6 @@
             });
         }
 
-        // Download sebagai CSV
         function downloadCSV() {
             const output = document.getElementById('outputData').textContent;
             if (!output || output.includes('Tidak ditemukan')) {
@@ -331,10 +324,8 @@
                 return;
             }
             
-            // Convert tab-separated ke comma-separated (CSV standard)
             const csvContent = output.split('\n').map(line => {
                 return line.split('\t').map(field => {
-                    // Escape quotes dan wrap field yang mengandung koma
                     if (field.includes(',') || field.includes('"')) {
                         return '"' + field.replace(/"/g, '""') + '"';
                     }
@@ -352,24 +343,12 @@
             showNotification('📥 File CSV berhasil didownload!');
         }
 
-        // Clear semua input/output
         function clearAll() {
             document.getElementById('inputData').value = '';
             document.getElementById('outputData').innerHTML = '<em style="color:#888;">Hasil pemrosesan akan muncul di sini...</em>';
             document.getElementById('statsSection').classList.add('hidden');
         }
 
-        // Load data contoh
-        function loadSample() {
-            const sample = `07/05/2026 19:47:04	failed	SMB5 (minerapayline@gmail.com)	LIT-6cffca3d-cfd4-4dba-9bc6-f06e873d056c	OVO	085226324612	KHAIRIL IMDAD	Rp3,000,000	Rp1,600	(-Rp3,001,600)
-07/05/2026 18:39:08	failed	SMB5 (minerapayline@gmail.com)	LIT-851167bc-e668-415c-ab6d-d41abf9a5123	Dana	082224256471		Rp60,000	Rp1,600	(-Rp61,600)
-07/05/2026 17:22:15	success	SMB5 (minerapayline@gmail.com)	LIT-abc123	OVO	081234567890	BUDI	Rp100,000	Rp1,600	(-Rp101,600)
-07/05/2026 16:10:05	failed	SMB5 (minerapayline@gmail.com)	LIT-def456-cfd4-4dba-9bc6-xyz	Gopay	089988776654	SITI RAHAYU	Rp150,000	Rp1,600	(-Rp151,600)`;
-            document.getElementById('inputData').value = sample;
-            showNotification('📄 Data contoh dimuat! Klik "Proses Data" untuk melanjutkan.');
-        }
-
-        // Notifikasi toast
         function showNotification(message) {
             const notif = document.createElement('div');
             notif.className = 'copy-success';
@@ -381,7 +360,7 @@
             }, 2500);
         }
 
-        // Auto-process dengan Ctrl+Enter
+        // Shortcut: Ctrl+Enter untuk proses
         document.getElementById('inputData').addEventListener('keydown', function(e) {
             if (e.ctrlKey && e.key === 'Enter') {
                 processData();
