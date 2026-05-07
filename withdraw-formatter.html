@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Withdraw List Formatter - Failed Status</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 30px;
+        }
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+        .section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+        .section-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        button.secondary {
+            background: #6c757d;
+        }
+        button.success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+        .output-area {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Consolas', 'Monaco', monospace;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        .stat-card {
+            background: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            min-width: 120px;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+        }
+        .column-map {
+            background: #e8f4fd;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+        .column-map code {
+            background: #fff;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .hidden {
+            display: none;
+        }
+        .copy-success {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideIn 0.3s ease;
+            z-index: 1000;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(150px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @media (max-width: 768px) {
+            .container { padding: 20px; }
+            .btn-group { flex-direction: column; }
+            button { width: 100%; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📋 Withdraw List Formatter</h1>
+        <p class="subtitle">Extract data failed → Format untuk Google Sheets</p>
+
+        <!-- Input Section -->
+        <div class="section">
+            <div class="section-title">📥 Paste Data Withdraw List</div>
+            <p style="font-size:13px;color:#666;margin-bottom:10px;">
+                Salin data dari tabel withdraw (status failed) dan paste di bawah ini. 
+                Data harus dalam format tab-separated seperti contoh.
+            </p>
+            <textarea id="inputData" placeholder="Contoh:
+07/05/2026 19:47:04	failed	SMB5 (minerapayline@gmail.com)	LIT-6cffca3d-cfd4-4dba-9bc6-f06e873d056c	OVO	085226324612	KHAIRIL IMDAD	Rp3,000,000	Rp1,600	(-Rp3,001,600)
+07/05/2026 18:39:08	failed	SMB5 (minerapayline@gmail.com)	LIT-851167bc-e668-415c-ab6d-d41abf9a5123	Dana	082224256471		Rp60,000	Rp1,600	(-Rp61,600)"></textarea>
+            <div class="btn-group">
+                <button onclick="processData()">🔄 Proses Data</button>
+                <button class="secondary" onclick="clearAll()">🗑️ Hapus Semua</button>
+                <button class="secondary" onclick="loadSample()">📄 Load Contoh</button>
+            </div>
+        </div>
+
+        <!-- Stats Section -->
+        <div class="stats hidden" id="statsSection">
+            <div class="stat-card">
+                <div class="stat-value" id="totalRows">0</div>
+                <div class="stat-label">Total Baris</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="failedCount">0</div>
+                <div class="stat-label">Status Failed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="processedCount">0</div>
+                <div class="stat-label">Diproses</div>
+            </div>
+        </div>
+
+        <!-- Column Mapping Info -->
+        <div class="section">
+            <div class="section-title">📐 Pemetaan Kolom Output</div>
+            <div class="column-map">
+                <strong>Format Output Google Sheets:</strong><br><br>
+                <code>Kolom A</code> : Payment Method (OVO/Dana/dll)<br>
+                <code>Kolom B</code> : <em>(kosong)</em><br>
+                <code>Kolom C</code> : Transaction ID (LIT-xxx)<br>
+                <code>Kolom D</code> : Nominal penarikan (tanpa Rp, contoh: 60,000)<br>
+                <code>Kolom E</code> : Nama penerima (jika ada)<br>
+                <code>Kolom F</code> : <em>(kosong)</em><br>
+                <code>Kolom G</code> : Nominal minus (contoh: -3,000,000)
+            </div>
+        </div>
+
+        <!-- Output Section -->
+        <div class="section">
+            <div class="section-title">📤 Hasil Format (Siap Copy ke Google Sheets)</div>
+            <div class="btn-group">
+                <button class="success" onclick="copyToClipboard()">📋 Copy Hasil</button>
+                <button class="secondary" onclick="downloadCSV()">💾 Download CSV</button>
+            </div>
+            <div class="output-area" id="outputData" style="margin-top:15px;min-height:100px;">
+                <em style="color:#888;">Hasil pemrosesan akan muncul di sini...</em>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fungsi utama: Memproses data input
+        function processData() {
+            const input = document.getElementById('inputData').value.trim();
+            if (!input) {
+                alert('⚠️ Silakan paste data withdraw list terlebih dahulu!');
+                return;
+            }
+
+            const lines = input.split('\n').filter(line => line.trim());
+            const results = [];
+            let failedCount = 0;
+
+            // Filter & parse setiap baris
+            lines.forEach(line => {
+                const fields = line.split('\t');
+                
+                // Validasi minimal field & status failed
+                if (fields.length >= 8 && fields[1]?.toLowerCase().trim() === 'failed') {
+                    failedCount++;
+                    
+                    // Extract field sesuai index (0-based)
+                    const paymentMethod = fields[4]?.trim() || '';           // Kolom A
+                    const transactionId = fields[3]?.trim() || '';            // Kolom C
+                    const amountRaw = fields[7]?.trim() || 'Rp0';             // Field amount: Rp3,000,000
+                    const name = fields[6]?.trim() || '';                     // Kolom E (opsional)
+                    
+                    // Bersihkan nominal: Rp3,000,000 → 3,000,000
+                    const amountClean = amountRaw.replace('Rp', '').trim();
+                    const amountNegative = '-' + amountClean;                 // Kolom G
+                    
+                    // Format output: Tab-separated untuk Google Sheets
+                    const outputLine = [
+                        paymentMethod,        // A
+                        '',                    // B (kosong)
+                        transactionId,         // C
+                        amountClean,           // D
+                        name,                  // E (bisa kosong)
+                        '',                    // F (kosong)
+                        amountNegative         // G
+                    ].join('\t');
+                    
+                    results.push(outputLine);
+                }
+            });
+
+            // Reverse: dari terbawah ke teratas (sesuai request)
+            results.reverse();
+
+            // Update stats
+            document.getElementById('totalRows').textContent = lines.length;
+            document.getElementById('failedCount').textContent = failedCount;
+            document.getElementById('processedCount').textContent = results.length;
+            document.getElementById('statsSection').classList.remove('hidden');
+
+            // Tampilkan hasil
+            const output = document.getElementById('outputData');
+            if (results.length > 0) {
+                output.textContent = results.join('\n');
+            } else {
+                output.innerHTML = '<em style="color:#dc3545;">❌ Tidak ditemukan data dengan status "failed"</em>';
+            }
+        }
+
+        // Copy hasil ke clipboard
+        function copyToClipboard() {
+            const output = document.getElementById('outputData').textContent;
+            if (!output || output.includes('Tidak ditemukan')) {
+                alert('⚠️ Tidak ada data untuk dicopy!');
+                return;
+            }
+            
+            navigator.clipboard.writeText(output).then(() => {
+                showNotification('✅ Berhasil disalin ke clipboard!');
+            }).catch(err => {
+                // Fallback untuk browser lama
+                const textarea = document.createElement('textarea');
+                textarea.value = output;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showNotification('✅ Berhasil disalin ke clipboard!');
+            });
+        }
+
+        // Download sebagai CSV
+        function downloadCSV() {
+            const output = document.getElementById('outputData').textContent;
+            if (!output || output.includes('Tidak ditemukan')) {
+                alert('⚠️ Tidak ada data untuk didownload!');
+                return;
+            }
+            
+            // Convert tab-separated ke comma-separated (CSV standard)
+            const csvContent = output.split('\n').map(line => {
+                return line.split('\t').map(field => {
+                    // Escape quotes dan wrap field yang mengandung koma
+                    if (field.includes(',') || field.includes('"')) {
+                        return '"' + field.replace(/"/g, '""') + '"';
+                    }
+                    return field;
+                }).join(',');
+            }).join('\n');
+            
+            const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `withdraw_failed_${new Date().toISOString().slice(0,10)}.csv`;
+            link.click();
+            URL.revokeObjectURL(url);
+            showNotification('📥 File CSV berhasil didownload!');
+        }
+
+        // Clear semua input/output
+        function clearAll() {
+            document.getElementById('inputData').value = '';
+            document.getElementById('outputData').innerHTML = '<em style="color:#888;">Hasil pemrosesan akan muncul di sini...</em>';
+            document.getElementById('statsSection').classList.add('hidden');
+        }
+
+        // Load data contoh
+        function loadSample() {
+            const sample = `07/05/2026 19:47:04	failed	SMB5 (minerapayline@gmail.com)	LIT-6cffca3d-cfd4-4dba-9bc6-f06e873d056c	OVO	085226324612	KHAIRIL IMDAD	Rp3,000,000	Rp1,600	(-Rp3,001,600)
+07/05/2026 18:39:08	failed	SMB5 (minerapayline@gmail.com)	LIT-851167bc-e668-415c-ab6d-d41abf9a5123	Dana	082224256471		Rp60,000	Rp1,600	(-Rp61,600)
+07/05/2026 17:22:15	success	SMB5 (minerapayline@gmail.com)	LIT-abc123	OVO	081234567890	BUDI	Rp100,000	Rp1,600	(-Rp101,600)
+07/05/2026 16:10:05	failed	SMB5 (minerapayline@gmail.com)	LIT-def456-cfd4-4dba-9bc6-xyz	Gopay	089988776654	SITI RAHAYU	Rp150,000	Rp1,600	(-Rp151,600)`;
+            document.getElementById('inputData').value = sample;
+            showNotification('📄 Data contoh dimuat! Klik "Proses Data" untuk melanjutkan.');
+        }
+
+        // Notifikasi toast
+        function showNotification(message) {
+            const notif = document.createElement('div');
+            notif.className = 'copy-success';
+            notif.textContent = message;
+            document.body.appendChild(notif);
+            setTimeout(() => {
+                notif.style.animation = 'slideIn 0.3s ease reverse';
+                setTimeout(() => notif.remove(), 300);
+            }, 2500);
+        }
+
+        // Auto-process dengan Ctrl+Enter
+        document.getElementById('inputData').addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                processData();
+            }
+        });
+    </script>
+</body>
+</html>
