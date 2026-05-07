@@ -203,7 +203,7 @@ Contoh format per baris:
             <div class="section-title">📐 Pemetaan Kolom Output</div>
             <div class="column-map">
                 <strong>Format Output Google Sheets:</strong><br><br>
-                <code>Kolom A</code> : Payment Method (OVO/Dana/dll)<br>
+                <code>Kolom A</code> : Payment Method (OVO/Dana/BNI/BCA/dll) <em>→ kata "Bank" otomatis dihapus</em><br>
                 <code>Kolom B</code> : <em>(kosong)</em><br>
                 <code>Kolom C</code> : Transaction ID (LIT-xxx)<br>
                 <code>Kolom D</code> : Nominal penarikan (tanpa Rp, contoh: 60,000)<br>
@@ -230,6 +230,14 @@ Contoh format per baris:
     </div>
 
     <script>
+        // Fungsi untuk membersihkan nama payment method
+        // Menghapus prefix "Bank " (case-insensitive) dari nama bank
+        function cleanPaymentMethod(method) {
+            if (!method) return '';
+            // Hapus "Bank " di awal string, tidak case-sensitive
+            return method.replace(/^Bank\s+/i, '').trim();
+        }
+
         function processData() {
             const input = document.getElementById('inputData').value.trim();
             if (!input) {
@@ -251,14 +259,15 @@ Contoh format per baris:
                     
                     // Mapping field sesuai struktur data input (0-based index)
                     // [0]timestamp [1]status [2]account [3]txid [4]payment [5]phone [6]name [7]amount [8]fee [9]total
-                    const paymentMethod = fields[4]?.trim() || '';           // → Kolom A
-                    const transactionId = fields[3]?.trim() || '';            // → Kolom C
-                    const amountRaw = fields[7]?.trim() || 'Rp0';             // Rp3,000,000
-                    const name = fields[6]?.trim() || '';                     // → Kolom E (opsional)
+                    const paymentMethodRaw = fields[4]?.trim() || '';
+                    const paymentMethod = cleanPaymentMethod(paymentMethodRaw);  // → Kolom A (Bank dihapus)
+                    const transactionId = fields[3]?.trim() || '';                // → Kolom C
+                    const amountRaw = fields[7]?.trim() || 'Rp0';                 // Rp3,000,000
+                    const name = fields[6]?.trim() || '';                         // → Kolom E (opsional)
                     
                     // Bersihkan nominal: Rp3,000,000 → 3,000,000
                     const amountClean = amountRaw.replace('Rp', '').trim();
-                    const amountNegative = '-' + amountClean;                 // → Kolom G
+                    const amountNegative = '-' + amountClean;                     // → Kolom G
                     
                     // Format output tab-separated untuk Google Sheets
                     const outputLine = [
@@ -277,7 +286,6 @@ Contoh format per baris:
             });
 
             // 🔁 URUTAN: dari terbawah ke teratas (reverse berdasarkan posisi asli di input)
-            // Data yang posisinya paling bawah di input akan muncul paling atas di output
             results.sort((a, b) => b.index - a.index);
             const finalOutput = results.map(r => r.line);
 
