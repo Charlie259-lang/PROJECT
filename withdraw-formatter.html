@@ -14,8 +14,8 @@
             --success-start: #10b981;
             --success-end: #059669;
             --bg-gradient: linear-gradient(135deg, #667eea22 0%, #764ba222 30%, #f093fb22 70%, #f5576c22 100%);
-            --card-bg: rgba(255, 255, 255, 0.95);
-            --card-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+            --card-bg: rgba(255, 255, 255, 0.92);
+            --card-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.12);
             --text-primary: #1e293b;
             --text-secondary: #64748b;
             --border-radius: 20px;
@@ -32,115 +32,43 @@
             min-height: 100vh;
             color: var(--text-primary);
             line-height: 1.6;
+            overflow-x: hidden;
         }
 
-        /* Animated Background Elements */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: 
-                radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.05) 0%, transparent 70%);
-            pointer-events: none;
-            z-index: 0;
-        }
+        .container { max-width: 1100px; margin: 0 auto; position: relative; z-index: 1; }
 
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 1;
-        }
+        .header { text-align: center; padding: 30px 20px; animation: slideDown 0.6s ease; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Header */
-        .header {
-            text-align: center;
-            padding: 30px 20px;
-            animation: slideDown 0.6s ease;
-        }
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .logo {
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 15px;
-        }
+        .logo { display: inline-flex; align-items: center; gap: 12px; margin-bottom: 15px; }
         .logo-icon {
-            width: 50px;
-            height: 50px;
+            width: 50px; height: 50px;
             background: linear-gradient(135deg, var(--primary-start), var(--primary-end));
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+            border-radius: 14px; display: flex; align-items: center; justify-content: center;
+            font-size: 24px; box-shadow: 0 10px 25px rgba(99, 102, 241, 0.35);
         }
         h1 {
-            font-size: 28px;
-            font-weight: 700;
+            font-size: 28px; font-weight: 700;
             background: linear-gradient(135deg, var(--primary-start), var(--secondary-end));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
         }
-        .subtitle {
-            color: var(--text-secondary);
-            font-size: 15px;
-            margin-top: 8px;
-        }
+        .subtitle { color: var(--text-secondary); font-size: 15px; margin-top: 8px; }
 
-        /* Tab Navigation */
         .tabs {
-            display: flex;
-            gap: 10px;
-            margin: 25px 0 30px;
-            padding: 8px;
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(20px);
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            display: flex; gap: 10px; margin: 25px 0 30px; padding: 8px;
+            background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(20px);
+            border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.3);
             animation: fadeIn 0.5s ease 0.2s both;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .tab-btn {
-            flex: 1;
-            padding: 16px 20px;
-            border: none;
-            background: transparent;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 14px;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            position: relative;
-            overflow: hidden;
+            flex: 1; padding: 16px 20px; border: none; background: transparent;
+            border-radius: 12px; font-weight: 600; font-size: 14px; color: var(--text-secondary);
+            cursor: pointer; transition: var(--transition); display: flex; align-items: center;
+            justify-content: center; gap: 10px; position: relative; overflow: hidden;
         }
-        .tab-btn::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
-            opacity: 0;
-            transition: var(--transition);
-            border-radius: 12px;
-        }
-        .tab-btn:hover::before { opacity: 1; }
+        .tab-btn:hover { background: rgba(0,0,0,0.04); }
         .tab-btn.active {
             color: white;
             background: linear-gradient(135deg, var(--primary-start), var(--primary-end));
@@ -151,351 +79,182 @@
             box-shadow: 0 10px 30px rgba(236, 72, 153, 0.35);
         }
 
-        /* Tab Content */
-        .tab-content { display: none; animation: contentFade 0.4s ease; }
-        .tab-content.active { display: block; }
-        @keyframes contentFade {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: contentFade 0.4s ease; }
+        @keyframes contentFade { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Cards */
         .card {
-            background: var(--card-bg);
-            border-radius: var(--border-radius);
-            padding: 25px;
-            margin-bottom: 20px;
-            box-shadow: var(--card-shadow);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            backdrop-filter: blur(10px);
-            transition: var(--transition);
-            animation: slideUp 0.5s ease both;
+            background: var(--card-bg); border-radius: var(--border-radius); padding: 25px;
+            margin-bottom: 20px; box-shadow: var(--card-shadow); border: 1px solid rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px); transition: var(--transition);
         }
-        .card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.2);
-        }
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .card:nth-child(1) { animation-delay: 0.1s; }
-        .card:nth-child(2) { animation-delay: 0.2s; }
-        .card:nth-child(3) { animation-delay: 0.3s; }
+        .card-title { font-weight: 600; font-size: 16px; color: var(--text-primary); margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .card-title::before { content: ''; width: 4px; height: 18px; background: linear-gradient(135deg, var(--primary-start), var(--primary-end)); border-radius: 2px; }
+        .pending-mode .card-title::before { background: linear-gradient(135deg, var(--secondary-start), var(--secondary-end)); }
 
-        .card-title {
-            font-weight: 600;
-            font-size: 16px;
-            color: var(--text-primary);
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .card-title::before {
-            content: '';
-            width: 4px;
-            height: 18px;
-            background: linear-gradient(135deg, var(--primary-start), var(--primary-end));
-            border-radius: 2px;
-        }
-        .pending-mode .card-title::before {
-            background: linear-gradient(135deg, var(--secondary-start), var(--secondary-end));
-        }
-
-        /* Textarea */
         textarea {
-            width: 100%;
-            min-height: 140px;
-            padding: 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 14px;
-            font-family: 'Consolas', 'Monaco', monospace;
-            font-size: 13px;
-            resize: vertical;
-            transition: var(--transition);
-            background: #f8fafc;
-            color: var(--text-primary);
+            width: 100%; min-height: 140px; padding: 16px; border: 2px solid #e2e8f0;
+            border-radius: 14px; font-family: 'Consolas', 'Monaco', monospace; font-size: 13px;
+            resize: vertical; transition: var(--transition); background: #f8fafc; color: var(--text-primary);
         }
-        textarea:focus {
-            outline: none;
-            border-color: var(--primary-start);
-            background: white;
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
-        }
-        .pending-mode textarea:focus {
-            border-color: var(--secondary-start);
-            box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.15);
-        }
+        textarea:focus { outline: none; border-color: var(--primary-start); background: white; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15); }
+        .pending-mode textarea:focus { border-color: var(--secondary-start); box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.15); }
         textarea::placeholder { color: #94a3b8; }
 
-        /* Buttons */
-        .btn-group {
-            display: flex;
-            gap: 12px;
-            margin-top: 18px;
-            flex-wrap: wrap;
-        }
+        .btn-group { display: flex; gap: 12px; margin-top: 18px; flex-wrap: wrap; }
         .btn {
-            padding: 14px 26px;
-            border: none;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            position: relative;
-            overflow: hidden;
+            padding: 14px 26px; border: none; border-radius: 12px; font-weight: 600; font-size: 14px;
+            cursor: pointer; transition: var(--transition); display: flex; align-items: center;
+            justify-content: center; gap: 8px; position: relative; overflow: hidden;
         }
-        .btn::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
-            opacity: 0;
-            transition: var(--transition);
-        }
-        .btn:hover::after { opacity: 1; }
         .btn:active { transform: scale(0.98); }
         
         .btn-primary {
             background: linear-gradient(135deg, var(--primary-start), var(--primary-end));
-            color: white;
-            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.35);
+            color: white; box-shadow: 0 8px 25px rgba(99, 102, 241, 0.35);
         }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 35px rgba(99, 102, 241, 0.5);
-        }
-        .pending-mode .btn-primary {
-            background: linear-gradient(135deg, var(--secondary-start), var(--secondary-end));
-            box-shadow: 0 8px 25px rgba(236, 72, 153, 0.35);
-        }
-        .pending-mode .btn-primary:hover {
-            box-shadow: 0 12px 35px rgba(236, 72, 153, 0.5);
-        }
+        .pending-mode .btn-primary { background: linear-gradient(135deg, var(--secondary-start), var(--secondary-end)); box-shadow: 0 8px 25px rgba(236, 72, 153, 0.35); }
         
-        .btn-secondary {
-            background: #f1f5f9;
-            color: var(--text-primary);
-        }
-        .btn-secondary:hover {
-            background: #e2e8f0;
-            transform: translateY(-2px);
-        }
+        .btn-secondary { background: #f1f5f9; color: var(--text-primary); }
+        .btn-secondary:hover { background: #e2e8f0; transform: translateY(-2px); }
         
         .btn-success {
             background: linear-gradient(135deg, var(--success-start), var(--success-end));
-            color: white;
-            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.35);
+            color: white; box-shadow: 0 8px 25px rgba(16, 185, 129, 0.35);
         }
-        .btn-success:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 35px rgba(16, 185, 129, 0.5);
-        }
+        .btn-success:hover { transform: translateY(-2px); box-shadow: 0 12px 35px rgba(16, 185, 129, 0.5); }
 
-        /* Stats */
-        .stats {
-            display: flex;
-            gap: 15px;
-            margin: 20px 0;
-            flex-wrap: wrap;
-            animation: fadeIn 0.5s ease 0.3s both;
+        /* --- LOADING ANIMATION --- */
+        .btn.loading { pointer-events: none; opacity: 0.85; transform: scale(0.98); }
+        .spinner {
+            width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite;
+            display: inline-block; flex-shrink: 0;
         }
-        .stat-card {
-            flex: 1;
-            min-width: 110px;
-            background: linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,255,255,0.4));
-            padding: 16px 20px;
-            border-radius: 14px;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            backdrop-filter: blur(10px);
-            transition: var(--transition);
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .loading-bar {
+            height: 3px; background: linear-gradient(90deg, var(--primary-start), var(--primary-end));
+            border-radius: 3px; width: 0%; margin-top: 12px; transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
         }
-        .stat-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        }
-        .stat-value {
-            font-size: 26px;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--primary-start), var(--primary-end));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            line-height: 1.2;
-        }
-        .pending-mode .stat-value {
-            background: linear-gradient(135deg, var(--secondary-start), var(--secondary-end));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .stat-label {
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-top: 4px;
-            font-weight: 500;
-        }
+        .pending-mode .loading-bar { background: linear-gradient(90deg, var(--secondary-start), var(--secondary-end)); }
+        .loading-bar.active { width: 100%; }
 
-        /* Mode Info */
-        .mode-info {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(139, 92, 246, 0.08));
-            padding: 14px 18px;
-            border-radius: 12px;
-            font-size: 13px;
-            color: var(--text-secondary);
-            margin: 12px 0;
-            border-left: 3px solid var(--primary-start);
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-        }
-        .pending-mode .mode-info {
-            background: linear-gradient(135deg, rgba(236, 72, 153, 0.08), rgba(244, 63, 94, 0.08));
-            border-left-color: var(--secondary-start);
-        }
-        .mode-info strong { color: var(--text-primary); font-weight: 600; }
-        .mode-info code {
-            background: rgba(99, 102, 241, 0.12);
-            padding: 2px 8px;
-            border-radius: 6px;
-            font-family: monospace;
-            font-size: 12px;
-            color: var(--primary-start);
-        }
-        .pending-mode .mode-info code {
-            background: rgba(236, 72, 153, 0.12);
-            color: var(--secondary-start);
-        }
-
-        /* Output Area */
         .output-area {
+            background: #0f172a; color: #e2e8f0; font-family: 'Consolas', 'Monaco', monospace;
+            padding: 18px; border-radius: 14px; overflow-x: auto; white-space: pre-wrap;
+            word-break: break-all; max-height: 380px; overflow-y: auto;
+            border: 1px solid #334155; line-height: 1.5; font-size: 12.5px;
+            position: relative; min-height: 120px; transition: all 0.3s ease;
+        }
+        .output-area::-webkit-scrollbar { width: 8px; height: 8px; }
+        .output-area::-webkit-scrollbar-track { background: #1e293b; border-radius: 4px; }
+        .output-area::-webkit-scrollbar-thumb { background: linear-gradient(135deg, var(--primary-start), var(--primary-end)); border-radius: 4px; }
+        .pending-mode .output-area::-webkit-scrollbar-thumb { background: linear-gradient(135deg, var(--secondary-start), var(--secondary-end)); }
+
+        .output-area.processing {
             background: #0f172a;
-            color: #e2e8f0;
-            font-family: 'Consolas', 'Monaco', monospace;
-            padding: 18px;
-            border-radius: 14px;
-            overflow-x: auto;
-            white-space: pre-wrap;
-            word-break: break-all;
-            max-height: 380px;
-            overflow-y: auto;
-            border: 1px solid #334155;
-            line-height: 1.5;
-            font-size: 12.5px;
+            display: flex; align-items: center; justify-content: center;
         }
-        .output-area::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+        .output-area.processing::after {
+            content: ''; position: absolute; inset: 0;
+            background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%);
+            animation: pulseGlow 1.5s ease-in-out infinite;
         }
-        .output-area::-webkit-scrollbar-track {
-            background: #1e293b;
-            border-radius: 4px;
+        .pending-mode .output-area.processing::after {
+            background: radial-gradient(circle, rgba(236,72,153,0.15) 0%, transparent 70%);
         }
-        .output-area::-webkit-scrollbar-thumb {
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.3; transform: scale(0.95); }
+            50% { opacity: 0.6; transform: scale(1.05); }
+        }
+
+        .processing-text {
+            color: #94a3b8; font-size: 14px; display: flex; align-items: center; gap: 8px;
+            z-index: 2; animation: bounceDots 1.2s ease-in-out infinite;
+        }
+        @keyframes bounceDots { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+        .result-animate { animation: fadeSlideIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both; }
+        @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+        .stats { display: flex; gap: 15px; margin: 20px 0; flex-wrap: wrap; }
+        .stat-card {
+            flex: 1; min-width: 110px; background: linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,255,255,0.4));
+            padding: 16px 20px; border-radius: 14px; text-align: center; border: 1px solid rgba(255,255,255,0.4);
+            backdrop-filter: blur(10px); transition: var(--transition); animation: statPop 0.4s ease backwards;
+        }
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        @keyframes statPop { from { opacity: 0; transform: scale(0.8) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        
+        .stat-value {
+            font-size: 26px; font-weight: 700;
             background: linear-gradient(135deg, var(--primary-start), var(--primary-end));
-            border-radius: 4px;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.2;
         }
-        .pending-mode .output-area::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, var(--secondary-start), var(--secondary-end));
-        }
+        .pending-mode .stat-value { background: linear-gradient(135deg, var(--secondary-start), var(--secondary-end)); -webkit-background-clip: text; background-clip: text; }
+        .stat-label { font-size: 12px; color: var(--text-secondary); margin-top: 4px; font-weight: 500; }
 
-        /* Notification */
+        .mode-info {
+            background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(139,92,246,0.08));
+            padding: 14px 18px; border-radius: 12px; font-size: 13px; color: var(--text-secondary);
+            margin: 12px 0; border-left: 3px solid var(--primary-start); display: flex; align-items: flex-start; gap: 10px;
+        }
+        .pending-mode .mode-info { background: linear-gradient(135deg, rgba(236,72,153,0.08), rgba(244,63,94,0.08)); border-left-color: var(--secondary-start); }
+        .mode-info strong { color: var(--text-primary); font-weight: 600; }
+        .mode-info code { background: rgba(99,102,241,0.12); padding: 2px 8px; border-radius: 6px; font-family: monospace; font-size: 12px; color: var(--primary-start); }
+        .pending-mode .mode-info code { background: rgba(236,72,153,0.12); color: var(--secondary-start); }
+
         .toast {
-            position: fixed;
-            top: 24px;
-            right: 24px;
+            position: fixed; top: 24px; right: 24px;
             background: linear-gradient(135deg, var(--success-start), var(--success-end));
-            color: white;
-            padding: 14px 24px;
-            border-radius: 14px;
-            box-shadow: 0 10px 40px rgba(16, 185, 129, 0.4);
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            z-index: 1000;
-            animation: toastIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            color: white; padding: 14px 24px; border-radius: 14px;
+            box-shadow: 0 10px 40px rgba(16,185,129,0.4); font-weight: 500;
+            display: flex; align-items: center; gap: 10px; z-index: 1000;
+            animation: toastIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
         }
-        @keyframes toastIn {
-            from { transform: translateX(150px) scale(0.9); opacity: 0; }
-            to { transform: translateX(0) scale(1); opacity: 1; }
-        }
-        .toast.hide {
-            animation: toastOut 0.3s ease forwards;
-        }
-        @keyframes toastOut {
-            to { transform: translateX(150px); opacity: 0; }
-        }
+        @keyframes toastIn { from { transform: translateX(150px) scale(0.9); opacity: 0; } to { transform: translateX(0) scale(1); opacity: 1; } }
+        .toast.hide { animation: toastOut 0.3s ease forwards; }
+        @keyframes toastOut { to { transform: translateX(150px); opacity: 0; } }
 
-        /* Hidden */
         .hidden { display: none !important; }
 
-        /* Responsive */
         @media (max-width: 768px) {
             body { padding: 15px; }
-            .header { padding: 25px 15px; }
             h1 { font-size: 24px; }
             .tabs { flex-direction: column; }
-            .tab-btn { padding: 14px; }
             .btn-group { flex-direction: column; }
-            .btn { width: 100%; justify-content: center; }
-            .stats { gap: 10px; }
-            .stat-card { min-width: 100px; padding: 14px 16px; }
-            .stat-value { font-size: 22px; }
+            .btn { width: 100%; }
         }
-
-        /* Floating Elements Animation */
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
-        .floating { animation: float 6s ease-in-out infinite; }
-        .floating-delay { animation: float 6s ease-in-out 1.5s infinite; }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
         <header class="header">
-            <div class="logo floating">
+            <div class="logo">
                 <div class="logo-icon">✨</div>
                 <h1>Withdraw Formatter Pro</h1>
             </div>
-            <p class="subtitle floating-delay">Extract & format withdraw data dengan cepat dan elegan</p>
+            <p class="subtitle">Extract & format withdraw data dengan cepat dan elegan</p>
         </header>
 
-        <!-- Tab Navigation -->
         <nav class="tabs">
-            <button class="tab-btn failed-mode active" onclick="switchTab('failed')">
-                <span>❌</span> Failed Status
-            </button>
-            <button class="tab-btn pending-mode" onclick="switchTab('pending')">
-                <span>⏳</span> Pending Status
-            </button>
+            <button class="tab-btn failed-mode active" onclick="switchTab('failed')"><span>❌</span> Failed Status</button>
+            <button class="tab-btn pending-mode" onclick="switchTab('pending')"><span>⏳</span> Pending Status</button>
         </nav>
 
         <!-- FAILED MODE -->
         <div id="tab-failed" class="tab-content active">
             <div class="card">
                 <div class="card-title">📥 Input Data (Failed)</div>
-                <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">
-                    Paste data withdraw dengan status <strong style="color:var(--text-primary)">failed</strong> (format tab-separated).
-                </p>
-                <textarea id="inputFailed" placeholder="Contoh:
-07/05/2026 19:47:04	failed	SMB5 (minerapayline@gmail.com)	LIT-6cffca3d-cfd4-4dba-9bc6-f06e873d056c	OVO	085226324612	KHAIRIL IMDAD	Rp3,000,000	Rp1,600	(-Rp3,001,600)"></textarea>
+                <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">Paste data withdraw status <strong style="color:var(--text-primary)">failed</strong> (tab-separated).</p>
+                <textarea id="inputFailed" placeholder="07/05/2026 19:47:04\tfailed\tSMB5 (...)\tLIT-xxx\tOVO\t..."></textarea>
+                <div class="loading-bar" id="barFailed"></div>
                 <div class="btn-group">
-                    <button class="btn btn-primary" onclick="processFailed()">
-                        <span>🔄</span> Proses Data
-                    </button>
-                    <button class="btn btn-secondary" onclick="clearTab('failed')">
-                        <span>🗑️</span> Hapus
-                    </button>
+                    <button class="btn btn-primary" id="btnFailed" onclick="processFailed()"><span>🔄</span> Proses Data</button>
+                    <button class="btn btn-secondary" onclick="clearTab('failed')"><span>🗑️</span> Hapus</button>
                 </div>
             </div>
 
@@ -509,22 +268,13 @@
                 <div class="card-title">📤 Output (7 Kolom)</div>
                 <div class="mode-info">
                     <span>📋</span>
-                    <div>
-                        <strong>Format:</strong> <code>A</code>=Payment | <code>B</code>=(kosong) | <code>C</code>=TxID | <code>D</code>=Amount | <code>E</code>=Name | <code>F</code>=(kosong) | <code>G</code>=-Amount<br>
-                        <span style="margin-top:6px;display:block">🔁 Urutan: bawah → atas | 🏦 "Bank" prefix otomatis dihapus</span>
-                    </div>
+                    <div><strong>Format:</strong> <code>A</code>=Payment | <code>B</code>=(kosong) | <code>C</code>=TxID | <code>D</code>=Amount | <code>E</code>=Name | <code>F</code>=(kosong) | <code>G</code>=-Amount<br><span style="margin-top:4px;display:block">🔁 Urutan: bawah → atas | 🏦 "Bank" prefix otomatis dihapus</span></div>
                 </div>
                 <div class="btn-group">
-                    <button class="btn btn-success" onclick="copyOutput('failed')">
-                        <span>📋</span> Copy Hasil
-                    </button>
-                    <button class="btn btn-secondary" onclick="downloadCSV('failed')">
-                        <span>💾</span> Download CSV
-                    </button>
+                    <button class="btn btn-success" onclick="copyOutput('failed')"><span>📋</span> Copy Hasil</button>
+                    <button class="btn btn-secondary" onclick="downloadCSV('failed')"><span>💾</span> Download CSV</button>
                 </div>
-                <div class="output-area" id="outputFailed" style="margin-top:18px;min-height:120px;">
-                    <em style="color:#64748b;">✨ Hasil pemrosesan akan muncul di sini...</em>
-                </div>
+                <div class="output-area" id="outputFailed"><em style="color:#64748b;">✨ Hasil pemrosesan akan muncul di sini...</em></div>
             </div>
         </div>
 
@@ -532,18 +282,12 @@
         <div id="tab-pending" class="tab-content">
             <div class="card">
                 <div class="card-title">📥 Input Data (Pending)</div>
-                <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">
-                    Paste data withdraw dengan status <strong style="color:var(--text-primary)">pending</strong> (format tab-separated).
-                </p>
-                <textarea id="inputPending" placeholder="Contoh:
-07/05/2026 22:53:07	pending	SMB5 (minerapayline@gmail.com)	LIT-3d93ca8b-3d67-446c-91ce-aa49c1f315eb	Bank Mandiri	1840004747851	SUNARWI	Rp200,000	Rp1,600	(-Rp201,600)"></textarea>
+                <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">Paste data withdraw status <strong style="color:var(--text-primary)">pending</strong> (tab-separated).</p>
+                <textarea id="inputPending" placeholder="07/05/2026 22:53:07\tpending\tSMB5 (...)\tLIT-xxx\tBank Mandiri\t..."></textarea>
+                <div class="loading-bar" id="barPending"></div>
                 <div class="btn-group">
-                    <button class="btn btn-primary" onclick="processPending()">
-                        <span>🔄</span> Proses Data
-                    </button>
-                    <button class="btn btn-secondary" onclick="clearTab('pending')">
-                        <span>🗑️</span> Hapus
-                    </button>
+                    <button class="btn btn-primary" id="btnPending" onclick="processPending()"><span>🔄</span> Proses Data</button>
+                    <button class="btn btn-secondary" onclick="clearTab('pending')"><span>🗑️</span> Hapus</button>
                 </div>
             </div>
 
@@ -557,91 +301,71 @@
                 <div class="card-title">📤 Output (4 Kolom)</div>
                 <div class="mode-info">
                     <span>📋</span>
-                    <div>
-                        <strong>Format:</strong> <code>A</code>=Timestamp | <code>B</code>=TxID | <code>C</code>=Amount | <code>D</code>=Fee<br>
-                        <span style="margin-top:6px;display:block">🔁 Urutan: bawah → atas | 💰 "Rp" prefix otomatis dihapus</span>
-                    </div>
+                    <div><strong>Format:</strong> <code>A</code>=Timestamp | <code>B</code>=TxID | <code>C</code>=Amount | <code>D</code>=Fee<br><span style="margin-top:4px;display:block">🔁 Urutan: bawah → atas | 💰 "Rp" prefix otomatis dihapus</span></div>
                 </div>
                 <div class="btn-group">
-                    <button class="btn btn-success" onclick="copyOutput('pending')">
-                        <span>📋</span> Copy Hasil
-                    </button>
-                    <button class="btn btn-secondary" onclick="downloadCSV('pending')">
-                        <span>💾</span> Download CSV
-                    </button>
+                    <button class="btn btn-success" onclick="copyOutput('pending')"><span>📋</span> Copy Hasil</button>
+                    <button class="btn btn-secondary" onclick="downloadCSV('pending')"><span>💾</span> Download CSV</button>
                 </div>
-                <div class="output-area" id="outputPending" style="margin-top:18px;min-height:120px;">
-                    <em style="color:#64748b;">✨ Hasil pemrosesan akan muncul di sini...</em>
-                </div>
+                <div class="output-area" id="outputPending"><em style="color:#64748b;">✨ Hasil pemrosesan akan muncul di sini...</em></div>
             </div>
         </div>
     </div>
 
     <script>
-        // ========== TAB SWITCHING ==========
         function switchTab(mode) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelector(`.tab-btn.${mode}-mode`).classList.add('active');
-            
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.getElementById(`tab-${mode}`).classList.add('active');
         }
 
-        // ========== UTILITY FUNCTIONS ==========
-        function cleanPaymentMethod(method) {
-            if (!method) return '';
-            return method.replace(/^Bank\s+/i, '').trim();
-        }
+        function cleanPaymentMethod(method) { if (!method) return ''; return method.replace(/^Bank\s+/i, '').trim(); }
+        function cleanAmount(amount) { if (!amount) return ''; return amount.replace('Rp', '').trim(); }
 
-        function cleanAmount(amount) {
-            if (!amount) return '';
-            return amount.replace('Rp', '').trim();
-        }
-
+        // Core Processing Logic
         function processLines(input, statusFilter, mode) {
             const lines = input.split('\n').filter(line => line.trim());
-            const results = [];
-            let filteredCount = 0;
+            const results = []; let filteredCount = 0;
 
             lines.forEach((line, index) => {
                 const fields = line.split('\t');
-                
                 if (fields.length >= 8 && fields[1]?.toLowerCase().trim() === statusFilter) {
                     filteredCount++;
-                    
                     if (mode === 'failed') {
                         const paymentMethod = cleanPaymentMethod(fields[4]?.trim() || '');
                         const transactionId = fields[3]?.trim() || '';
                         const amountRaw = fields[7]?.trim() || 'Rp0';
                         const name = fields[6]?.trim() || '';
-                        
                         const amountClean = cleanAmount(amountRaw);
-                        const amountNegative = '-' + amountClean;
-                        
-                        const outputLine = [
-                            paymentMethod, '', transactionId, amountClean, name, '', amountNegative
-                        ].join('\t');
-                        results.push({ index, line: outputLine });
-                        
+                        results.push({ index, line: [paymentMethod, '', transactionId, amountClean, name, '', '-' + amountClean].join('\t') });
                     } else if (mode === 'pending') {
                         const timestamp = fields[0]?.trim() || '';
                         const transactionId = fields[3]?.trim() || '';
-                        const amountRaw = fields[7]?.trim() || 'Rp0';
-                        const feeRaw = fields[8]?.trim() || 'Rp0';
-                        
-                        const amountClean = cleanAmount(amountRaw);
-                        const feeClean = cleanAmount(feeRaw);
-                        
-                        const outputLine = [
-                            timestamp, transactionId, amountClean, feeClean
-                        ].join('\t');
-                        results.push({ index, line: outputLine });
+                        const amountClean = cleanAmount(fields[7]?.trim() || 'Rp0');
+                        const feeClean = cleanAmount(fields[8]?.trim() || 'Rp0');
+                        results.push({ index, line: [timestamp, transactionId, amountClean, feeClean].join('\t') });
                     }
                 }
             });
-
             results.sort((a, b) => b.index - a.index);
             return { total: lines.length, filtered: filteredCount, output: results.map(r => r.line) };
+        }
+
+        // UI State Managers
+        function setLoading(btn, bar, mode) {
+            btn.classList.add('loading');
+            btn.disabled = true;
+            bar.classList.add('active');
+            const out = document.getElementById(`output${mode.charAt(0).toUpperCase() + mode.slice(1)}`);
+            out.classList.add('processing');
+            out.innerHTML = '<div class="processing-text"><span class="spinner"></span> Memproses data...</div>';
+        }
+
+        function finishLoading(btn, bar) {
+            btn.classList.remove('loading');
+            btn.disabled = false;
+            bar.classList.remove('active');
         }
 
         function showStats(mode, total, filtered, processed) {
@@ -654,8 +378,13 @@
 
         function showOutput(mode, outputArray) {
             const outputEl = document.getElementById(`output${mode.charAt(0).toUpperCase() + mode.slice(1)}`);
+            outputEl.classList.remove('processing');
             if (outputArray.length > 0) {
                 outputEl.textContent = outputArray.join('\n');
+                // Trigger reflow for animation
+                void outputEl.offsetWidth;
+                outputEl.classList.add('result-animate');
+                setTimeout(() => outputEl.classList.remove('result-animate'), 500);
             } else {
                 const status = mode === 'failed' ? 'failed' : 'pending';
                 outputEl.innerHTML = `<em style="color:#f87171;">❌ Tidak ditemukan data dengan status "${status}"</em>`;
@@ -664,105 +393,79 @@
 
         function copyOutput(mode) {
             const output = document.getElementById(`output${mode.charAt(0).toUpperCase() + mode.slice(1)}`).textContent;
-            if (!output || output.includes('Tidak ditemukan')) {
-                showToast('⚠️ Tidak ada data untuk dicopy!', 'warning');
-                return;
-            }
-            navigator.clipboard.writeText(output).then(() => {
-                showToast('✅ Berhasil disalin ke clipboard!');
-            }).catch(() => {
-                const textarea = document.createElement('textarea');
-                textarea.value = output;
-                document.body.appendChild(textarea);
-                textarea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textarea);
-                showToast('✅ Berhasil disalin ke clipboard!');
+            if (!output || output.includes('Tidak ditemukan')) { showToast('⚠️ Tidak ada data untuk dicopy!', 'warning'); return; }
+            navigator.clipboard.writeText(output).then(() => showToast('✅ Berhasil disalin!')).catch(() => {
+                const ta = document.createElement('textarea'); ta.value = output; document.body.appendChild(ta); ta.select();
+                document.execCommand('copy'); document.body.removeChild(ta); showToast('✅ Berhasil disalin!');
             });
         }
 
         function downloadCSV(mode) {
             const output = document.getElementById(`output${mode.charAt(0).toUpperCase() + mode.slice(1)}`).textContent;
-            if (!output || output.includes('Tidak ditemukan')) {
-                showToast('⚠️ Tidak ada data untuk didownload!', 'warning');
-                return;
-            }
-            const csvContent = output.split('\n').map(line => {
-                return line.split('\t').map(field => {
-                    if (field.includes(',') || field.includes('"')) {
-                        return '"' + field.replace(/"/g, '""') + '"';
-                    }
-                    return field;
-                }).join(',');
-            }).join('\n');
-            
-            const status = mode === 'failed' ? 'failed' : 'pending';
-            const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `withdraw_${status}_${new Date().toISOString().slice(0,10)}.csv`;
-            link.click();
-            URL.revokeObjectURL(url);
-            showToast('📥 File CSV berhasil didownload!');
+            if (!output || output.includes('Tidak ditemukan')) { showToast('⚠️ Tidak ada data!', 'warning'); return; }
+            const csv = output.split('\n').map(l => l.split('\t').map(f => (f.includes(',') || f.includes('"')) ? `"${f.replace(/"/g,'""')}"` : f).join(',')).join('\n');
+            const blob = new Blob(['\ufeff'+csv], {type:'text/csv;charset=utf-8;'});
+            const url = URL.createObjectURL(blob); const a = document.createElement('a');
+            a.href = url; a.download = `withdraw_${mode}_${new Date().toISOString().slice(0,10)}.csv`; a.click(); URL.revokeObjectURL(url);
+            showToast('📥 File CSV didownload!');
         }
 
         function clearTab(mode) {
             document.getElementById(`input${mode.charAt(0).toUpperCase() + mode.slice(1)}`).value = '';
+            document.getElementById(`output${mode.charAt(0).toUpperCase() + mode.slice(1)}`).classList.remove('processing','result-animate');
             document.getElementById(`output${mode.charAt(0).toUpperCase() + mode.slice(1)}`).innerHTML = '<em style="color:#64748b;">✨ Hasil pemrosesan akan muncul di sini...</em>';
             document.getElementById(`stats${mode.charAt(0).toUpperCase() + mode.slice(1)}`).classList.add('hidden');
+            document.getElementById(`bar${mode.charAt(0).toUpperCase() + mode.slice(1)}`).classList.remove('active');
+            document.getElementById(`btn${mode.charAt(0).toUpperCase() + mode.slice(1)}`).classList.remove('loading');
+            document.getElementById(`btn${mode.charAt(0).toUpperCase() + mode.slice(1)}`).disabled = false;
         }
 
         function showToast(message, type = 'success') {
-            const existing = document.querySelector('.toast');
-            if (existing) existing.remove();
-            
-            const toast = document.createElement('div');
-            toast.className = 'toast';
+            const existing = document.querySelector('.toast'); if (existing) existing.remove();
+            const toast = document.createElement('div'); toast.className = 'toast';
             toast.innerHTML = `<span>${type === 'warning' ? '⚠️' : '✅'}</span> ${message}`;
             document.body.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.classList.add('hide');
-                setTimeout(() => toast.remove(), 300);
-            }, 2800);
+            setTimeout(() => { toast.classList.add('hide'); setTimeout(() => toast.remove(), 300); }, 2500);
         }
 
-        // ========== PROCESS FUNCTIONS ==========
+        // Process Functions with Animation
         function processFailed() {
             const input = document.getElementById('inputFailed').value.trim();
-            if (!input) { showToast('⚠️ Silakan paste data terlebih dahulu!', 'warning'); return; }
+            if (!input) { showToast('⚠️ Paste data dulu!', 'warning'); return; }
             
-            const result = processLines(input, 'failed', 'failed');
-            showStats('failed', result.total, result.filtered, result.output.length);
-            showOutput('failed', result.output);
-            if (result.output.length > 0) showToast('🎉 Data berhasil diproses!');
+            const btn = document.getElementById('btnFailed');
+            const bar = document.getElementById('barFailed');
+            setLoading(btn, bar, 'failed');
+
+            // Simulate slight processing delay for smooth animation
+            setTimeout(() => {
+                const result = processLines(input, 'failed', 'failed');
+                showStats('failed', result.total, result.filtered, result.output.length);
+                showOutput('failed', result.output);
+                finishLoading(btn, bar);
+                if (result.output.length > 0) showToast('🎉 Data berhasil diproses!');
+            }, 500);
         }
 
         function processPending() {
             const input = document.getElementById('inputPending').value.trim();
-            if (!input) { showToast('⚠️ Silakan paste data terlebih dahulu!', 'warning'); return; }
+            if (!input) { showToast('⚠️ Paste data dulu!', 'warning'); return; }
             
-            const result = processLines(input, 'pending', 'pending');
-            showStats('pending', result.total, result.filtered, result.output.length);
-            showOutput('pending', result.output);
-            if (result.output.length > 0) showToast('🎉 Data berhasil diproses!');
+            const btn = document.getElementById('btnPending');
+            const bar = document.getElementById('barPending');
+            setLoading(btn, bar, 'pending');
+
+            setTimeout(() => {
+                const result = processLines(input, 'pending', 'pending');
+                showStats('pending', result.total, result.filtered, result.output.length);
+                showOutput('pending', result.output);
+                finishLoading(btn, bar);
+                if (result.output.length > 0) showToast('🎉 Data berhasil diproses!');
+            }, 500);
         }
 
-        // Keyboard shortcut: Ctrl+Enter
-        document.getElementById('inputFailed').addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.key === 'Enter') processFailed();
-        });
-        document.getElementById('inputPending').addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.key === 'Enter') processPending();
-        });
-
-        // Add subtle hover effect to cards on load
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('.card').forEach((card, i) => {
-                card.style.animationDelay = `${0.1 + i * 0.1}s`;
-            });
-        });
+        document.getElementById('inputFailed').addEventListener('keydown', e => { if(e.ctrlKey && e.key==='Enter') processFailed(); });
+        document.getElementById('inputPending').addEventListener('keydown', e => { if(e.ctrlKey && e.key==='Enter') processPending(); });
     </script>
 </body>
 </html>
