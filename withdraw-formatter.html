@@ -87,6 +87,7 @@
             background: var(--card-bg); border-radius: var(--border-radius); padding: 25px;
             margin-bottom: 20px; box-shadow: var(--card-shadow); border: 1px solid rgba(255, 255, 255, 0.5);
             backdrop-filter: blur(10px); transition: var(--transition);
+            display: flex; flex-direction: column; /* 🔥 FIX: Stack children vertically */
         }
         .card-title { font-weight: 600; font-size: 16px; color: var(--text-primary); margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
         .card-title::before { content: ''; width: 4px; height: 18px; background: linear-gradient(135deg, var(--primary-start), var(--primary-end)); border-radius: 2px; }
@@ -101,38 +102,6 @@
         .pending-mode textarea:focus { border-color: var(--secondary-start); box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.15); }
         textarea::placeholder { color: #94a3b8; }
 
-        .btn-group { display: flex; gap: 12px; margin-top: 18px; flex-wrap: wrap; }
-        .btn {
-            padding: 14px 26px; border: none; border-radius: 12px; font-weight: 600; font-size: 14px;
-            cursor: pointer; transition: var(--transition); display: flex; align-items: center;
-            justify-content: center; gap: 8px; position: relative; overflow: hidden;
-        }
-        .btn:active { transform: scale(0.98); }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary-start), var(--primary-end));
-            color: white; box-shadow: 0 8px 25px rgba(99, 102, 241, 0.35);
-        }
-        .pending-mode .btn-primary { background: linear-gradient(135deg, var(--secondary-start), var(--secondary-end)); box-shadow: 0 8px 25px rgba(236, 72, 153, 0.35); }
-        
-        .btn-secondary { background: #f1f5f9; color: var(--text-primary); }
-        .btn-secondary:hover { background: #e2e8f0; transform: translateY(-2px); }
-        
-        .btn-success {
-            background: linear-gradient(135deg, var(--success-start), var(--success-end));
-            color: white; box-shadow: 0 8px 25px rgba(16, 185, 129, 0.35);
-        }
-        .btn-success:hover { transform: translateY(-2px); box-shadow: 0 12px 35px rgba(16, 185, 129, 0.5); }
-
-        /* --- LOADING ANIMATION --- */
-        .btn.loading { pointer-events: none; opacity: 0.85; transform: scale(0.98); }
-        .spinner {
-            width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3);
-            border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite;
-            display: inline-block; flex-shrink: 0;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        
         .loading-bar {
             height: 3px; background: linear-gradient(90deg, var(--primary-start), var(--primary-end));
             border-radius: 3px; width: 0%; margin-top: 12px; transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
@@ -140,39 +109,65 @@
         .pending-mode .loading-bar { background: linear-gradient(90deg, var(--secondary-start), var(--secondary-end)); }
         .loading-bar.active { width: 100%; }
 
+        .btn-group { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+        .btn {
+            padding: 14px 26px; border: none; border-radius: 12px; font-weight: 600; font-size: 14px;
+            cursor: pointer; transition: var(--transition); display: flex; align-items: center;
+            justify-content: center; gap: 8px; position: relative; overflow: hidden;
+        }
+        .btn:active { transform: scale(0.98); }
+        .btn.loading { pointer-events: none; opacity: 0.85; }
+        .spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; flex-shrink: 0; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .btn-primary { background: linear-gradient(135deg, var(--primary-start), var(--primary-end)); color: white; box-shadow: 0 8px 25px rgba(99, 102, 241, 0.35); }
+        .pending-mode .btn-primary { background: linear-gradient(135deg, var(--secondary-start), var(--secondary-end)); box-shadow: 0 8px 25px rgba(236, 72, 153, 0.35); }
+        
+        .btn-secondary { background: #f1f5f9; color: var(--text-primary); }
+        .btn-secondary:hover { background: #e2e8f0; transform: translateY(-2px); }
+        
+        .btn-success { background: linear-gradient(135deg, var(--success-start), var(--success-end)); color: white; box-shadow: 0 8px 25px rgba(16, 185, 129, 0.35); }
+        .btn-success:hover { transform: translateY(-2px); box-shadow: 0 12px 35px rgba(16, 185, 129, 0.5); }
+
+        /* 🔥 FIX: Output wrapper ensures proper stacking without overlap */
+        .output-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 16px;
+        }
+        .mode-info {
+            background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(139,92,246,0.08));
+            padding: 14px 18px; border-radius: 12px; font-size: 13px; color: var(--text-secondary);
+            border-left: 3px solid var(--primary-start); display: flex; align-items: flex-start; gap: 10px;
+        }
+        .pending-mode .mode-info { background: linear-gradient(135deg, rgba(236,72,153,0.08), rgba(244,63,94,0.08)); border-left-color: var(--secondary-start); }
+        .mode-info strong { color: var(--text-primary); font-weight: 600; }
+        .mode-info code { background: rgba(99,102,241,0.12); padding: 2px 8px; border-radius: 6px; font-family: monospace; font-size: 12px; color: var(--primary-start); }
+        .pending-mode .mode-info code { background: rgba(236,72,153,0.12); color: var(--secondary-start); }
+
         .output-area {
             background: #0f172a; color: #e2e8f0; font-family: 'Consolas', 'Monaco', monospace;
             padding: 18px; border-radius: 14px; overflow-x: auto; white-space: pre-wrap;
             word-break: break-all; max-height: 380px; overflow-y: auto;
             border: 1px solid #334155; line-height: 1.5; font-size: 12.5px;
-            position: relative; min-height: 120px; transition: all 0.3s ease;
+            position: relative; min-height: 140px; transition: all 0.3s ease;
         }
         .output-area::-webkit-scrollbar { width: 8px; height: 8px; }
         .output-area::-webkit-scrollbar-track { background: #1e293b; border-radius: 4px; }
         .output-area::-webkit-scrollbar-thumb { background: linear-gradient(135deg, var(--primary-start), var(--primary-end)); border-radius: 4px; }
         .pending-mode .output-area::-webkit-scrollbar-thumb { background: linear-gradient(135deg, var(--secondary-start), var(--secondary-end)); }
 
-        .output-area.processing {
-            background: #0f172a;
-            display: flex; align-items: center; justify-content: center;
-        }
+        .output-area.processing { display: flex; align-items: center; justify-content: center; }
         .output-area.processing::after {
             content: ''; position: absolute; inset: 0;
             background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%);
-            animation: pulseGlow 1.5s ease-in-out infinite;
+            animation: pulseGlow 1.5s ease-in-out infinite; pointer-events: none;
         }
-        .pending-mode .output-area.processing::after {
-            background: radial-gradient(circle, rgba(236,72,153,0.15) 0%, transparent 70%);
-        }
-        @keyframes pulseGlow {
-            0%, 100% { opacity: 0.3; transform: scale(0.95); }
-            50% { opacity: 0.6; transform: scale(1.05); }
-        }
+        .pending-mode .output-area.processing::after { background: radial-gradient(circle, rgba(236,72,153,0.15) 0%, transparent 70%); }
+        @keyframes pulseGlow { 0%, 100% { opacity: 0.3; transform: scale(0.95); } 50% { opacity: 0.6; transform: scale(1.05); } }
 
-        .processing-text {
-            color: #94a3b8; font-size: 14px; display: flex; align-items: center; gap: 8px;
-            z-index: 2; animation: bounceDots 1.2s ease-in-out infinite;
-        }
+        .processing-text { color: #94a3b8; font-size: 14px; display: flex; align-items: center; gap: 8px; z-index: 2; animation: bounceDots 1.2s ease-in-out infinite; }
         @keyframes bounceDots { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
 
         .result-animate { animation: fadeSlideIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both; }
@@ -197,16 +192,6 @@
         .pending-mode .stat-value { background: linear-gradient(135deg, var(--secondary-start), var(--secondary-end)); -webkit-background-clip: text; background-clip: text; }
         .stat-label { font-size: 12px; color: var(--text-secondary); margin-top: 4px; font-weight: 500; }
 
-        .mode-info {
-            background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(139,92,246,0.08));
-            padding: 14px 18px; border-radius: 12px; font-size: 13px; color: var(--text-secondary);
-            margin: 12px 0; border-left: 3px solid var(--primary-start); display: flex; align-items: flex-start; gap: 10px;
-        }
-        .pending-mode .mode-info { background: linear-gradient(135deg, rgba(236,72,153,0.08), rgba(244,63,94,0.08)); border-left-color: var(--secondary-start); }
-        .mode-info strong { color: var(--text-primary); font-weight: 600; }
-        .mode-info code { background: rgba(99,102,241,0.12); padding: 2px 8px; border-radius: 6px; font-family: monospace; font-size: 12px; color: var(--primary-start); }
-        .pending-mode .mode-info code { background: rgba(236,72,153,0.12); color: var(--secondary-start); }
-
         .toast {
             position: fixed; top: 24px; right: 24px;
             background: linear-gradient(135deg, var(--success-start), var(--success-end));
@@ -227,6 +212,7 @@
             .tabs { flex-direction: column; }
             .btn-group { flex-direction: column; }
             .btn { width: 100%; }
+            .output-area { min-height: 120px; }
         }
     </style>
 </head>
@@ -266,15 +252,18 @@
 
             <div class="card">
                 <div class="card-title">📤 Output (7 Kolom)</div>
-                <div class="mode-info">
-                    <span>📋</span>
-                    <div><strong>Format:</strong> <code>A</code>=Payment | <code>B</code>=(kosong) | <code>C</code>=TxID | <code>D</code>=Amount | <code>E</code>=Name | <code>F</code>=(kosong) | <code>G</code>=-Amount<br><span style="margin-top:4px;display:block">🔁 Urutan: bawah → atas | 🏦 "Bank" prefix otomatis dihapus</span></div>
+                
+                <div class="output-wrapper">
+                    <div class="mode-info">
+                        <span>📋</span>
+                        <div><strong>Format:</strong> <code>A</code>=Payment | <code>B</code>=(kosong) | <code>C</code>=TxID | <code>D</code>=Amount | <code>E</code>=Name | <code>F</code>=(kosong) | <code>G</code>=-Amount<br><span style="margin-top:4px;display:block">🔁 Urutan: bawah → atas | 🏦 "Bank" prefix otomatis dihapus</span></div>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-success" onclick="copyOutput('failed')"><span>📋</span> Copy Hasil</button>
+                        <button class="btn btn-secondary" onclick="downloadCSV('failed')"><span>💾</span> Download CSV</button>
+                    </div>
+                    <div class="output-area" id="outputFailed"><em style="color:#64748b;">✨ Hasil pemrosesan akan muncul di sini...</em></div>
                 </div>
-                <div class="btn-group">
-                    <button class="btn btn-success" onclick="copyOutput('failed')"><span>📋</span> Copy Hasil</button>
-                    <button class="btn btn-secondary" onclick="downloadCSV('failed')"><span>💾</span> Download CSV</button>
-                </div>
-                <div class="output-area" id="outputFailed"><em style="color:#64748b;">✨ Hasil pemrosesan akan muncul di sini...</em></div>
             </div>
         </div>
 
@@ -299,15 +288,18 @@
 
             <div class="card">
                 <div class="card-title">📤 Output (4 Kolom)</div>
-                <div class="mode-info">
-                    <span>📋</span>
-                    <div><strong>Format:</strong> <code>A</code>=Timestamp | <code>B</code>=TxID | <code>C</code>=Amount | <code>D</code>=Fee<br><span style="margin-top:4px;display:block">🔁 Urutan: bawah → atas | 💰 "Rp" prefix otomatis dihapus</span></div>
+                
+                <div class="output-wrapper">
+                    <div class="mode-info">
+                        <span>📋</span>
+                        <div><strong>Format:</strong> <code>A</code>=Timestamp | <code>B</code>=TxID | <code>C</code>=Amount | <code>D</code>=Fee<br><span style="margin-top:4px;display:block">🔁 Urutan: bawah → atas | 💰 "Rp" prefix otomatis dihapus</span></div>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-success" onclick="copyOutput('pending')"><span>📋</span> Copy Hasil</button>
+                        <button class="btn btn-secondary" onclick="downloadCSV('pending')"><span>💾</span> Download CSV</button>
+                    </div>
+                    <div class="output-area" id="outputPending"><em style="color:#64748b;">✨ Hasil pemrosesan akan muncul di sini...</em></div>
                 </div>
-                <div class="btn-group">
-                    <button class="btn btn-success" onclick="copyOutput('pending')"><span>📋</span> Copy Hasil</button>
-                    <button class="btn btn-secondary" onclick="downloadCSV('pending')"><span>💾</span> Download CSV</button>
-                </div>
-                <div class="output-area" id="outputPending"><em style="color:#64748b;">✨ Hasil pemrosesan akan muncul di sini...</em></div>
             </div>
         </div>
     </div>
@@ -323,7 +315,6 @@
         function cleanPaymentMethod(method) { if (!method) return ''; return method.replace(/^Bank\s+/i, '').trim(); }
         function cleanAmount(amount) { if (!amount) return ''; return amount.replace('Rp', '').trim(); }
 
-        // Core Processing Logic
         function processLines(input, statusFilter, mode) {
             const lines = input.split('\n').filter(line => line.trim());
             const results = []; let filteredCount = 0;
@@ -352,7 +343,6 @@
             return { total: lines.length, filtered: filteredCount, output: results.map(r => r.line) };
         }
 
-        // UI State Managers
         function setLoading(btn, bar, mode) {
             btn.classList.add('loading');
             btn.disabled = true;
@@ -381,8 +371,7 @@
             outputEl.classList.remove('processing');
             if (outputArray.length > 0) {
                 outputEl.textContent = outputArray.join('\n');
-                // Trigger reflow for animation
-                void outputEl.offsetWidth;
+                void outputEl.offsetWidth; // trigger reflow
                 outputEl.classList.add('result-animate');
                 setTimeout(() => outputEl.classList.remove('result-animate'), 500);
             } else {
@@ -412,8 +401,9 @@
 
         function clearTab(mode) {
             document.getElementById(`input${mode.charAt(0).toUpperCase() + mode.slice(1)}`).value = '';
-            document.getElementById(`output${mode.charAt(0).toUpperCase() + mode.slice(1)}`).classList.remove('processing','result-animate');
-            document.getElementById(`output${mode.charAt(0).toUpperCase() + mode.slice(1)}`).innerHTML = '<em style="color:#64748b;">✨ Hasil pemrosesan akan muncul di sini...</em>';
+            const out = document.getElementById(`output${mode.charAt(0).toUpperCase() + mode.slice(1)}`);
+            out.classList.remove('processing','result-animate');
+            out.innerHTML = '<em style="color:#64748b;">✨ Hasil pemrosesan akan muncul di sini...</em>';
             document.getElementById(`stats${mode.charAt(0).toUpperCase() + mode.slice(1)}`).classList.add('hidden');
             document.getElementById(`bar${mode.charAt(0).toUpperCase() + mode.slice(1)}`).classList.remove('active');
             document.getElementById(`btn${mode.charAt(0).toUpperCase() + mode.slice(1)}`).classList.remove('loading');
@@ -428,21 +418,15 @@
             setTimeout(() => { toast.classList.add('hide'); setTimeout(() => toast.remove(), 300); }, 2500);
         }
 
-        // Process Functions with Animation
         function processFailed() {
             const input = document.getElementById('inputFailed').value.trim();
             if (!input) { showToast('⚠️ Paste data dulu!', 'warning'); return; }
-            
-            const btn = document.getElementById('btnFailed');
-            const bar = document.getElementById('barFailed');
-            setLoading(btn, bar, 'failed');
-
-            // Simulate slight processing delay for smooth animation
+            setLoading(document.getElementById('btnFailed'), document.getElementById('barFailed'), 'failed');
             setTimeout(() => {
                 const result = processLines(input, 'failed', 'failed');
                 showStats('failed', result.total, result.filtered, result.output.length);
                 showOutput('failed', result.output);
-                finishLoading(btn, bar);
+                finishLoading(document.getElementById('btnFailed'), document.getElementById('barFailed'));
                 if (result.output.length > 0) showToast('🎉 Data berhasil diproses!');
             }, 500);
         }
@@ -450,16 +434,12 @@
         function processPending() {
             const input = document.getElementById('inputPending').value.trim();
             if (!input) { showToast('⚠️ Paste data dulu!', 'warning'); return; }
-            
-            const btn = document.getElementById('btnPending');
-            const bar = document.getElementById('barPending');
-            setLoading(btn, bar, 'pending');
-
+            setLoading(document.getElementById('btnPending'), document.getElementById('barPending'), 'pending');
             setTimeout(() => {
                 const result = processLines(input, 'pending', 'pending');
                 showStats('pending', result.total, result.filtered, result.output.length);
                 showOutput('pending', result.output);
-                finishLoading(btn, bar);
+                finishLoading(document.getElementById('btnPending'), document.getElementById('barPending'));
                 if (result.output.length > 0) showToast('🎉 Data berhasil diproses!');
             }, 500);
         }
