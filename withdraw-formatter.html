@@ -25,7 +25,6 @@
         
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            /* 🔥 BACKGROUND IMAGE CUSTOM */
             background: 
                 linear-gradient(135deg, rgba(15, 23, 42, 0.75) 0%, rgba(30, 41, 59, 0.65) 50%, rgba(15, 23, 42, 0.75) 100%),
                 url('https://cdn.areabermain.club/assets/cdn/az6/2025/12/10/20251210/7f0bdc56062fceb10a05b6412f5ce6e2/linetogel-bg-natal2025.webp');
@@ -40,7 +39,6 @@
             overflow-x: hidden;
         }
 
-        /* ✨ Festive particle effect overlay (optional subtle animation) */
         body::before {
             content: '';
             position: fixed;
@@ -52,10 +50,7 @@
             z-index: 0;
             animation: festiveGlow 8s ease-in-out infinite alternate;
         }
-        @keyframes festiveGlow {
-            from { opacity: 0.7; }
-            to { opacity: 1; }
-        }
+        @keyframes festiveGlow { from { opacity: 0.7; } to { opacity: 1; } }
 
         .container { max-width: 1100px; margin: 0 auto; position: relative; z-index: 1; }
 
@@ -164,28 +159,45 @@
         .mode-info code { background: rgba(99,102,241,0.12); padding: 2px 8px; border-radius: 6px; font-family: monospace; font-size: 12px; color: var(--primary-start); }
         .pending-mode .mode-info code { background: rgba(236,72,153,0.12); color: var(--secondary-start); }
 
+        /* 🔥 OUTPUT AREA: HITAM + FONT PUTIH */
         .output-area {
-            background: #0f172a; color: #e2e8f0; font-family: 'Consolas', 'Monaco', monospace;
-            padding: 18px; border-radius: 14px; overflow-x: auto; white-space: pre-wrap;
-            word-break: break-all; max-height: 380px; overflow-y: auto;
-            border: 1px solid #334155; line-height: 1.5; font-size: 12.5px;
-            position: relative; min-height: 140px; transition: all 0.3s ease;
+            background: #000000;
+            color: #ffffff;
+            font-family: 'Consolas', 'Monaco', monospace;
+            padding: 18px;
+            border-radius: 14px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 380px;
+            overflow-y: auto;
+            border: 1px solid #333333;
+            line-height: 1.5;
+            font-size: 13px;
+            position: relative;
+            min-height: 140px;
+            transition: all 0.3s ease;
         }
         .output-area::-webkit-scrollbar { width: 8px; height: 8px; }
-        .output-area::-webkit-scrollbar-track { background: #1e293b; border-radius: 4px; }
-        .output-area::-webkit-scrollbar-thumb { background: linear-gradient(135deg, var(--primary-start), var(--primary-end)); border-radius: 4px; }
-        .pending-mode .output-area::-webkit-scrollbar-thumb { background: linear-gradient(135deg, var(--secondary-start), var(--secondary-end)); }
+        .output-area::-webkit-scrollbar-track { background: #1a1a1a; border-radius: 4px; }
+        .output-area::-webkit-scrollbar-thumb { 
+            background: linear-gradient(135deg, var(--primary-start), var(--primary-end)); 
+            border-radius: 4px; 
+        }
+        .pending-mode .output-area::-webkit-scrollbar-thumb { 
+            background: linear-gradient(135deg, var(--secondary-start), var(--secondary-end)); 
+        }
 
         .output-area.processing { display: flex; align-items: center; justify-content: center; }
         .output-area.processing::after {
             content: ''; position: absolute; inset: 0;
-            background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(99,102,241,0.2) 0%, transparent 70%);
             animation: pulseGlow 1.5s ease-in-out infinite; pointer-events: none;
         }
-        .pending-mode .output-area.processing::after { background: radial-gradient(circle, rgba(236,72,153,0.15) 0%, transparent 70%); }
+        .pending-mode .output-area.processing::after { background: radial-gradient(circle, rgba(236,72,153,0.2) 0%, transparent 70%); }
         @keyframes pulseGlow { 0%, 100% { opacity: 0.3; transform: scale(0.95); } 50% { opacity: 0.6; transform: scale(1.05); } }
 
-        .processing-text { color: #94a3b8; font-size: 14px; display: flex; align-items: center; gap: 8px; z-index: 2; animation: bounceDots 1.2s ease-in-out infinite; }
+        .processing-text { color: #cccccc; font-size: 14px; display: flex; align-items: center; gap: 8px; z-index: 2; animation: bounceDots 1.2s ease-in-out infinite; }
         @keyframes bounceDots { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
 
         .result-animate { animation: fadeSlideIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both; }
@@ -279,7 +291,7 @@
                         <button class="btn btn-success" onclick="copyOutput('failed')"><span>📋</span> Copy Hasil</button>
                         <button class="btn btn-secondary" onclick="downloadCSV('failed')"><span>💾</span> Download CSV</button>
                     </div>
-                    <div class="output-area" id="outputFailed"><em style="color:#64748b;">✨ Hasil pemrosesan akan muncul di sini...</em></div>
+                    <div class="output-area" id="outputFailed"><em style="color:#888888;">✨ Hasil pemrosesan akan muncul di sini...</em></div>
                 </div>
             </div>
         </div>
@@ -314,7 +326,7 @@
                         <button class="btn btn-success" onclick="copyOutput('pending')"><span>📋</span> Copy Hasil</button>
                         <button class="btn btn-secondary" onclick="downloadCSV('pending')"><span>💾</span> Download CSV</button>
                     </div>
-                    <div class="output-area" id="outputPending"><em style="color:#64748b;">✨ Hasil pemrosesan akan muncul di sini...</em></div>
+                    <div class="output-area" id="outputPending"><em style="color:#888888;">✨ Hasil pemrosesan akan muncul di sini...</em></div>
                 </div>
             </div>
         </div>
@@ -392,7 +404,7 @@
                 setTimeout(() => outputEl.classList.remove('result-animate'), 500);
             } else {
                 const status = mode === 'failed' ? 'failed' : 'pending';
-                outputEl.innerHTML = `<em style="color:#f87171;">❌ Tidak ditemukan data dengan status "${status}"</em>`;
+                outputEl.innerHTML = `<em style="color:#ff6b6b;">❌ Tidak ditemukan data dengan status "${status}"</em>`;
             }
         }
 
@@ -419,7 +431,7 @@
             document.getElementById(`input${mode.charAt(0).toUpperCase() + mode.slice(1)}`).value = '';
             const out = document.getElementById(`output${mode.charAt(0).toUpperCase() + mode.slice(1)}`);
             out.classList.remove('processing','result-animate');
-            out.innerHTML = '<em style="color:#64748b;">✨ Hasil pemrosesan akan muncul di sini...</em>';
+            out.innerHTML = '<em style="color:#888888;">✨ Hasil pemrosesan akan muncul di sini...</em>';
             document.getElementById(`stats${mode.charAt(0).toUpperCase() + mode.slice(1)}`).classList.add('hidden');
             document.getElementById(`bar${mode.charAt(0).toUpperCase() + mode.slice(1)}`).classList.remove('active');
             document.getElementById(`btn${mode.charAt(0).toUpperCase() + mode.slice(1)}`).classList.remove('loading');
