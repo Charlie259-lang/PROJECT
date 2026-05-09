@@ -13,12 +13,16 @@
             --secondary-end: #f43f5e;
             --success-start: #10b981;
             --success-end: #059669;
-            --card-bg: rgba(255, 255, 255, 0.92);
-            --card-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.12);
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
+            --card-bg: rgba(30, 30, 30, 0.95);
+            --card-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
             --border-radius: 20px;
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --dark-bg: #000000;
+            --dark-border: #333333;
+            --dark-text: #ffffff;
+            --dark-placeholder: #666666;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -74,19 +78,19 @@
 
         .tabs {
             display: flex; gap: 10px; margin: 25px 0 30px; padding: 8px;
-            background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(20px);
-            border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(20, 20, 20, 0.8); backdrop-filter: blur(20px);
+            border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.1);
             animation: fadeIn 0.5s ease 0.2s both;
         }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .tab-btn {
-            flex: 1; padding: 16px 20px; border: none; background: rgba(255,255,255,0.1);
+            flex: 1; padding: 16px 20px; border: none; background: rgba(40,40,40,0.8);
             border-radius: 12px; font-weight: 600; font-size: 14px; color: rgba(255,255,255,0.9);
             cursor: pointer; transition: var(--transition); display: flex; align-items: center;
             justify-content: center; gap: 10px; position: relative; overflow: hidden;
         }
-        .tab-btn:hover { background: rgba(255,255,255,0.25); }
+        .tab-btn:hover { background: rgba(60,60,60,0.9); }
         .tab-btn.active {
             color: white;
             background: linear-gradient(135deg, var(--primary-start), var(--primary-end));
@@ -103,7 +107,7 @@
 
         .card {
             background: var(--card-bg); border-radius: var(--border-radius); padding: 25px;
-            margin-bottom: 20px; box-shadow: var(--card-shadow); border: 1px solid rgba(255, 255, 255, 0.3);
+            margin-bottom: 20px; box-shadow: var(--card-shadow); border: 1px solid rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px); transition: var(--transition);
             display: flex; flex-direction: column;
         }
@@ -111,14 +115,29 @@
         .card-title::before { content: ''; width: 4px; height: 18px; background: linear-gradient(135deg, var(--primary-start), var(--primary-end)); border-radius: 2px; }
         .pending-mode .card-title::before { background: linear-gradient(135deg, var(--secondary-start), var(--secondary-end)); }
 
+        /* 🔥 TEXTAREA: HITAM + FONT PUTIH */
         textarea {
-            width: 100%; min-height: 140px; padding: 16px; border: 2px solid #e2e8f0;
-            border-radius: 14px; font-family: 'Consolas', 'Monaco', monospace; font-size: 13px;
-            resize: vertical; transition: var(--transition); background: #f8fafc; color: var(--text-primary);
+            width: 100%; min-height: 140px; padding: 16px; 
+            border: 2px solid var(--dark-border);
+            border-radius: 14px; 
+            font-family: 'Consolas', 'Monaco', monospace; 
+            font-size: 13px;
+            resize: vertical; 
+            transition: var(--transition); 
+            background: var(--dark-bg); 
+            color: var(--dark-text);
         }
-        textarea:focus { outline: none; border-color: var(--primary-start); background: white; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15); }
-        .pending-mode textarea:focus { border-color: var(--secondary-start); box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.15); }
-        textarea::placeholder { color: #94a3b8; }
+        textarea:focus { 
+            outline: none; 
+            border-color: var(--primary-start); 
+            background: #0a0a0a; 
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.25); 
+        }
+        .pending-mode textarea:focus { 
+            border-color: var(--secondary-start); 
+            box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.25); 
+        }
+        textarea::placeholder { color: var(--dark-placeholder); }
 
         .loading-bar {
             height: 3px; background: linear-gradient(90deg, var(--primary-start), var(--primary-end));
@@ -141,28 +160,48 @@
         .btn-primary { background: linear-gradient(135deg, var(--primary-start), var(--primary-end)); color: white; box-shadow: 0 8px 25px rgba(99, 102, 241, 0.35); }
         .pending-mode .btn-primary { background: linear-gradient(135deg, var(--secondary-start), var(--secondary-end)); box-shadow: 0 8px 25px rgba(236, 72, 153, 0.35); }
         
-        .btn-secondary { background: #f1f5f9; color: var(--text-primary); }
-        .btn-secondary:hover { background: #e2e8f0; transform: translateY(-2px); }
+        .btn-secondary { background: #2a2a2a; color: var(--dark-text); border: 1px solid var(--dark-border); }
+        .btn-secondary:hover { background: #3a3a3a; transform: translateY(-2px); }
         
         .btn-success { background: linear-gradient(135deg, var(--success-start), var(--success-end)); color: white; box-shadow: 0 8px 25px rgba(16, 185, 129, 0.35); }
         .btn-success:hover { transform: translateY(-2px); box-shadow: 0 12px 35px rgba(16, 185, 129, 0.5); }
 
         .output-wrapper { display: flex; flex-direction: column; gap: 16px; margin-top: 16px; }
         
+        /* 🔥 MODE INFO: HITAM + FONT PUTIH */
         .mode-info {
-            background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(139,92,246,0.08));
-            padding: 14px 18px; border-radius: 12px; font-size: 13px; color: var(--text-secondary);
-            border-left: 3px solid var(--primary-start); display: flex; align-items: flex-start; gap: 10px;
+            background: #0a0a0a;
+            padding: 14px 18px; 
+            border-radius: 12px; 
+            font-size: 13px; 
+            color: var(--text-secondary);
+            border: 1px solid var(--dark-border);
+            border-left: 3px solid var(--primary-start); 
+            display: flex; 
+            align-items: flex-start; 
+            gap: 10px;
         }
-        .pending-mode .mode-info { background: linear-gradient(135deg, rgba(236,72,153,0.08), rgba(244,63,94,0.08)); border-left-color: var(--secondary-start); }
-        .mode-info strong { color: var(--text-primary); font-weight: 600; }
-        .mode-info code { background: rgba(99,102,241,0.12); padding: 2px 8px; border-radius: 6px; font-family: monospace; font-size: 12px; color: var(--primary-start); }
-        .pending-mode .mode-info code { background: rgba(236,72,153,0.12); color: var(--secondary-start); }
+        .pending-mode .mode-info { 
+            border-left-color: var(--secondary-start); 
+        }
+        .mode-info strong { color: var(--dark-text); font-weight: 600; }
+        .mode-info code { 
+            background: rgba(99,102,241,0.2); 
+            padding: 2px 8px; 
+            border-radius: 6px; 
+            font-family: monospace; 
+            font-size: 12px; 
+            color: var(--primary-start); 
+        }
+        .pending-mode .mode-info code { 
+            background: rgba(236,72,153,0.2); 
+            color: var(--secondary-start); 
+        }
 
         /* 🔥 OUTPUT AREA: HITAM + FONT PUTIH */
         .output-area {
-            background: #000000;
-            color: #ffffff;
+            background: var(--dark-bg);
+            color: var(--dark-text);
             font-family: 'Consolas', 'Monaco', monospace;
             padding: 18px;
             border-radius: 14px;
@@ -171,7 +210,7 @@
             word-break: break-all;
             max-height: 380px;
             overflow-y: auto;
-            border: 1px solid #333333;
+            border: 1px solid var(--dark-border);
             line-height: 1.5;
             font-size: 13px;
             position: relative;
@@ -204,10 +243,19 @@
         @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 
         .stats { display: flex; gap: 15px; margin: 20px 0; flex-wrap: wrap; }
+        
+        /* 🔥 STAT CARD: HITAM + FONT PUTIH */
         .stat-card {
-            flex: 1; min-width: 110px; background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7));
-            padding: 16px 20px; border-radius: 14px; text-align: center; border: 1px solid rgba(255,255,255,0.4);
-            backdrop-filter: blur(10px); transition: var(--transition); animation: statPop 0.4s ease backwards;
+            flex: 1; 
+            min-width: 110px; 
+            background: #0a0a0a;
+            padding: 16px 20px; 
+            border-radius: 14px; 
+            text-align: center; 
+            border: 1px solid var(--dark-border);
+            backdrop-filter: blur(10px); 
+            transition: var(--transition); 
+            animation: statPop 0.4s ease backwards;
         }
         .stat-card:nth-child(1) { animation-delay: 0.1s; }
         .stat-card:nth-child(2) { animation-delay: 0.2s; }
