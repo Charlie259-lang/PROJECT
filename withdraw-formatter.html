@@ -69,12 +69,12 @@
             font-size: 24px; box-shadow: 0 10px 25px rgba(99, 102, 241, 0.35);
         }
         h1 {
-            font-size: 28px; font-weight: 700;
+            font-size: 32px; /* 🔼 Dinaikkan */
+            font-weight: 700;
             background: linear-gradient(135deg, #fff, #e2e8f0);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
-        .subtitle { color: rgba(255,255,255,0.85); font-size: 15px; margin-top: 8px; }
+        .subtitle { color: rgba(255,255,255,0.85); font-size: 16px; margin-top: 8px; } /* 🔼 Dinaikkan */
 
         .tabs {
             display: flex; gap: 10px; margin: 25px 0 30px; padding: 8px;
@@ -86,9 +86,9 @@
 
         .tab-btn {
             flex: 1; padding: 16px 20px; border: none; background: rgba(40,40,40,0.8);
-            border-radius: 12px; font-weight: 600; font-size: 14px; color: rgba(255,255,255,0.9);
-            cursor: pointer; transition: var(--transition); display: flex; align-items: center;
-            justify-content: center; gap: 10px; position: relative; overflow: hidden;
+            border-radius: 12px; font-weight: 600; font-size: 15px; /* 🔼 Dinaikkan */
+            color: rgba(255,255,255,0.9); cursor: pointer; transition: var(--transition); 
+            display: flex; align-items: center; justify-content: center; gap: 10px;
         }
         .tab-btn:hover { background: rgba(60,60,60,0.9); }
         .tab-btn.active {
@@ -111,17 +111,17 @@
             backdrop-filter: blur(10px); transition: var(--transition);
             display: flex; flex-direction: column;
         }
-        .card-title { font-weight: 600; font-size: 16px; color: var(--text-primary); margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .card-title { font-weight: 600; font-size: 17px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; } /* 🔼 Dinaikkan */
         .card-title::before { content: ''; width: 4px; height: 18px; background: linear-gradient(135deg, var(--primary-start), var(--primary-end)); border-radius: 2px; }
         .pending-mode .card-title::before { background: linear-gradient(135deg, var(--secondary-start), var(--secondary-end)); }
 
-        /* 🔥 TEXTAREA: HITAM + FONT PUTIH */
+        /* 🔥 TEXTAREA: Font lebih besar */
         textarea {
             width: 100%; min-height: 140px; padding: 16px; 
             border: 2px solid var(--dark-border);
             border-radius: 14px; 
             font-family: 'Consolas', 'Monaco', monospace; 
-            font-size: 13px;
+            font-size: 14.5px; /* 🔼 Dinaikkan */
             resize: vertical; 
             transition: var(--transition); 
             background: var(--dark-bg); 
@@ -148,7 +148,7 @@
 
         .btn-group { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
         .btn {
-            padding: 14px 26px; border: none; border-radius: 12px; font-weight: 600; font-size: 14px;
+            padding: 14px 26px; border: none; border-radius: 12px; font-weight: 600; font-size: 15px; /* 🔼 Dinaikkan */
             cursor: pointer; transition: var(--transition); display: flex; align-items: center;
             justify-content: center; gap: 8px; position: relative; overflow: hidden;
         }
@@ -168,12 +168,12 @@
 
         .output-wrapper { display: flex; flex-direction: column; gap: 16px; margin-top: 16px; }
         
-        /* 🔥 MODE INFO: HITAM + FONT PUTIH */
+        /* 🔥 MODE INFO: Font lebih besar */
         .mode-info {
             background: #0a0a0a;
             padding: 14px 18px; 
             border-radius: 12px; 
-            font-size: 13px; 
+            font-size: 14px; /* 🔼 Dinaikkan */
             color: var(--text-secondary);
             border: 1px solid var(--dark-border);
             border-left: 3px solid var(--primary-start); 
@@ -181,24 +181,12 @@
             align-items: flex-start; 
             gap: 10px;
         }
-        .pending-mode .mode-info { 
-            border-left-color: var(--secondary-start); 
-        }
+        .pending-mode .mode-info { border-left-color: var(--secondary-start); }
         .mode-info strong { color: var(--dark-text); font-weight: 600; }
-        .mode-info code { 
-            background: rgba(99,102,241,0.2); 
-            padding: 2px 8px; 
-            border-radius: 6px; 
-            font-family: monospace; 
-            font-size: 12px; 
-            color: var(--primary-start); 
-        }
-        .pending-mode .mode-info code { 
-            background: rgba(236,72,153,0.2); 
-            color: var(--secondary-start); 
-        }
+        .mode-info code { background: rgba(99,102,241,0.2); padding: 3px 9px; border-radius: 6px; font-family: monospace; font-size: 13px; color: var(--primary-start); }
+        .pending-mode .mode-info code { background: rgba(236,72,153,0.2); color: var(--secondary-start); }
 
-        /* 🔥 OUTPUT AREA: HITAM + FONT PUTIH */
+        /* 🔥 OUTPUT AREA: Font lebih besar & line-height nyaman dibaca */
         .output-area {
             background: var(--dark-bg);
             color: var(--dark-text);
@@ -211,21 +199,16 @@
             max-height: 380px;
             overflow-y: auto;
             border: 1px solid var(--dark-border);
-            line-height: 1.5;
-            font-size: 13px;
+            line-height: 1.65; /* 🔼 Dinaikkan agar tidak terlalu rapat */
+            font-size: 15px; /* 🔼 Dinaikkan */
             position: relative;
             min-height: 140px;
             transition: all 0.3s ease;
         }
         .output-area::-webkit-scrollbar { width: 8px; height: 8px; }
         .output-area::-webkit-scrollbar-track { background: #1a1a1a; border-radius: 4px; }
-        .output-area::-webkit-scrollbar-thumb { 
-            background: linear-gradient(135deg, var(--primary-start), var(--primary-end)); 
-            border-radius: 4px; 
-        }
-        .pending-mode .output-area::-webkit-scrollbar-thumb { 
-            background: linear-gradient(135deg, var(--secondary-start), var(--secondary-end)); 
-        }
+        .output-area::-webkit-scrollbar-thumb { background: linear-gradient(135deg, var(--primary-start), var(--primary-end)); border-radius: 4px; }
+        .pending-mode .output-area::-webkit-scrollbar-thumb { background: linear-gradient(135deg, var(--secondary-start), var(--secondary-end)); }
 
         .output-area.processing { display: flex; align-items: center; justify-content: center; }
         .output-area.processing::after {
@@ -236,7 +219,7 @@
         .pending-mode .output-area.processing::after { background: radial-gradient(circle, rgba(236,72,153,0.2) 0%, transparent 70%); }
         @keyframes pulseGlow { 0%, 100% { opacity: 0.3; transform: scale(0.95); } 50% { opacity: 0.6; transform: scale(1.05); } }
 
-        .processing-text { color: #cccccc; font-size: 14px; display: flex; align-items: center; gap: 8px; z-index: 2; animation: bounceDots 1.2s ease-in-out infinite; }
+        .processing-text { color: #cccccc; font-size: 15px; display: flex; align-items: center; gap: 8px; z-index: 2; animation: bounceDots 1.2s ease-in-out infinite; } /* 🔼 Dinaikkan */
         @keyframes bounceDots { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
 
         .result-animate { animation: fadeSlideIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both; }
@@ -244,18 +227,10 @@
 
         .stats { display: flex; gap: 15px; margin: 20px 0; flex-wrap: wrap; }
         
-        /* 🔥 STAT CARD: HITAM + FONT PUTIH */
         .stat-card {
-            flex: 1; 
-            min-width: 110px; 
-            background: #0a0a0a;
-            padding: 16px 20px; 
-            border-radius: 14px; 
-            text-align: center; 
-            border: 1px solid var(--dark-border);
-            backdrop-filter: blur(10px); 
-            transition: var(--transition); 
-            animation: statPop 0.4s ease backwards;
+            flex: 1; min-width: 110px; background: #0a0a0a;
+            padding: 16px 20px; border-radius: 14px; text-align: center; border: 1px solid var(--dark-border);
+            backdrop-filter: blur(10px); transition: var(--transition); animation: statPop 0.4s ease backwards;
         }
         .stat-card:nth-child(1) { animation-delay: 0.1s; }
         .stat-card:nth-child(2) { animation-delay: 0.2s; }
@@ -263,18 +238,18 @@
         @keyframes statPop { from { opacity: 0; transform: scale(0.8) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
         
         .stat-value {
-            font-size: 26px; font-weight: 700;
+            font-size: 28px; /* 🔼 Dinaikkan */ font-weight: 700;
             background: linear-gradient(135deg, var(--primary-start), var(--primary-end));
             -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.2;
         }
         .pending-mode .stat-value { background: linear-gradient(135deg, var(--secondary-start), var(--secondary-end)); -webkit-background-clip: text; background-clip: text; }
-        .stat-label { font-size: 12px; color: var(--text-secondary); margin-top: 4px; font-weight: 500; }
+        .stat-label { font-size: 13px; color: var(--text-secondary); margin-top: 4px; font-weight: 500; } /* 🔼 Dinaikkan */
 
         .toast {
             position: fixed; top: 24px; right: 24px;
             background: linear-gradient(135deg, var(--success-start), var(--success-end));
             color: white; padding: 14px 24px; border-radius: 14px;
-            box-shadow: 0 10px 40px rgba(16,185,129,0.4); font-weight: 500;
+            box-shadow: 0 10px 40px rgba(16,185,129,0.4); font-weight: 500; font-size: 14.5px; /* 🔼 Dinaikkan */
             display: flex; align-items: center; gap: 10px; z-index: 1000;
             animation: toastIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
         }
@@ -286,7 +261,7 @@
 
         @media (max-width: 768px) {
             body { padding: 15px; }
-            h1 { font-size: 24px; }
+            h1 { font-size: 26px; }
             .tabs { flex-direction: column; }
             .btn-group { flex-direction: column; }
             .btn { width: 100%; }
@@ -313,7 +288,7 @@
         <div id="tab-failed" class="tab-content active">
             <div class="card">
                 <div class="card-title">📥 Input Data (Failed)</div>
-                <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">Paste data withdraw status <strong style="color:var(--text-primary)">failed</strong> (tab-separated).</p>
+                <p style="font-size:14px;color:var(--text-secondary);margin-bottom:12px;">Paste data withdraw status <strong style="color:var(--text-primary)">failed</strong> (tab-separated).</p>
                 <textarea id="inputFailed" placeholder="07/05/2026 19:47:04\tfailed\tSMB5 (...)\tLIT-xxx\tOVO\t..."></textarea>
                 <div class="loading-bar" id="barFailed"></div>
                 <div class="btn-group">
@@ -348,7 +323,7 @@
         <div id="tab-pending" class="tab-content">
             <div class="card">
                 <div class="card-title">📥 Input Data (Pending)</div>
-                <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">Paste data withdraw status <strong style="color:var(--text-primary)">pending</strong> (tab-separated).</p>
+                <p style="font-size:14px;color:var(--text-secondary);margin-bottom:12px;">Paste data withdraw status <strong style="color:var(--text-primary)">pending</strong> (tab-separated).</p>
                 <textarea id="inputPending" placeholder="07/05/2026 22:53:07\tpending\tSMB5 (...)\tLIT-xxx\tBank Mandiri\t..."></textarea>
                 <div class="loading-bar" id="barPending"></div>
                 <div class="btn-group">
@@ -420,19 +395,12 @@
         }
 
         function setLoading(btn, bar, mode) {
-            btn.classList.add('loading');
-            btn.disabled = true;
-            bar.classList.add('active');
+            btn.classList.add('loading'); btn.disabled = true; bar.classList.add('active');
             const out = document.getElementById(`output${mode.charAt(0).toUpperCase() + mode.slice(1)}`);
             out.classList.add('processing');
             out.innerHTML = '<div class="processing-text"><span class="spinner"></span> Memproses data...</div>';
         }
-
-        function finishLoading(btn, bar) {
-            btn.classList.remove('loading');
-            btn.disabled = false;
-            bar.classList.remove('active');
-        }
+        function finishLoading(btn, bar) { btn.classList.remove('loading'); btn.disabled = false; bar.classList.remove('active'); }
 
         function showStats(mode, total, filtered, processed) {
             const prefix = mode === 'failed' ? 'failed' : 'pending';
