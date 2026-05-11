@@ -356,14 +356,14 @@
         // ========== SNOW ANIMATION SCRIPT ==========
         (function() {
             const container = document.getElementById('snowContainer');
-            const snowflakesCount = 150; // ❄️ Ditingkatkan dari 60 → 150
+            const snowflakesCount = 1500; // ❄️ Ditingkatkan dari 60 → 150
             const flakes = [];
 
             for (let i = 0; i < snowflakesCount; i++) {
                 const flake = document.createElement('div');
                 flake.classList.add('snowflake');
                 
-                const size = Math.random() * 10 + 2; // 2px - 12px
+                const size = Math.random() * 10 + 2; // 2px - 15px
                 flake.style.width = size + 'px';
                 flake.style.height = size + 'px';
                 flake.style.left = Math.random() * 100 + 'vw';
