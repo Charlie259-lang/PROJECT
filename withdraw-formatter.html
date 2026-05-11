@@ -44,7 +44,8 @@
         }
 
         body::before {
-            content: ''; position: fixed; inset: 0;
+            content: '';
+            position: fixed; inset: 0;
             background: 
                 radial-gradient(ellipse at top, rgba(236, 72, 153, 0.08) 0%, transparent 60%),
                 radial-gradient(ellipse at bottom, rgba(99, 102, 241, 0.08) 0%, transparent 60%);
@@ -59,16 +60,15 @@
             pointer-events: none; z-index: 0; overflow: hidden;
         }
         .snowflake {
-            position: absolute; top: -60px;
+            position: absolute; top: -15px;
             background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.4) 100%);
             border-radius: 50%;
             opacity: 0.75;
             pointer-events: none;
             animation: snowfall linear infinite, snowsway ease-in-out infinite alternate;
-            will-change: transform; /* 🔥 Optimasi GPU untuk 1500 elemen */
         }
         @keyframes snowfall { 0% { transform: translateY(0); } 100% { transform: translateY(110vh); } }
-        @keyframes snowsway { from { margin-left: -40px; } to { margin-left: 40px; } }
+        @keyframes snowsway { from { margin-left: -30px; } to { margin-left: 30px; } }
 
         .container { max-width: 1100px; margin: 0 auto; position: relative; z-index: 1; }
 
@@ -356,22 +356,20 @@
         // ========== SNOW ANIMATION SCRIPT ==========
         (function() {
             const container = document.getElementById('snowContainer');
-            const snowflakesCount = 1500; // ❄️ Ditingkatkan ke 1500
+            const snowflakesCount = 150; // ❄️ Ditingkatkan dari 60 → 150
             const flakes = [];
 
             for (let i = 0; i < snowflakesCount; i++) {
                 const flake = document.createElement('div');
                 flake.classList.add('snowflake');
                 
-                const size = Math.random() * 48 + 2; // ❄️ 2px - 50px
+                const size = Math.random() * 10 + 2; // 2px - 12px
                 flake.style.width = size + 'px';
                 flake.style.height = size + 'px';
                 flake.style.left = Math.random() * 100 + 'vw';
+                flake.style.opacity = (Math.random() * 0.5 + 0.3); // 0.3 - 0.8
                 
-                // Opacity disesuaikan: salju besar lebih transparan agar tidak terlalu blocking
-                flake.style.opacity = Math.random() * 0.4 + 0.3; 
-                
-                const fallDuration = Math.random() * 8 + 3; // 3s - 11s
+                const fallDuration = Math.random() * 7 + 3; // 3s - 10s
                 const swayDuration = Math.random() * 4 + 2; // 2s - 6s
                 flake.style.animationDuration = `${fallDuration}s, ${swayDuration}s`;
                 flake.style.animationDelay = `-${Math.random() * fallDuration}s, 0s`;
