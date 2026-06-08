@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✨ Withdraw Formatter Pro</title>
+    <title>✨ Withdraw Formatter Pro + Report Pending QRIS</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -11,6 +11,8 @@
             --primary-end: #8b5cf6;
             --secondary-start: #ec4899;
             --secondary-end: #f43f5e;
+            --qris-start: #10b981;
+            --qris-end: #14b8a6;
             --success-start: #10b981;
             --success-end: #059669;
             --card-bg: rgba(30, 30, 30, 0.95);
@@ -53,13 +55,12 @@
         }
         @keyframes festiveGlow { from { opacity: 0.7; } to { opacity: 1; } }
 
-        /* ========== SNOW ANIMATION ========== */
+        /* SNOW & SANTA */
         .snow-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
         .snowflake { position: absolute; top: -15px; background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.4) 100%); border-radius: 50%; opacity: 0.75; pointer-events: none; animation: snowfall linear infinite, snowsway ease-in-out infinite alternate; }
         @keyframes snowfall { 0% { transform: translateY(0); } 100% { transform: translateY(110vh); } }
         @keyframes snowsway { from { margin-left: -30px; } to { margin-left: 30px; } }
 
-        /* ========== SANTA ANIMATION ========== */
         .santa-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
         .santa-img {
             width: 260px;
@@ -80,7 +81,7 @@
             100% { transform: translateX(calc(100vw + 350px)) translateY(-4px) rotate(2deg); }
         }
 
-        .container { max-width: 1100px; margin: 0 auto; position: relative; z-index: 1; }
+        .container { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
 
         .header { text-align: center; padding: 30px 20px; animation: slideDown 0.6s ease; }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
@@ -90,13 +91,12 @@
         h1 { font-size: 42px; font-weight: 700; background: linear-gradient(135deg, #fff, #e2e8f0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         .subtitle { color: rgba(255,255,255,0.85); font-size: 19px; margin-top: 8px; }
 
-        .tabs { display: flex; gap: 12px; margin: 25px 0 30px; padding: 10px; background: rgba(20, 20, 20, 0.8); backdrop-filter: blur(20px); border-radius: 18px; border: 1px solid rgba(255, 255, 255, 0.1); animation: fadeIn 0.5s ease 0.2s both; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
+        .tabs { display: flex; gap: 12px; margin: 25px 0 30px; padding: 10px; background: rgba(20, 20, 20, 0.8); backdrop-filter: blur(20px); border-radius: 18px; border: 1px solid rgba(255, 255, 255, 0.1); }
         .tab-btn { flex: 1; padding: 18px 22px; border: none; background: rgba(40,40,40,0.8); border-radius: 14px; font-weight: 600; font-size: 18px; color: rgba(255,255,255,0.9); cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 10px; }
         .tab-btn:hover { background: rgba(60,60,60,0.9); }
         .tab-btn.active { color: white; background: linear-gradient(135deg, var(--primary-start), var(--primary-end)); box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4); }
         .tab-btn.pending-mode.active { background: linear-gradient(135deg, var(--secondary-start), var(--secondary-end)); box-shadow: 0 10px 30px rgba(236, 72, 153, 0.4); }
+        .tab-btn.qris-mode.active { background: linear-gradient(135deg, var(--qris-start), var(--qris-end)); box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4); }
 
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: contentFade 0.4s ease; }
@@ -106,14 +106,15 @@
         .card-title { font-weight: 600; font-size: 20px; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
         .card-title::before { content: ''; width: 5px; height: 20px; background: linear-gradient(135deg, var(--primary-start), var(--primary-end)); border-radius: 2px; }
         .pending-mode .card-title::before { background: linear-gradient(135deg, var(--secondary-start), var(--secondary-end)); }
+        .qris-mode .card-title::before { background: linear-gradient(135deg, var(--qris-start), var(--qris-end)); }
 
         textarea { width: 100%; min-height: 150px; padding: 18px; border: 2px solid var(--dark-border); border-radius: 14px; font-family: 'Consolas', 'Monaco', monospace; font-size: 17px; resize: vertical; transition: var(--transition); background: var(--dark-bg); color: var(--dark-text); }
         textarea:focus { outline: none; border-color: var(--primary-start); background: #0a0a0a; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.25); }
-        .pending-mode textarea:focus { border-color: var(--secondary-start); box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.25); }
+        .qris-mode textarea:focus { border-color: var(--qris-start); box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.25); }
         textarea::placeholder { color: var(--dark-placeholder); }
 
         .loading-bar { height: 4px; background: linear-gradient(90deg, var(--primary-start), var(--primary-end)); border-radius: 4px; width: 0%; margin-top: 14px; transition: width 0.5s cubic-bezier(0.4,0,0.2,1); }
-        .pending-mode .loading-bar { background: linear-gradient(90deg, var(--secondary-start), var(--secondary-end)); }
+        .qris-mode .loading-bar { background: linear-gradient(90deg, var(--qris-start), var(--qris-end)); }
         .loading-bar.active { width: 100%; }
 
         .btn-group { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 18px; }
@@ -124,7 +125,8 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         
         .btn-primary { background: linear-gradient(135deg, var(--primary-start), var(--primary-end)); color: white; box-shadow: 0 8px 25px rgba(99, 102, 241, 0.35); }
-        .pending-mode .btn-primary { background: linear-gradient(135deg, var(--secondary-start), var(--secondary-end)); box-shadow: 0 8px 25px rgba(236, 72, 153, 0.35); }
+        .pending-mode .btn-primary { background: linear-gradient(135deg, var(--secondary-start), var(--secondary-end)); }
+        .qris-mode .btn-primary { background: linear-gradient(135deg, var(--qris-start), var(--qris-end)); box-shadow: 0 8px 25px rgba(16,185,129,0.35); }
         .btn-secondary { background: #2a2a2a; color: var(--dark-text); border: 1px solid var(--dark-border); }
         .btn-secondary:hover { background: #3a3a3a; transform: translateY(-2px); }
         .btn-success { background: linear-gradient(135deg, var(--success-start), var(--success-end)); color: white; box-shadow: 0 8px 25px rgba(16, 185, 129, 0.35); }
@@ -132,67 +134,66 @@
 
         .output-wrapper { display: flex; flex-direction: column; gap: 18px; margin-top: 18px; }
         .mode-info { background: #0a0a0a; padding: 16px 20px; border-radius: 14px; font-size: 16.5px; color: var(--text-secondary); border: 1px solid var(--dark-border); border-left: 4px solid var(--primary-start); display: flex; align-items: flex-start; gap: 12px; }
-        .pending-mode .mode-info { border-left-color: var(--secondary-start); }
+        .qris-mode .mode-info { border-left-color: var(--qris-start); }
         .mode-info strong { color: var(--dark-text); font-weight: 600; }
         .mode-info code { background: rgba(99,102,241,0.2); padding: 4px 10px; border-radius: 8px; font-family: monospace; font-size: 15px; color: var(--primary-start); }
-        .pending-mode .mode-info code { background: rgba(236,72,153,0.2); color: var(--secondary-start); }
+        .qris-mode .mode-info code { background: rgba(16,185,129,0.2); color: var(--qris-start); }
 
-        .output-area { background: var(--dark-bg); color: var(--dark-text); font-family: 'Consolas', 'Monaco', monospace; padding: 20px; border-radius: 14px; overflow-x: auto; white-space: pre-wrap; word-break: break-all; max-height: 400px; overflow-y: auto; border: 1px solid var(--dark-border); line-height: 1.75; font-size: 18px; position: relative; min-height: 150px; transition: all 0.3s ease; }
-        .output-area::-webkit-scrollbar { width: 9px; height: 9px; }
+        .cards-grid-pending {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .pending-item {
+            background: #0f0f0f;
+            border: 1px solid #2a2a2a;
+            border-radius: 20px;
+            padding: 1.2rem 1.5rem;
+            transition: 0.2s;
+        }
+        .pending-item:hover { background: #1a1a1a; border-color: var(--qris-start); }
+        .info-line { display: flex; flex-wrap: wrap; margin-bottom: 0.7rem; align-items: baseline; gap: 12px; }
+        .info-label { font-weight: 650; min-width: 95px; color: #b0b0b0; font-size: 0.85rem; }
+        .info-value { color: #f0f0f0; font-weight: 500; word-break: break-all; }
+        .order-id-value { font-family: monospace; background: #1e1e1e; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.8rem; }
+        .nominal-value { font-weight: 700; color: #2ecc71; }
+        .empty-value { color: #777; font-style: italic; }
+        .no-data-message { text-align: center; padding: 2rem; background: #0a0a0a; border-radius: 24px; color: #888; }
+
+        .output-area { background: var(--dark-bg); color: var(--dark-text); font-family: 'Consolas', 'Monaco', monospace; padding: 20px; border-radius: 14px; overflow-x: auto; white-space: pre-wrap; word-break: break-all; max-height: 400px; overflow-y: auto; border: 1px solid var(--dark-border); line-height: 1.75; font-size: 18px; position: relative; min-height: 150px; }
+        .output-area::-webkit-scrollbar { width: 9px; }
         .output-area::-webkit-scrollbar-track { background: #1a1a1a; border-radius: 5px; }
         .output-area::-webkit-scrollbar-thumb { background: linear-gradient(135deg, var(--primary-start), var(--primary-end)); border-radius: 5px; }
-        .pending-mode .output-area::-webkit-scrollbar-thumb { background: linear-gradient(135deg, var(--secondary-start), var(--secondary-end)); }
+        .qris-mode .output-area::-webkit-scrollbar-thumb { background: linear-gradient(135deg, var(--qris-start), var(--qris-end)); }
 
-        .output-area.processing { display: flex; align-items: center; justify-content: center; }
-        .output-area.processing::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle, rgba(99,102,241,0.2) 0%, transparent 70%); animation: pulseGlow 1.5s ease-in-out infinite; pointer-events: none; }
-        .pending-mode .output-area.processing::after { background: radial-gradient(circle, rgba(236,72,153,0.2) 0%, transparent 70%); }
-        @keyframes pulseGlow { 0%, 100% { opacity: 0.3; transform: scale(0.95); } 50% { opacity: 0.6; transform: scale(1.05); } }
-
-        .processing-text { color: #cccccc; font-size: 17px; display: flex; align-items: center; gap: 10px; z-index: 2; animation: bounceDots 1.2s ease-in-out infinite; }
-        @keyframes bounceDots { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
-
-        .result-animate { animation: fadeSlideIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both; }
-        @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-
+        .processing-text { color: #cccccc; font-size: 17px; display: flex; align-items: center; gap: 10px; }
         .stats { display: flex; gap: 18px; margin: 22px 0; flex-wrap: wrap; }
-        .stat-card { flex: 1; min-width: 120px; background: #0a0a0a; padding: 18px 22px; border-radius: 16px; text-align: center; border: 1px solid var(--dark-border); backdrop-filter: blur(10px); transition: var(--transition); animation: statPop 0.4s ease backwards; }
-        .stat-card:nth-child(1) { animation-delay: 0.1s; }
-        .stat-card:nth-child(2) { animation-delay: 0.2s; }
-        .stat-card:nth-child(3) { animation-delay: 0.3s; }
-        @keyframes statPop { from { opacity: 0; transform: scale(0.8) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-        
+        .stat-card { flex: 1; min-width: 120px; background: #0a0a0a; padding: 18px 22px; border-radius: 16px; text-align: center; border: 1px solid var(--dark-border); backdrop-filter: blur(10px); }
         .stat-value { font-size: 34px; font-weight: 700; background: linear-gradient(135deg, var(--primary-start), var(--primary-end)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.2; }
-        .pending-mode .stat-value { background: linear-gradient(135deg, var(--secondary-start), var(--secondary-end)); -webkit-background-clip: text; background-clip: text; }
+        .qris-mode .stat-value { background: linear-gradient(135deg, var(--qris-start), var(--qris-end)); -webkit-background-clip: text; background-clip: text; }
         .stat-label { font-size: 15px; color: var(--text-secondary); margin-top: 5px; font-weight: 500; }
 
         .toast { position: fixed; top: 24px; right: 24px; background: linear-gradient(135deg, var(--success-start), var(--success-end)); color: white; padding: 16px 26px; border-radius: 14px; box-shadow: 0 10px 40px rgba(16,185,129,0.4); font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 10px; z-index: 1000; animation: toastIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275); }
         @keyframes toastIn { from { transform: translateX(150px) scale(0.9); opacity: 0; } to { transform: translateX(0) scale(1); opacity: 1; } }
         .toast.hide { animation: toastOut 0.3s ease forwards; }
         @keyframes toastOut { to { transform: translateX(150px); opacity: 0; } }
-
         .hidden { display: none !important; }
 
         @media (max-width: 768px) {
             body { padding: 15px; }
             h1 { font-size: 32px; }
-            .subtitle { font-size: 16px; }
             .tabs { flex-direction: column; }
             .tab-btn { font-size: 16px; padding: 15px; }
             .btn-group { flex-direction: column; }
-            .btn { width: 100%; font-size: 15px; padding: 14px 20px; }
-            .output-area { font-size: 16px; min-height: 120px; }
-            .stat-value { font-size: 28px; }
+            .btn { width: 100%; }
             .santa-img { width: 180px; top: 15vh; }
         }
     </style>
 </head>
 <body>
-    <!-- SNOW CONTAINER -->
     <div class="snow-container" id="snowContainer"></div>
-
-    <!-- SANTA CLAUSE ANIMATION -->
     <div class="santa-container">
-        <!-- Ganti src dengan URL gambar Santa PNG transparan pilihan Anda jika perlu -->
         <img src="https://pngimg.com/d/santa_PNG33.png" alt="Santa Claus" class="santa-img" onerror="this.style.display='none'">
     </div>
 
@@ -202,19 +203,20 @@
                 <div class="logo-icon">🎄</div>
                 <h1>Withdraw Formatter Pro</h1>
             </div>
-            <p class="subtitle">Extract & format withdraw data dengan cepat dan elegan</p>
+            <p class="subtitle">Extract & format withdraw data + Report Pending QRIS</p>
         </header>
 
         <nav class="tabs">
             <button class="tab-btn failed-mode active" onclick="switchTab('failed')"><span>❌</span> Failed Status</button>
             <button class="tab-btn pending-mode" onclick="switchTab('pending')"><span>⏳</span> Pending Status</button>
+            <button class="tab-btn qris-mode" onclick="switchTab('qris')"><span>🏷️</span> Report Pending QRIS</button>
         </nav>
 
         <!-- FAILED MODE -->
         <div id="tab-failed" class="tab-content active">
             <div class="card">
                 <div class="card-title">📥 Input Data (Failed)</div>
-                <p style="font-size:15px;color:var(--text-secondary);margin-bottom:12px;">Paste data withdraw status <strong style="color:var(--text-primary)">failed</strong> (tab-separated).</p>
+                <p style="font-size:15px;color:var(--text-secondary);margin-bottom:12px;">Paste data withdraw status <strong>failed</strong> (tab-separated).</p>
                 <textarea id="inputFailed" placeholder="07/05/2026 19:47:04\tfailed\tSMB5 (...)\tLIT-xxx\tOVO\t..."></textarea>
                 <div class="loading-bar" id="barFailed"></div>
                 <div class="btn-group">
@@ -222,24 +224,16 @@
                     <button class="btn btn-secondary" onclick="clearTab('failed')"><span>🗑️</span> Hapus</button>
                 </div>
             </div>
-
             <div class="stats hidden" id="statsFailed">
                 <div class="stat-card"><div class="stat-value" id="failedTotal">0</div><div class="stat-label">Total Baris</div></div>
                 <div class="stat-card"><div class="stat-value" id="failedFiltered">0</div><div class="stat-label">Status Failed</div></div>
                 <div class="stat-card"><div class="stat-value" id="failedProcessed">0</div><div class="stat-label">Diproses</div></div>
             </div>
-
             <div class="card">
                 <div class="card-title">📤 Output (7 Kolom)</div>
                 <div class="output-wrapper">
-                    <div class="mode-info">
-                        <span>📋</span>
-                        <div><strong>Format:</strong> <code>A</code>=Payment | <code>B</code>=(kosong) | <code>C</code>=TxID | <code>D</code>=Amount | <code>E</code>=Name | <code>F</code>=(kosong) | <code>G</code>=-Amount<br><span style="margin-top:5px;display:block">🔁 Urutan: bawah → atas | 🏦 "Bank" prefix otomatis dihapus</span></div>
-                    </div>
-                    <div class="btn-group">
-                        <button class="btn btn-success" onclick="copyOutput('failed')"><span>📋</span> Copy Hasil</button>
-                        <button class="btn btn-secondary" onclick="downloadCSV('failed')"><span>💾</span> Download CSV</button>
-                    </div>
+                    <div class="mode-info"><span>📋</span><div><strong>Format:</strong> <code>A</code>=Payment | <code>B</code>=(kosong) | <code>C</code>=TxID | <code>D</code>=Amount | <code>E</code>=Name | <code>F</code>=(kosong) | <code>G</code>=-Amount<br><span>🔁 Urutan: bawah → atas | 🏦 "Bank" prefix otomatis dihapus</span></div></div>
+                    <div class="btn-group"><button class="btn btn-success" onclick="copyOutput('failed')"><span>📋</span> Copy Hasil</button><button class="btn btn-secondary" onclick="downloadCSV('failed')"><span>💾</span> Download CSV</button></div>
                     <div class="output-area" id="outputFailed"><em style="color:#888888;">✨ Hasil pemrosesan akan muncul di sini...</em></div>
                 </div>
             </div>
@@ -249,7 +243,7 @@
         <div id="tab-pending" class="tab-content">
             <div class="card">
                 <div class="card-title">📥 Input Data (Pending)</div>
-                <p style="font-size:15px;color:var(--text-secondary);margin-bottom:12px;">Paste data withdraw status <strong style="color:var(--text-primary)">pending</strong> (tab-separated).</p>
+                <p style="font-size:15px;color:var(--text-secondary);margin-bottom:12px;">Paste data withdraw status <strong>pending</strong> (tab-separated).</p>
                 <textarea id="inputPending" placeholder="07/05/2026 22:53:07\tpending\tSMB5 (...)\tLIT-xxx\tBank Mandiri\t..."></textarea>
                 <div class="loading-bar" id="barPending"></div>
                 <div class="btn-group">
@@ -257,36 +251,58 @@
                     <button class="btn btn-secondary" onclick="clearTab('pending')"><span>🗑️</span> Hapus</button>
                 </div>
             </div>
-
             <div class="stats hidden" id="statsPending">
                 <div class="stat-card"><div class="stat-value" id="pendingTotal">0</div><div class="stat-label">Total Baris</div></div>
                 <div class="stat-card"><div class="stat-value" id="pendingFiltered">0</div><div class="stat-label">Status Pending</div></div>
                 <div class="stat-card"><div class="stat-value" id="pendingProcessed">0</div><div class="stat-label">Diproses</div></div>
             </div>
-
             <div class="card">
                 <div class="card-title">📤 Output (4 Kolom)</div>
                 <div class="output-wrapper">
-                    <div class="mode-info">
-                        <span>📋</span>
-                        <div><strong>Format:</strong> <code>A</code>=Timestamp | <code>B</code>=TxID | <code>C</code>=Amount | <code>D</code>=Fee<br><span style="margin-top:5px;display:block">🔁 Urutan: bawah → atas | 💰 "Rp" prefix otomatis dihapus</span></div>
-                    </div>
-                    <div class="btn-group">
-                        <button class="btn btn-success" onclick="copyOutput('pending')"><span>📋</span> Copy Hasil</button>
-                        <button class="btn btn-secondary" onclick="downloadCSV('pending')"><span>💾</span> Download CSV</button>
-                    </div>
+                    <div class="mode-info"><span>📋</span><div><strong>Format:</strong> <code>A</code>=Timestamp | <code>B</code>=TxID | <code>C</code>=Amount | <code>D</code>=Fee<br><span>🔁 Urutan: bawah → atas | 💰 "Rp" prefix otomatis dihapus</span></div></div>
+                    <div class="btn-group"><button class="btn btn-success" onclick="copyOutput('pending')"><span>📋</span> Copy Hasil</button><button class="btn btn-secondary" onclick="downloadCSV('pending')"><span>💾</span> Download CSV</button></div>
                     <div class="output-area" id="outputPending"><em style="color:#888888;">✨ Hasil pemrosesan akan muncul di sini...</em></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- REPORT PENDING QRIS MODE -->
+        <div id="tab-qris" class="tab-content">
+            <div class="card">
+                <div class="card-title">📥 Input Data (Report Pending QRIS)</div>
+                <p style="font-size:15px;color:var(--text-secondary);margin-bottom:12px;">Paste data transaksi <strong>PENDING</strong> (tab-separated). Support format: <code>tanggal\tuserID\torderID\tnominal\tmetode\tPENDING</code></p>
+                <textarea id="inputQRIS" placeholder="01/06/2026	cruser200	LIT-fd084956-fcf9-4884-b479-e026eff5e6f1	802,000	MINERAPAY	PENDING"></textarea>
+                <div class="loading-bar" id="barQRIS"></div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="btnQRIS" onclick="processQRIS()"><span>🔄</span> Proses Data</button>
+                    <button class="btn btn-secondary" onclick="clearTab('qris')"><span>🗑️</span> Hapus</button>
+                </div>
+            </div>
+            <div class="stats hidden" id="statsQRIS">
+                <div class="stat-card"><div class="stat-value" id="qrisTotal">0</div><div class="stat-label">Total Baris</div></div>
+                <div class="stat-card"><div class="stat-value" id="qrisFiltered">0</div><div class="stat-label">Status Pending</div></div>
+                <div class="stat-card"><div class="stat-value" id="qrisProcessed">0</div><div class="stat-label">Diproses</div></div>
+            </div>
+            <div class="card">
+                <div class="card-title">📤 Hasil Ekstraksi (User ID, Order ID, Nominal)</div>
+                <div class="output-wrapper">
+                    <div class="mode-info"><span>📋</span><div><strong>Format output:</strong> User ID (diisi), Order ID, Nominal (tanpa Rp), Lampiran kosong.<br>📅 Tanggal range otomatis dari data terendah & tertinggi.</div></div>
+                    <div class="btn-group">
+                        <button class="btn btn-success" onclick="copyQRISResult()"><span>📋</span> Salin Hasil + Header</button>
+                    </div>
+                    <div id="qrisCardsContainer" class="cards-grid-pending">
+                        <div class="no-data-message">✨ Belum ada data. Tempelkan teks lalu klik Proses Data.</div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // ========== SNOW ANIMATION SCRIPT ==========
+        // SNOW
         (function() {
             const container = document.getElementById('snowContainer');
-            const snowflakesCount = 1500;
-            for (let i = 0; i < snowflakesCount; i++) {
+            for (let i = 0; i < 1500; i++) {
                 const flake = document.createElement('div');
                 flake.classList.add('snowflake');
                 const size = Math.random() * 10 + 2;
@@ -301,64 +317,195 @@
             }
         })();
 
-        // ========== MAIN APP LOGIC ==========
+        // GLOBAL FUNCTIONS
         function switchTab(mode) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelector(`.tab-btn.${mode}-mode`).classList.add('active');
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.getElementById(`tab-${mode}`).classList.add('active');
         }
-
-        function cleanPaymentMethod(method) { if (!method) return ''; return method.replace(/^Bank\s+/i, '').trim(); }
-        function cleanAmount(amount) { if (!amount) return ''; return amount.replace('Rp', '').trim(); }
-
+        function cleanPaymentMethod(method) { return method ? method.replace(/^Bank\s+/i, '').trim() : ''; }
+        function cleanAmount(amount) { return amount ? amount.replace('Rp', '').trim() : ''; }
         function processLines(input, statusFilter, mode) {
-            const lines = input.split('\n').filter(line => line.trim());
+            const lines = input.split('\n').filter(l => l.trim());
             const results = []; let filteredCount = 0;
-            lines.forEach((line, index) => {
+            lines.forEach((line, idx) => {
                 const fields = line.split('\t');
                 if (fields.length >= 8 && fields[1]?.toLowerCase().trim() === statusFilter) {
                     filteredCount++;
                     if (mode === 'failed') {
-                        const paymentMethod = cleanPaymentMethod(fields[4]?.trim() || '');
-                        const transactionId = fields[3]?.trim() || '';
-                        const amountRaw = fields[7]?.trim() || 'Rp0';
-                        const name = fields[6]?.trim() || '';
-                        const amountClean = cleanAmount(amountRaw);
-                        results.push({ index, line: [paymentMethod, '', transactionId, amountClean, name, '', '-' + amountClean].join('\t') });
+                        const payment = cleanPaymentMethod(fields[4]);
+                        const txid = fields[3];
+                        const amount = cleanAmount(fields[7]);
+                        const name = fields[6];
+                        results.push({ idx, line: [payment, '', txid, amount, name, '', '-' + amount].join('\t') });
                     } else if (mode === 'pending') {
-                        const timestamp = fields[0]?.trim() || '';
-                        const transactionId = fields[3]?.trim() || '';
-                        const amountClean = cleanAmount(fields[7]?.trim() || 'Rp0');
-                        const feeClean = cleanAmount(fields[8]?.trim() || 'Rp0');
-                        results.push({ index, line: [timestamp, transactionId, amountClean, feeClean].join('\t') });
+                        const timestamp = fields[0];
+                        const txid = fields[3];
+                        const amount = cleanAmount(fields[7]);
+                        const fee = cleanAmount(fields[8]);
+                        results.push({ idx, line: [timestamp, txid, amount, fee].join('\t') });
                     }
                 }
             });
-            results.sort((a, b) => b.index - a.index);
+            results.sort((a,b) => b.idx - a.idx);
             return { total: lines.length, filtered: filteredCount, output: results.map(r => r.line) };
         }
-
-        function setLoading(btn, bar, mode) { btn.classList.add('loading'); btn.disabled = true; bar.classList.add('active'); const out = document.getElementById(`output${mode.charAt(0).toUpperCase() + mode.slice(1)}`); out.classList.add('processing'); out.innerHTML = '<div class="processing-text"><span class="spinner"></span> Memproses data...</div>'; }
+        function setLoading(btn, bar) { btn.classList.add('loading'); btn.disabled = true; bar.classList.add('active'); }
         function finishLoading(btn, bar) { btn.classList.remove('loading'); btn.disabled = false; bar.classList.remove('active'); }
+        function showStats(mode, total, filtered, processed) {
+            const prefix = mode === 'failed' ? 'failed' : (mode === 'pending' ? 'pending' : 'qris');
+            document.getElementById(`${prefix}Total`).textContent = total;
+            document.getElementById(`${prefix}Filtered`).textContent = filtered;
+            document.getElementById(`${prefix}Processed`).textContent = processed;
+            document.getElementById(`stats${mode.charAt(0).toUpperCase() + mode.slice(1)}`).classList.remove('hidden');
+        }
+        function showOutput(mode, outputArray) {
+            const el = document.getElementById(`output${mode.charAt(0).toUpperCase() + mode.slice(1)}`);
+            if (outputArray.length) el.textContent = outputArray.join('\n');
+            else el.innerHTML = `<em style="color:#ff6b6b;">❌ Tidak ditemukan data dengan status "${mode}"</em>`;
+        }
+        function copyOutput(mode) {
+            const output = document.getElementById(`output${mode.charAt(0).toUpperCase() + mode.slice(1)}`).textContent;
+            if (!output || output.includes('Tidak ditemukan')) { showToast('⚠️ Tidak ada data!', 'warning'); return; }
+            navigator.clipboard.writeText(output).then(() => showToast('✅ Berhasil disalin!'));
+        }
+        function downloadCSV(mode) {
+            const output = document.getElementById(`output${mode.charAt(0).toUpperCase() + mode.slice(1)}`).textContent;
+            if (!output || output.includes('Tidak ditemukan')) { showToast('⚠️ Tidak ada data!', 'warning'); return; }
+            const csv = output.split('\n').map(l => l.split('\t').map(f => (f.includes(',') || f.includes('"')) ? `"${f.replace(/"/g,'""')}"` : f).join(',')).join('\n');
+            const blob = new Blob(['\ufeff'+csv], {type:'text/csv;charset=utf-8;'});
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `withdraw_${mode}_${new Date().toISOString().slice(0,10)}.csv`; a.click(); URL.revokeObjectURL(a.href);
+            showToast('📥 CSV didownload!');
+        }
+        function clearTab(mode) {
+            if (mode === 'qris') {
+                document.getElementById('inputQRIS').value = '';
+                document.getElementById('qrisCardsContainer').innerHTML = '<div class="no-data-message">✨ Kosong. Tempel data lalu klik Proses Data.</div>';
+                document.getElementById('statsQRIS').classList.add('hidden');
+                document.getElementById('barQRIS').classList.remove('active');
+                const btn = document.getElementById('btnQRIS'); if(btn) { btn.classList.remove('loading'); btn.disabled = false; }
+                currentQRISData = [];
+            } else {
+                document.getElementById(`input${mode.charAt(0).toUpperCase() + mode.slice(1)}`).value = '';
+                const out = document.getElementById(`output${mode.charAt(0).toUpperCase() + mode.slice(1)}`);
+                if(out) out.innerHTML = '<em style="color:#888888;">✨ Hasil pemrosesan akan muncul di sini...</em>';
+                document.getElementById(`stats${mode.charAt(0).toUpperCase() + mode.slice(1)}`).classList.add('hidden');
+                document.getElementById(`bar${mode.charAt(0).toUpperCase() + mode.slice(1)}`).classList.remove('active');
+                const btn = document.getElementById(`btn${mode.charAt(0).toUpperCase() + mode.slice(1)}`);
+                if(btn) { btn.classList.remove('loading'); btn.disabled = false; }
+            }
+        }
+        function showToast(message, type='success') {
+            const existing = document.querySelector('.toast'); if(existing) existing.remove();
+            const toast = document.createElement('div'); toast.className = 'toast'; toast.innerHTML = `<span>${type==='warning'?'⚠️':'✅'}</span> ${message}`;
+            document.body.appendChild(toast);
+            setTimeout(() => { toast.classList.add('hide'); setTimeout(() => toast.remove(), 300); }, 2500);
+        }
+        function processFailed() { const input = document.getElementById('inputFailed').value.trim(); if(!input) { showToast('⚠️ Paste data dulu!','warning'); return; } setLoading(document.getElementById('btnFailed'),document.getElementById('barFailed')); setTimeout(()=>{ const res = processLines(input,'failed','failed'); showStats('failed',res.total,res.filtered,res.output.length); showOutput('failed',res.output); finishLoading(document.getElementById('btnFailed'),document.getElementById('barFailed')); if(res.output.length) showToast('🎉 Data diproses!'); },500); }
+        function processPending() { const input = document.getElementById('inputPending').value.trim(); if(!input) { showToast('⚠️ Paste data dulu!','warning'); return; } setLoading(document.getElementById('btnPending'),document.getElementById('barPending')); setTimeout(()=>{ const res = processLines(input,'pending','pending'); showStats('pending',res.total,res.filtered,res.output.length); showOutput('pending',res.output); finishLoading(document.getElementById('btnPending'),document.getElementById('barPending')); if(res.output.length) showToast('🎉 Data diproses!'); },500); }
 
-        function showStats(mode, total, filtered, processed) { const prefix = mode === 'failed' ? 'failed' : 'pending'; document.getElementById(`${prefix}Total`).textContent = total; document.getElementById(`${prefix}Filtered`).textContent = filtered; document.getElementById(`${prefix}Processed`).textContent = processed; document.getElementById(`stats${mode.charAt(0).toUpperCase() + mode.slice(1)}`).classList.remove('hidden'); }
-        function showOutput(mode, outputArray) { const outputEl = document.getElementById(`output${mode.charAt(0).toUpperCase() + mode.slice(1)}`); outputEl.classList.remove('processing'); if (outputArray.length > 0) { outputEl.textContent = outputArray.join('\n'); void outputEl.offsetWidth; outputEl.classList.add('result-animate'); setTimeout(() => outputEl.classList.remove('result-animate'), 500); } else { const status = mode === 'failed' ? 'failed' : 'pending'; outputEl.innerHTML = `<em style="color:#ff6b6b;">❌ Tidak ditemukan data dengan status "${status}"</em>`; } }
+        // QRIS REPORT MODULE
+        let currentQRISData = [];
 
-        function copyOutput(mode) { const output = document.getElementById(`output${mode.charAt(0).toUpperCase() + mode.slice(1)}`).textContent; if (!output || output.includes('Tidak ditemukan')) { showToast('⚠️ Tidak ada data untuk dicopy!', 'warning'); return; } navigator.clipboard.writeText(output).then(() => showToast('✅ Berhasil disalin!')).catch(() => { const ta = document.createElement('textarea'); ta.value = output; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); showToast('✅ Berhasil disalin!'); }); }
+        function parseQRISLine(line) {
+            const parts = line.split('\t');
+            if (parts.length >= 6 && /\bpending\b/i.test(parts[5])) {
+                const tanggal = parts[0].trim();
+                const userID = parts[1].trim();
+                const orderID = parts[2].trim();
+                const nominalRaw = parts[3].trim();
+                return { tanggal, userID, orderID, nominal: nominalRaw };
+            }
+            return null;
+        }
 
-        function downloadCSV(mode) { const output = document.getElementById(`output${mode.charAt(0).toUpperCase() + mode.slice(1)}`).textContent; if (!output || output.includes('Tidak ditemukan')) { showToast('⚠️ Tidak ada data!', 'warning'); return; } const csv = output.split('\n').map(l => l.split('\t').map(f => (f.includes(',') || f.includes('"')) ? `"${f.replace(/"/g,'""')}"` : f).join(',')).join('\n'); const blob = new Blob(['\ufeff'+csv], {type:'text/csv;charset=utf-8;'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `withdraw_${mode}_${new Date().toISOString().slice(0,10)}.csv`; a.click(); URL.revokeObjectURL(url); showToast('📥 File CSV didownload!'); }
+        function processQRISData(rawText) {
+            if (!rawText.trim()) return [];
+            const lines = rawText.split(/\r?\n/);
+            const results = [];
+            for (let line of lines) {
+                line = line.trim();
+                if (!line) continue;
+                const parsed = parseQRISLine(line);
+                if (parsed) results.push(parsed);
+            }
+            return results;
+        }
 
-        function clearTab(mode) { document.getElementById(`input${mode.charAt(0).toUpperCase() + mode.slice(1)}`).value = ''; const out = document.getElementById(`output${mode.charAt(0).toUpperCase() + mode.slice(1)}`); out.classList.remove('processing','result-animate'); out.innerHTML = '<em style="color:#888888;">✨ Hasil pemrosesan akan muncul di sini...</em>'; document.getElementById(`stats${mode.charAt(0).toUpperCase() + mode.slice(1)}`).classList.add('hidden'); document.getElementById(`bar${mode.charAt(0).toUpperCase() + mode.slice(1)}`).classList.remove('active'); document.getElementById(`btn${mode.charAt(0).toUpperCase() + mode.slice(1)}`).classList.remove('loading'); document.getElementById(`btn${mode.charAt(0).toUpperCase() + mode.slice(1)}`).disabled = false; }
+        function getDateRangeFromQRIS(data) {
+            if (!data.length) return "";
+            const dates = data.map(d => {
+                const parts = d.tanggal.split('/');
+                if (parts.length === 3) return new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+                return null;
+            }).filter(d => d && !isNaN(d));
+            if (!dates.length) return "";
+            const min = new Date(Math.min(...dates));
+            const max = new Date(Math.max(...dates));
+            const monthNames = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+            if (min.getFullYear() === max.getFullYear() && min.getMonth() === max.getMonth())
+                return `${min.getDate()} - ${max.getDate()} ${monthNames[min.getMonth()]} ${min.getFullYear()}`;
+            else if (min.getFullYear() === max.getFullYear())
+                return `${min.getDate()} ${monthNames[min.getMonth()]} - ${max.getDate()} ${monthNames[max.getMonth()]} ${min.getFullYear()}`;
+            else
+                return `${min.getDate()} ${monthNames[min.getMonth()]} ${min.getFullYear()} - ${max.getDate()} ${monthNames[max.getMonth()]} ${max.getFullYear()}`;
+        }
 
-        function showToast(message, type = 'success') { const existing = document.querySelector('.toast'); if (existing) existing.remove(); const toast = document.createElement('div'); toast.className = 'toast'; toast.innerHTML = `<span>${type === 'warning' ? '⚠️' : '✅'}</span> ${message}`; document.body.appendChild(toast); setTimeout(() => { toast.classList.add('hide'); setTimeout(() => toast.remove(), 300); }, 2500); }
+        function renderQRISCards(data) {
+            const container = document.getElementById('qrisCardsContainer');
+            if (!data.length) {
+                container.innerHTML = '<div class="no-data-message">📭 Tidak ditemukan baris dengan status PENDING.</div>';
+                return;
+            }
+            let html = '';
+            for (let item of data) {
+                html += `
+                    <div class="pending-item">
+                        <div class="info-line"><div class="info-label">🆔 User ID :</div><div class="info-value">${escapeHtml(item.userID)}</div></div>
+                        <div class="info-line"><div class="info-label">🔖 Order ID :</div><div class="info-value order-id-value">${escapeHtml(item.orderID)}</div></div>
+                        <div class="info-line"><div class="info-label">💰 Nominal :</div><div class="info-value nominal-value">${escapeHtml(item.nominal)}</div></div>
+                        <div class="info-line"><div class="info-label">📎 Lampiran :</div><div class="info-value empty-value">(kosong)</div></div>
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+        }
 
-        function processFailed() { const input = document.getElementById('inputFailed').value.trim(); if (!input) { showToast('⚠️ Paste data dulu!', 'warning'); return; } setLoading(document.getElementById('btnFailed'), document.getElementById('barFailed'), 'failed'); setTimeout(() => { const result = processLines(input, 'failed', 'failed'); showStats('failed', result.total, result.filtered, result.output.length); showOutput('failed', result.output); finishLoading(document.getElementById('btnFailed'), document.getElementById('barFailed')); if (result.output.length > 0) showToast('🎉 Data berhasil diproses!'); }, 500); }
+        function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
 
-        function processPending() { const input = document.getElementById('inputPending').value.trim(); if (!input) { showToast('⚠️ Paste data dulu!', 'warning'); return; } setLoading(document.getElementById('btnPending'), document.getElementById('barPending'), 'pending'); setTimeout(() => { const result = processLines(input, 'pending', 'pending'); showStats('pending', result.total, result.filtered, result.output.length); showOutput('pending', result.output); finishLoading(document.getElementById('btnPending'), document.getElementById('barPending')); if (result.output.length > 0) showToast('🎉 Data berhasil diproses!'); }, 500); }
+        function processQRIS() {
+            const input = document.getElementById('inputQRIS').value.trim();
+            if (!input) { showToast('⚠️ Paste data dulu!','warning'); return; }
+            const btn = document.getElementById('btnQRIS'); const bar = document.getElementById('barQRIS');
+            setLoading(btn, bar);
+            setTimeout(() => {
+                const data = processQRISData(input);
+                currentQRISData = data;
+                renderQRISCards(data);
+                const totalLines = input.split('\n').filter(l => l.trim()).length;
+                const filtered = data.length;
+                showStats('qris', totalLines, filtered, filtered);
+                finishLoading(btn, bar);
+                if (filtered) showToast(`✅ ${filtered} transaksi pending ditemukan`);
+                else showToast('⚠️ Tidak ada data pending', 'warning');
+            }, 300);
+        }
 
-        document.getElementById('inputFailed').addEventListener('keydown', e => { if(e.ctrlKey && e.key==='Enter') processFailed(); });
-        document.getElementById('inputPending').addEventListener('keydown', e => { if(e.ctrlKey && e.key==='Enter') processPending(); });
+        function copyQRISResult() {
+            if (!currentQRISData.length) { showToast('Tidak ada data untuk disalin', 'warning'); return; }
+            const rangeString = getDateRangeFromQRIS(currentQRISData);
+            let result = `Info : Linetogel\nPerihal : Transaksi Withdraw Pending Qris Minerapay\nTanggal : ${rangeString || '(tanggal tidak tersedia)'}\n\n`;
+            for (let i = 0; i < currentQRISData.length; i++) {
+                const item = currentQRISData[i];
+                result += `User ID : ${item.userID}\nOrder ID : ${item.orderID}\nNominal : ${item.nominal}\nLampiran : \n`;
+                if (i < currentQRISData.length - 1) result += '\n';
+            }
+            navigator.clipboard.writeText(result).then(() => showToast(`✅ ${currentQRISData.length} transaksi + header disalin`)).catch(() => showToast('❌ Gagal menyalin', 'warning'));
+        }
+
+        window.copyQRISResult = copyQRISResult;
+        window.processQRIS = processQRIS;
     </script>
 </body>
 </html>
