@@ -216,8 +216,8 @@
         <div id="tab-failed" class="tab-content active">
             <div class="card">
                 <div class="card-title">📥 Input Data (Failed)</div>
-                <p style="font-size:15px;color:var(--text-secondary);margin-bottom:12px;">Paste data withdraw status <strong>failed</strong> (tab-separated).</p>
-                <textarea id="inputFailed" placeholder="07/05/2026 19:47:04\tfailed\tSMB5 (...)\tLIT-xxx\tOVO\t..."></textarea>
+                <p style="font-size:15px;color:var(--text-secondary);margin-bottom:12px;">Paste data withdraw status <strong>failed</strong> (tab-separated).<br>E-WALLET: kolom D akan digabung dengan kode VA + nomor rekening asli (contoh: DANA -> 3901 + nomor = 390108310930337)</p>
+                <textarea id="inputFailed" placeholder="08/06/2026 02:28:12	failed	SMB5 (minerapayline@gmail.com)	LIT-e121fdf8-4d9a-478d-88f5-7bb12d87d786	DANA	08310930337		Rp450,000	Rp1,600	(-Rp451,600)"></textarea>
                 <div class="loading-bar" id="barFailed"></div>
                 <div class="btn-group">
                     <button class="btn btn-primary" id="btnFailed" onclick="processFailed()"><span>🔄</span> Proses Data</button>
@@ -232,7 +232,7 @@
             <div class="card">
                 <div class="card-title">📤 Output (7 Kolom)</div>
                 <div class="output-wrapper">
-                    <div class="mode-info"><span>📋</span><div><strong>Format:</strong> <code>A</code>=Payment | <code>B</code>=(kosong) | <code>C</code>=TxID | <code>D</code>=Amount | <code>E</code>=Name | <code>F</code>=(kosong) | <code>G</code>=-Amount<br><span>🔁 Urutan: bawah → atas | 🏦 "Bank" prefix otomatis dihapus</span></div></div>
+                    <div class="mode-info"><span>📋</span><div><strong>Format:</strong> <code>A</code>=Payment | <code>B</code>=(kosong) | <code>C</code>=TxID | <code>D</code>=Nomor Rekening (E-WALLET: VA + nomor) | <code>E</code>=Name | <code>F</code>=(kosong) | <code>G</code>=Amount (-) tanpa Rp<br><span>🔁 Urutan: bawah → atas | 💳 E-WALLET mapping: DANA=3901, LINKAJA=09110, GOPAY=70001, OVO=39358</span></div></div>
                     <div class="btn-group"><button class="btn btn-success" onclick="copyOutput('failed')"><span>📋</span> Copy Hasil</button><button class="btn btn-secondary" onclick="downloadCSV('failed')"><span>💾</span> Download CSV</button></div>
                     <div class="output-area" id="outputFailed"><em style="color:#888888;">✨ Hasil pemrosesan akan muncul di sini...</em></div>
                 </div>
@@ -288,7 +288,7 @@
                 <div class="output-wrapper">
                     <div class="mode-info"><span>📋</span><div><strong>Format output:</strong> User ID (diisi), Order ID, Nominal (tanpa Rp), Lampiran kosong.<br>📅 Tanggal range otomatis dari data terendah & tertinggi.</div></div>
                     <div class="btn-group">
-                        <button class="btn btn-success" onclick="copyQRISResult()"><span>📋</span> Salin Hasil + Header</button>
+                        <button class="btn btn-success" id="copyQRISBtn"><span>📋</span> Salin Hasil + Header</button>
                     </div>
                     <div id="qrisCardsContainer" class="cards-grid-pending">
                         <div class="no-data-message">✨ Belum ada data. Tempelkan teks lalu klik Proses Data.</div>
@@ -325,7 +325,21 @@
             document.getElementById(`tab-${mode}`).classList.add('active');
         }
         function cleanPaymentMethod(method) { return method ? method.replace(/^Bank\s+/i, '').trim() : ''; }
-        function cleanAmount(amount) { return amount ? amount.replace('Rp', '').trim() : ''; }
+        function cleanAmount(amount) { return amount ? amount.replace(/Rp/gi, '').trim() : ''; }
+        
+        // Mapping kode virtual account untuk E-WALLET
+        function getVirtualAccountCode(paymentMethod) {
+            const method = paymentMethod.toUpperCase();
+            const map = {
+                'DANA': '3901',
+                'LINKAJA': '09110',
+                'GOPAY': '70001',
+                'OVO': '39358'
+            };
+            return map[method] || null;
+        }
+        
+        // Proses failed: kolom D = jika e-wallet, gabung kode VA + nomor rekening asli, jika bank pakai nomor rekening asli
         function processLines(input, statusFilter, mode) {
             const lines = input.split('\n').filter(l => l.trim());
             const results = []; let filteredCount = 0;
@@ -334,16 +348,30 @@
                 if (fields.length >= 8 && fields[1]?.toLowerCase().trim() === statusFilter) {
                     filteredCount++;
                     if (mode === 'failed') {
-                        const payment = cleanPaymentMethod(fields[4]);
-                        const txid = fields[3];
-                        const amount = cleanAmount(fields[7]);
-                        const name = fields[6];
-                        results.push({ idx, line: [payment, '', txid, amount, name, '', '-' + amount].join('\t') });
+                        // fields: 0=tgl,1=failed,2=userinfo,3=txid,4=bank/metode,5=rekening,6=nama,7=amount,8=fee,9=minus
+                        const paymentRaw = fields[4]?.trim() || '';
+                        const payment = cleanPaymentMethod(paymentRaw);
+                        const txid = fields[3]?.trim() || '';
+                        const originalRekening = fields[5]?.trim() || '';
+                        let rekeningFinal = originalRekening;
+                        const vaCode = getVirtualAccountCode(payment);
+                        if (vaCode && originalRekening) {
+                            // Gabungkan kode VA dengan nomor rekening asli
+                            rekeningFinal = vaCode + originalRekening;
+                        } else if (vaCode && !originalRekening) {
+                            // Jika tidak ada nomor rekening, tetap pakai kode VA saja
+                            rekeningFinal = vaCode;
+                        }
+                        const name = fields[6]?.trim() || '';
+                        const amountRaw = fields[7]?.trim() || 'Rp0';
+                        const amountPositive = cleanAmount(amountRaw);
+                        const amountNegative = '-' + amountPositive;
+                        results.push({ idx, line: [payment, '', txid, rekeningFinal, name, '', amountNegative].join('\t') });
                     } else if (mode === 'pending') {
-                        const timestamp = fields[0];
-                        const txid = fields[3];
-                        const amount = cleanAmount(fields[7]);
-                        const fee = cleanAmount(fields[8]);
+                        const timestamp = fields[0]?.trim() || '';
+                        const txid = fields[3]?.trim() || '';
+                        const amount = cleanAmount(fields[7]?.trim() || 'Rp0');
+                        const fee = cleanAmount(fields[8]?.trim() || 'Rp0');
                         results.push({ idx, line: [timestamp, txid, amount, fee].join('\t') });
                     }
                 }
@@ -351,6 +379,7 @@
             results.sort((a,b) => b.idx - a.idx);
             return { total: lines.length, filtered: filteredCount, output: results.map(r => r.line) };
         }
+        
         function setLoading(btn, bar) { btn.classList.add('loading'); btn.disabled = true; bar.classList.add('active'); }
         function finishLoading(btn, bar) { btn.classList.remove('loading'); btn.disabled = false; bar.classList.remove('active'); }
         function showStats(mode, total, filtered, processed) {
@@ -368,7 +397,7 @@
         function copyOutput(mode) {
             const output = document.getElementById(`output${mode.charAt(0).toUpperCase() + mode.slice(1)}`).textContent;
             if (!output || output.includes('Tidak ditemukan')) { showToast('⚠️ Tidak ada data!', 'warning'); return; }
-            navigator.clipboard.writeText(output).then(() => showToast('✅ Berhasil disalin!'));
+            navigator.clipboard.writeText(output).then(() => showToast('✅ Berhasil disalin!')).catch(() => fallbackCopy(output));
         }
         function downloadCSV(mode) {
             const output = document.getElementById(`output${mode.charAt(0).toUpperCase() + mode.slice(1)}`).textContent;
@@ -401,6 +430,16 @@
             const toast = document.createElement('div'); toast.className = 'toast'; toast.innerHTML = `<span>${type==='warning'?'⚠️':'✅'}</span> ${message}`;
             document.body.appendChild(toast);
             setTimeout(() => { toast.classList.add('hide'); setTimeout(() => toast.remove(), 300); }, 2500);
+        }
+        function fallbackCopy(text) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            const success = document.execCommand('copy');
+            document.body.removeChild(ta);
+            if (success) showToast('✅ Berhasil disalin!');
+            else showToast('❌ Gagal menyalin, silakan copy manual', 'warning');
         }
         function processFailed() { const input = document.getElementById('inputFailed').value.trim(); if(!input) { showToast('⚠️ Paste data dulu!','warning'); return; } setLoading(document.getElementById('btnFailed'),document.getElementById('barFailed')); setTimeout(()=>{ const res = processLines(input,'failed','failed'); showStats('failed',res.total,res.filtered,res.output.length); showOutput('failed',res.output); finishLoading(document.getElementById('btnFailed'),document.getElementById('barFailed')); if(res.output.length) showToast('🎉 Data diproses!'); },500); }
         function processPending() { const input = document.getElementById('inputPending').value.trim(); if(!input) { showToast('⚠️ Paste data dulu!','warning'); return; } setLoading(document.getElementById('btnPending'),document.getElementById('barPending')); setTimeout(()=>{ const res = processLines(input,'pending','pending'); showStats('pending',res.total,res.filtered,res.output.length); showOutput('pending',res.output); finishLoading(document.getElementById('btnPending'),document.getElementById('barPending')); if(res.output.length) showToast('🎉 Data diproses!'); },500); }
@@ -501,11 +540,17 @@
                 result += `User ID : ${item.userID}\nOrder ID : ${item.orderID}\nNominal : ${item.nominal}\nLampiran : \n`;
                 if (i < currentQRISData.length - 1) result += '\n';
             }
-            navigator.clipboard.writeText(result).then(() => showToast(`✅ ${currentQRISData.length} transaksi + header disalin`)).catch(() => showToast('❌ Gagal menyalin', 'warning'));
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(result).then(() => showToast(`✅ ${currentQRISData.length} transaksi + header disalin`)).catch(() => fallbackCopy(result));
+            } else {
+                fallbackCopy(result);
+            }
         }
 
+        document.getElementById('copyQRISBtn').addEventListener('click', copyQRISResult);
         window.copyQRISResult = copyQRISResult;
         window.processQRIS = processQRIS;
+        window.fallbackCopy = fallbackCopy;
     </script>
 </body>
 </html>
