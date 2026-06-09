@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Jadwal Shift + Offday | Bersebelahan</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #eef2f7 0%, #d9e2ec 100%);
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            padding: 1.5rem;
+            min-height: 100vh;
+            color: #1e2f3a;
+        }
+
+        .container {
+            max-width: 1500px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(3px);
+            border-radius: 2rem;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1f5e7e, #2c839c);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            display: inline-block;
+        }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 1rem 0 1.5rem 0;
+            background: #ffffffc9;
+            padding: 0.8rem 1.2rem;
+            border-radius: 2rem;
+        }
+
+        .date-picker {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: white;
+            padding: 0.3rem 1rem;
+            border-radius: 3rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+        }
+        .date-picker label { font-weight: 600; color: #1f5e7e; }
+        input[type="date"] {
+            border: 1px solid #cde0ea;
+            padding: 0.4rem 0.8rem;
+            border-radius: 2rem;
+            font-family: inherit;
+        }
+        .btn {
+            background: #2c7da0;
+            border: none;
+            padding: 0.45rem 1.2rem;
+            border-radius: 2rem;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-outline {
+            background: #eef3fc;
+            color: #1f5e7e;
+            border: 1px solid #bbd4e3;
+        }
+        .btn-outline:hover { background: #d9e6f2; transform: scale(0.97);}
+        .btn:hover { background: #1f5e7e; transform: scale(0.97);}
+
+        /* tiga kolom bersebelahan */
+        .shifts-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+        .shift-col {
+            flex: 1;
+            min-width: 260px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 1.8rem;
+            padding: 1.2rem 1rem;
+            box-shadow: 0 12px 25px -10px rgba(0,0,0,0.1);
+            border: 1px solid #ffffff;
+        }
+        .shift-header {
+            font-size: 1.5rem;
+            font-weight: 800;
+            padding-bottom: 0.6rem;
+            margin-bottom: 1rem;
+            border-bottom: 3px solid;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+        }
+        .pagi-header { border-bottom-color: #f4b942; color: #c47d2e; }
+        .malam-header { border-bottom-color: #2c6e9e; color: #1f5a7a; }
+        .offday-header { border-bottom-color: #9aaeb9; color: #5e7a8c; }
+        .shift-count {
+            font-size: 0.75rem;
+            background: #eef2f7;
+            padding: 0.2rem 0.7rem;
+            border-radius: 30px;
+            font-weight: normal;
+        }
+        .staff-list {
+            min-height: 350px;
+            max-height: 60vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+            padding: 0.2rem;
+        }
+        .staff-item {
+            background: #fefef7;
+            border: 1px solid #e2edf5;
+            border-radius: 1.2rem;
+            padding: 0.65rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.15s;
+        }
+        .staff-info {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .staff-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #1e3a4a;
+        }
+        .staff-role {
+            font-size: 0.7rem;
+            background: #e9f0f5;
+            display: inline-block;
+            width: fit-content;
+            padding: 0.15rem 0.7rem;
+            border-radius: 30px;
+            color: #2c7da0;
+            font-weight: 500;
+        }
+        .fixed-top {
+            background: #fff1e0;
+            border-left: 4px solid #f4b942;
+        }
+        .empty-zone {
+            text-align: center;
+            padding: 2rem;
+            color: #8aaec0;
+            font-style: italic;
+            background: #f9fbfd;
+            border-radius: 1.5rem;
+            border: 1px dashed #cbdde9;
+        }
+        footer {
+            margin-top: 1.8rem;
+            text-align: center;
+            font-size: 0.7rem;
+            color: #517f98;
+        }
+
+        /* Admin Modal */
+        .admin-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        .admin-modal-content {
+            background: #f0f4f9;
+            border-radius: 2rem;
+            width: 95%;
+            max-width: 1500px;
+            height: 90%;
+            overflow-y: auto;
+            padding: 1.5rem;
+            position: relative;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+        }
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            font-size: 1.8rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: #2c7da0;
+        }
+        .drag-icon {
+            font-size: 1.2rem;
+            opacity: 0.5;
+            letter-spacing: 2px;
+        }
+        .staff-item[draggable="true"] {
+            cursor: grab;
+        }
+        .staff-item[draggable="true"]:active {
+            cursor: grabbing;
+        }
+        .staff-item[draggable="true"]:hover {
+            background: #fff5e6;
+            border-color: #f2bc7b;
+            transform: translateX(3px);
+        }
+        .master-staff-panel {
+            background: #ffffffdb;
+            border-radius: 1.5rem;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        .master-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            max-height: 140px;
+            overflow-y: auto;
+            padding: 0.3rem;
+        }
+        .master-item {
+            background: #eef3fc;
+            border-radius: 2rem;
+            padding: 0.3rem 0.9rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: grab;
+            border: 1px solid #cde0ec;
+        }
+        .master-item:active { cursor: grabbing; }
+        .badge-role {
+            background: white;
+            border-radius: 30px;
+            padding: 0.1rem 0.5rem;
+            font-size: 0.7rem;
+        }
+        .instruction {
+            background: #eef2fa;
+            border-radius: 1rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
+            margin-top: 1rem;
+        }
+        .role-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .role-table th, .role-table td {
+            padding: 0.6rem;
+            border-bottom: 1px solid #d9e2ec;
+            text-align: left;
+        }
+        select {
+            padding: 0.3rem 0.6rem;
+            border-radius: 2rem;
+            border: 1px solid #bbd4e3;
+        }
+        @media (max-width: 950px) {
+            .shifts-row { flex-direction: column; }
+            .shift-col { min-width: auto; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+        <h1>📅 Jadwal Shift & Offday</h1>
+        <button class="btn btn-outline" id="adminModeBtn">🔧 Admin (Edit)</button>
+    </div>
+    <div class="toolbar">
+        <div class="date-picker">
+            <label>📆 Tanggal:</label>
+            <input type="date" id="datePicker">
+        </div>
+    </div>
+
+    <!-- Tiga kolom bersebelahan -->
+    <div class="shifts-row">
+        <div class="shift-col">
+            <div class="shift-header pagi-header">
+                🌅 PAGI
+                <span class="shift-count" id="pagiCount">0</span>
+            </div>
+            <div class="staff-list" id="pagiList"></div>
+        </div>
+        <div class="shift-col">
+            <div class="shift-header malam-header">
+                🌙 MALAM
+                <span class="shift-count" id="malamCount">0</span>
+            </div>
+            <div class="staff-list" id="malamList"></div>
+        </div>
+        <div class="shift-col">
+            <div class="shift-header offday-header">
+                🏖️ OFFDAY
+                <span class="shift-count" id="offdayCount">0</span>
+            </div>
+            <div class="staff-list" id="offdayList"></div>
+        </div>
+    </div>
+    <footer>✅ Jadwal resmi. Hubungi admin untuk perubahan shift atau offday.</footer>
+</div>
+
+<!-- MODAL ADMIN (Edit Shift + Offday) -->
+<div id="adminModal" class="admin-modal">
+    <div class="admin-modal-content">
+        <button class="close-modal" id="closeAdminModal">&times;</button>
+        <h2 style="color:#1f5e7e;">🛠️ Mode Admin - Atur Shift & Offday</h2>
+        <p style="margin-bottom: 1rem;">Drag & drop staff dari panel bawah ke kolom mana saja, atau antar kolom. Perubahan otomatis tersimpan.</p>
+        
+        <div class="shifts-row" style="margin-top: 0;">
+            <div class="shift-col">
+                <div class="shift-header pagi-header">
+                    🌅 PAGI
+                    <span class="shift-count" id="adminPagiCount">0</span>
+                </div>
+                <div class="staff-list" id="adminPagiList" data-shift="pagi"></div>
+            </div>
+            <div class="shift-col">
+                <div class="shift-header malam-header">
+                    🌙 MALAM
+                    <span class="shift-count" id="adminMalamCount">0</span>
+                </div>
+                <div class="staff-list" id="adminMalamList" data-shift="malam"></div>
+            </div>
+            <div class="shift-col">
+                <div class="shift-header offday-header">
+                    🏖️ OFFDAY
+                    <span class="shift-count" id="adminOffdayCount">0</span>
+                </div>
+                <div class="staff-list" id="adminOffdayList" data-shift="offday"></div>
+            </div>
+        </div>
+
+        <div class="master-staff-panel">
+            <div style="display: flex; justify-content: space-between; flex-wrap: wrap; margin-bottom: 0.8rem;">
+                <strong>📋 SEMUA STAFF (drag ke kolom mana saja)</strong>
+                <div>
+                    <button class="btn" id="openRoleModalBtnAdmin">⚙️ Atur Jabatan</button>
+                    <button class="btn btn-outline" id="resetAdminBtn">⟳ Reset Hari Ini</button>
+                </div>
+            </div>
+            <div class="master-list" id="masterStaffListAdmin"></div>
+            <div class="instruction">
+                🖱️ <strong>Cara:</strong> Drag staff dari atas ke kolom shift/offday. Drag antar kolom untuk memindahkan. Drag dari kolom ke area "Semua Staff" untuk menghapus. <strong>Tiga nama utama (CHARLIE, RINAL, ANDI) selalu di atas di shift Pagi/Malam, offday tidak diurutkan khusus.</strong>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Atur Jabatan -->
+<div id="roleModalAdmin" class="admin-modal" style="z-index: 3000;">
+    <div class="admin-modal-content" style="max-width: 800px; height: auto;">
+        <button class="close-modal" id="closeRoleModalAdmin">&times;</button>
+        <h3>📌 Ubah Jabatan Karyawan (CS / KKS / OP / KS)</h3>
+        <div style="overflow-x: auto;">
+            <table class="role-table" id="roleTableAdmin">
+                <thead><tr><th>Nama</th><th>Role Saat Ini</th><th>Role Baru</th></tr></thead>
+                <tbody id="roleTableBodyAdmin"></tbody>
+            </table>
+        </div>
+        <button class="btn" id="saveRoleBtnAdmin" style="margin-top:1rem;">💾 Simpan Semua Perubahan</button>
+    </div>
+</div>
+
+<script>
+    // ======================= DATA MASTER STAFF =======================
+    const TOP_NAMES = ["CHARLIE", "RINAL ABDILLAH NASUTION", "ANDI"];
+
+    const defaultStaffMaster = [
+        { name: "CHARLIE", role: "CS" }, { name: "ANDI", role: "CS" }, { name: "WIDJAYA", role: "CS" },
+        { name: "TOMMY HASIM", role: "CS" }, { name: "WILLY PERAYUDA", role: "CS" }, { name: "SUHAN RAZ", role: "CS" },
+        { name: "PUTRA RAMADHANI", role: "CS" }, { name: "MAHAT SANJAYA HARAHAP", role: "KKS" }, { name: "RIDZKY RAMADHAN", role: "KKS" },
+        { name: "MAICEL TAMPUBOLON", role: "OP" }, { name: "ALFIANSYAH", role: "KS" }, { name: "EGA PRAYUDA", role: "KS" },
+        { name: "ADE OJI SHAPUTRA", role: "KS" }, { name: "MELAN PUTRI TRINITA", role: "KS" }, { name: "GUNAWAN", role: "KS" },
+        { name: "RINAL ABDILLAH NASUTION", role: "CS" }, { name: "ARI ROMANDUS FERNAND", role: "CS" }, { name: "PUTRA ANUGRAH RIZKI", role: "CS" },
+        { name: "JUNITA MARSHA", role: "CS" }, { name: "DIMAS SYAHPUTRA", role: "CS" }, { name: "ALFINO MUKTI", role: "CS" },
+        { name: "DANIEL", role: "CS" }, { name: "AMRUL", role: "KKS" }, { name: "PUTRA INSANY", role: "KKS" },
+        { name: "RIVLAN RIZKY", role: "OP" }, { name: "M REZI SYAPUTRA", role: "KS" }, { name: "BAMBANG AGUNG SUTRISNO", role: "KS" },
+        { name: "AHMAD ANDIKA", role: "KS" }, { name: "ANGGARA K S", role: "KS" }, { name: "ANDY PUTRA", role: "KS" }, { name: "GALI PRATAMA", role: "KS" }
+    ];
+
+    let staffMaster = JSON.parse(JSON.stringify(defaultStaffMaster));
+    let schedulesDB = new Map();
+
+    const defaultPagiNames = [
+        "CHARLIE", "ANDI", "WIDJAYA", "TOMMY HASIM", "WILLY PERAYUDA", "SUHAN RAZ", "PUTRA RAMADHANI",
+        "MAHAT SANJAYA HARAHAP", "RIDZKY RAMADHAN", "MAICEL TAMPUBOLON", "ALFIANSYAH", "EGA PRAYUDA",
+        "ADE OJI SHAPUTRA", "MELAN PUTRI TRINITA", "GUNAWAN"
+    ];
+    const defaultMalamNames = [
+        "RINAL ABDILLAH NASUTION", "ARI ROMANDUS FERNAND", "PUTRA ANUGRAH RIZKI", "JUNITA MARSHA",
+        "DIMAS SYAHPUTRA", "ALFINO MUKTI", "DANIEL", "AMRUL", "PUTRA INSANY", "RIVLAN RIZKY",
+        "M REZI SYAPUTRA", "BAMBANG AGUNG SUTRISNO", "AHMAD ANDIKA", "ANGGARA K S", "ANDY PUTRA", "GALI PRATAMA"
+    ];
+    const defaultOffdayNames = [];
+
+    function getRolePriority(role) {
+        switch(role) {
+            case "CS": return 1;
+            case "KKS": return 2;
+            case "OP": return 3;
+            case "KS": return 4;
+            default: return 5;
+        }
+    }
+    function sortShiftArray(shiftArray) {
+        return shiftArray.sort((a, b) => {
+            const aIsTop = TOP_NAMES.indexOf(a.name);
+            const bIsTop = TOP_NAMES.indexOf(b.name);
+            if (aIsTop !== -1 && bIsTop !== -1) return aIsTop - bIsTop;
+            if (aIsTop !== -1) return -1;
+            if (bIsTop !== -1) return 1;
+            const priorityA = getRolePriority(a.role);
+            const priorityB = getRolePriority(b.role);
+            if (priorityA !== priorityB) return priorityA - priorityB;
+            return a.name.localeCompare(b.name);
+        });
+    }
+    function sortOffdayArray(arr) { return arr; }
+
+    function getStaffWithRole(name) {
+        let found = staffMaster.find(s => s.name === name);
+        if (!found) return { name, role: "CS" };
+        return { name, role: found.role };
+    }
+
+    function buildShiftFromNames(namesArray) {
+        const raw = namesArray.map(name => getStaffWithRole(name));
+        return sortShiftArray(raw);
+    }
+
+    function initScheduleForDate(dateStr) {
+        if (!schedulesDB.has(dateStr)) {
+            const pagiShift = buildShiftFromNames(defaultPagiNames);
+            const malamShift = buildShiftFromNames(defaultMalamNames);
+            const offdayShift = defaultOffdayNames.map(name => getStaffWithRole(name));
+            schedulesDB.set(dateStr, { pagi: pagiShift, malam: malamShift, offday: offdayShift });
+        }
+        return schedulesDB.get(dateStr);
+    }
+
+    function persistAll() {
+        const toStore = {
+            staffMaster: staffMaster,
+            schedules: Object.fromEntries(schedulesDB)
+        };
+        localStorage.setItem("shiftAppData", JSON.stringify(toStore));
+    }
+
+    function loadFromStorage() {
+        const raw = localStorage.getItem("shiftAppData");
+        if (!raw) return;
+        try {
+            const data = JSON.parse(raw);
+            if (data.staffMaster) staffMaster = data.staffMaster;
+            if (data.schedules) {
+                const newMap = new Map();
+                for (let [k, v] of Object.entries(data.schedules)) {
+                    if (v.pagi) v.pagi = sortShiftArray(v.pagi);
+                    if (v.malam) v.malam = sortShiftArray(v.malam);
+                    if (v.offday) v.offday = sortOffdayArray(v.offday);
+                    newMap.set(k, v);
+                }
+                schedulesDB = newMap;
+            }
+        } catch(e) { console.warn(e); }
+    }
+
+    // Tampilan utama (read-only)
+    function renderMainView(dateStr) {
+        let schedule = schedulesDB.get(dateStr);
+        if (!schedule) schedule = initScheduleForDate(dateStr);
+        schedule.pagi = sortShiftArray(schedule.pagi);
+        schedule.malam = sortShiftArray(schedule.malam);
+        schedule.offday = sortOffdayArray(schedule.offday);
+        renderStaffListReadonly("pagiList", schedule.pagi, "pagiCount");
+        renderStaffListReadonly("malamList", schedule.malam, "malamCount");
+        renderStaffListReadonly("offdayList", schedule.offday, "offdayCount");
+    }
+
+    function renderStaffListReadonly(containerId, items, counterId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        container.innerHTML = "";
+        if (!items.length) {
+            container.innerHTML = '<div class="empty-zone">✨ Kosong</div>';
+        } else {
+            items.forEach(staff => {
+                const div = document.createElement("div");
+                div.className = "staff-item";
+                if (TOP_NAMES.includes(staff.name) && containerId !== "offdayList") div.classList.add("fixed-top");
+                div.innerHTML = `
+                    <div class="staff-info">
+                        <span class="staff-name">${escapeHtml(staff.name)}</span>
+                        <span class="staff-role">${escapeHtml(staff.role)}</span>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+        document.getElementById(counterId).innerText = items.length + " orang";
+    }
+
+    // Admin drag & drop
+    let dragSource = null;
+
+    function renderAdminLists(dateStr) {
+        let schedule = schedulesDB.get(dateStr);
+        if (!schedule) schedule = initScheduleForDate(dateStr);
+        schedule.pagi = sortShiftArray(schedule.pagi);
+        schedule.malam = sortShiftArray(schedule.malam);
+        schedule.offday = sortOffdayArray(schedule.offday);
+        renderStaffListEditable("adminPagiList", schedule.pagi, "adminPagiCount", "pagi");
+        renderStaffListEditable("adminMalamList", schedule.malam, "adminMalamCount", "malam");
+        renderStaffListEditable("adminOffdayList", schedule.offday, "adminOffdayCount", "offday");
+        renderMasterStaffAdmin();
+    }
+
+    function renderStaffListEditable(containerId, items, counterId, shiftType) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        container.innerHTML = "";
+        if (!items.length) {
+            container.innerHTML = '<div class="empty-zone">✨ Kosong, drag staff dari bawah</div>';
+        } else {
+            items.forEach((staff, idx) => {
+                const div = document.createElement("div");
+                div.className = "staff-item";
+                if (TOP_NAMES.includes(staff.name) && shiftType !== "offday") div.classList.add("fixed-top");
+                div.setAttribute("draggable", "true");
+                div.setAttribute("data-name", staff.name);
+                div.setAttribute("data-role", staff.role);
+                div.setAttribute("data-shift", shiftType);
+                div.setAttribute("data-index", idx);
+                div.innerHTML = `
+                    <div class="staff-info">
+                        <span class="staff-name">${escapeHtml(staff.name)}</span>
+                        <span class="staff-role">${escapeHtml(staff.role)}</span>
+                    </div>
+                    <div class="drag-icon">⋮⋮</div>
+                `;
+                div.addEventListener("dragstart", handleDragStartAdmin);
+                div.addEventListener("dragend", () => { dragSource = null; });
+                container.appendChild(div);
+            });
+        }
+        document.getElementById(counterId).innerText = items.length + " orang";
+    }
+
+    function renderMasterStaffAdmin() {
+        const container = document.getElementById("masterStaffListAdmin");
+        container.innerHTML = "";
+        staffMaster.forEach(staff => {
+            const chip = document.createElement("div");
+            chip.className = "master-item";
+            chip.setAttribute("draggable", "true");
+            chip.setAttribute("data-name", staff.name);
+            chip.setAttribute("data-role", staff.role);
+            chip.setAttribute("data-source", "master");
+            chip.innerHTML = `${escapeHtml(staff.name)} <span class="badge-role">${escapeHtml(staff.role)}</span>`;
+            chip.addEventListener("dragstart", handleDragStartAdmin);
+            chip.addEventListener("dragend", () => { dragSource = null; });
+            container.appendChild(chip);
+        });
+    }
+
+    function handleDragStartAdmin(e) {
+        const target = e.target.closest("[draggable='true']");
+        if (!target) { e.preventDefault(); return; }
+        const isMaster = target.classList.contains("master-item");
+        if (isMaster) {
+            dragSource = { type: "master", name: target.getAttribute("data-name"), role: target.getAttribute("data-role") };
+            e.dataTransfer.setData("text/plain", JSON.stringify(dragSource));
+            e.dataTransfer.effectAllowed = "copy";
+        } else if (target.classList.contains("staff-item")) {
+            dragSource = {
+                type: "shift",
+                shiftType: target.getAttribute("data-shift"),
+                index: parseInt(target.getAttribute("data-index")),
+                name: target.getAttribute("data-name"),
+                role: target.getAttribute("data-role")
+            };
+            e.dataTransfer.setData("text/plain", JSON.stringify(dragSource));
+            e.dataTransfer.effectAllowed = "move";
+        } else { e.preventDefault(); return; }
+        const dragIcon = document.createElement("div");
+        dragIcon.textContent = `📌 ${dragSource.name}`;
+        dragIcon.style.cssText = "position:absolute; top:-1000px; background:#2c7da0; color:white; padding:4px 12px; border-radius:40px;";
+        document.body.appendChild(dragIcon);
+        e.dataTransfer.setDragImage(dragIcon, 10, 10);
+        setTimeout(() => document.body.removeChild(dragIcon), 0);
+    }
+
+    function setupAdminDropZones() {
+        const zones = ["adminPagiList", "adminMalamList", "adminOffdayList", "masterStaffListAdmin"];
+        zones.forEach(zoneId => {
+            const zone = document.getElementById(zoneId);
+            if (!zone) return;
+            zone.addEventListener("dragover", (e) => { e.preventDefault(); e.dataTransfer.dropEffect = "move"; });
+            zone.addEventListener("drop", handleAdminDrop);
+        });
+    }
+
+    async function handleAdminDrop(e) {
+        e.preventDefault();
+        if (!dragSource) return;
+        const targetZone = e.target.closest(".staff-list, .master-list");
+        if (!targetZone) return;
+        const currentDate = document.getElementById("datePicker").value;
+        if (!currentDate) return;
+        let schedule = schedulesDB.get(currentDate);
+        if (!schedule) schedule = initScheduleForDate(currentDate);
+
+        let targetType = null;
+        if (targetZone.id === "adminPagiList") targetType = "pagi";
+        else if (targetZone.id === "adminMalamList") targetType = "malam";
+        else if (targetZone.id === "adminOffdayList") targetType = "offday";
+        else if (targetZone.id === "masterStaffListAdmin") targetType = "master";
+
+        let newPagi = [...schedule.pagi];
+        let newMalam = [...schedule.malam];
+        let newOffday = [...schedule.offday];
+
+        if (dragSource.type === "shift") {
+            const { shiftType, index, name } = dragSource;
+            if (shiftType === "pagi") {
+                if (index >= 0 && index < newPagi.length && newPagi[index].name === name) newPagi.splice(index, 1);
+                else return;
+            } else if (shiftType === "malam") {
+                if (index >= 0 && index < newMalam.length && newMalam[index].name === name) newMalam.splice(index, 1);
+                else return;
+            } else if (shiftType === "offday") {
+                if (index >= 0 && index < newOffday.length && newOffday[index].name === name) newOffday.splice(index, 1);
+                else return;
+            }
+        }
+
+        if (targetType !== "master") {
+            const staffToAdd = { name: dragSource.name, role: dragSource.role };
+            let targetArray = null;
+            if (targetType === "pagi") targetArray = newPagi;
+            else if (targetType === "malam") targetArray = newMalam;
+            else if (targetType === "offday") targetArray = newOffday;
+            if (targetArray) {
+                if (!targetArray.some(s => s.name === staffToAdd.name)) targetArray.push(staffToAdd);
+                else { showToastAdmin(`⚠️ ${staffToAdd.name} sudah ada`, "info"); renderAdminLists(currentDate); dragSource = null; return; }
+            }
+        }
+
+        schedule.pagi = sortShiftArray(newPagi);
+        schedule.malam = sortShiftArray(newMalam);
+        schedule.offday = sortOffdayArray(newOffday);
+        schedulesDB.set(currentDate, schedule);
+        persistAll();
+        renderAdminLists(currentDate);
+        renderMainView(currentDate);
+        showToastAdmin(`✅ ${dragSource.name} dipindahkan`, "success");
+        dragSource = null;
+    }
+
+    function resetAdminSchedule() {
+        const date = document.getElementById("datePicker").value;
+        if (!date) return;
+        const pagiShift = buildShiftFromNames(defaultPagiNames);
+        const malamShift = buildShiftFromNames(defaultMalamNames);
+        const offdayShift = defaultOffdayNames.map(name => getStaffWithRole(name));
+        schedulesDB.set(date, { pagi: pagiShift, malam: malamShift, offday: offdayShift });
+        persistAll();
+        renderAdminLists(date);
+        renderMainView(date);
+        showToastAdmin("↺ Reset ke jadwal awal", "reset");
+    }
+
+    // Role modal
+    function buildRoleModalAdmin() {
+        const tbody = document.getElementById("roleTableBodyAdmin");
+        tbody.innerHTML = "";
+        staffMaster.forEach(staff => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${escapeHtml(staff.name)}</td>
+                <td><span style="background:#eef2f8; padding:0.2rem 0.7rem; border-radius:30px;">${escapeHtml(staff.role)}</span></td>
+                <td><select data-name="${escapeHtml(staff.name)}" class="new-role-select-admin">
+                        <option value="CS" ${staff.role === "CS" ? "selected" : ""}>CS</option>
+                        <option value="KKS" ${staff.role === "KKS" ? "selected" : ""}>KKS</option>
+                        <option value="OP" ${staff.role === "OP" ? "selected" : ""}>OP</option>
+                        <option value="KS" ${staff.role === "KS" ? "selected" : ""}>KS</option>
+                    </select>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function saveRoleChangesAdmin() {
+        const selects = document.querySelectorAll("#roleTableBodyAdmin .new-role-select-admin");
+        const newRolesMap = new Map();
+        selects.forEach(sel => {
+            const name = sel.getAttribute("data-name");
+            if (name) newRolesMap.set(name, sel.value);
+        });
+        staffMaster = staffMaster.map(s => {
+            if (newRolesMap.has(s.name)) return { ...s, role: newRolesMap.get(s.name) };
+            return s;
+        });
+        for (let [date, schedule] of schedulesDB.entries()) {
+            const newPagi = schedule.pagi.map(p => ({ name: p.name, role: getStaffWithRole(p.name).role }));
+            const newMalam = schedule.malam.map(m => ({ name: m.name, role: getStaffWithRole(m.name).role }));
+            const newOffday = schedule.offday.map(o => ({ name: o.name, role: getStaffWithRole(o.name).role }));
+            schedulesDB.set(date, { pagi: sortShiftArray(newPagi), malam: sortShiftArray(newMalam), offday: sortOffdayArray(newOffday) });
+        }
+        persistAll();
+        const currentDate = document.getElementById("datePicker").value;
+        if (currentDate) {
+            renderAdminLists(currentDate);
+            renderMainView(currentDate);
+        }
+        document.getElementById("roleModalAdmin").style.display = "none";
+        showToastAdmin("✅ Jabatan diperbarui", "success");
+    }
+
+    function showToastAdmin(msg) {
+        let toast = document.getElementById("adminToast");
+        if (!toast) {
+            toast = document.createElement("div");
+            toast.id = "adminToast";
+            toast.style.cssText = "position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#1f4d66e6; color:white; padding:8px 18px; border-radius:40px; font-size:0.85rem; z-index:10000; backdrop-filter:blur(8px); pointer-events:none;";
+            document.body.appendChild(toast);
+        }
+        toast.textContent = msg;
+        toast.style.opacity = "1";
+        setTimeout(() => toast.style.opacity = "0", 1800);
+    }
+
+    function escapeHtml(str) { return str.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+
+    function init() {
+        loadFromStorage();
+        const today = new Date().toISOString().slice(0,10);
+        const datePicker = document.getElementById("datePicker");
+        datePicker.value = today;
+        if (!schedulesDB.has(today)) initScheduleForDate(today);
+        renderMainView(today);
+        datePicker.addEventListener("change", (e) => {
+            const newDate = e.target.value;
+            if (!schedulesDB.has(newDate)) initScheduleForDate(newDate);
+            renderMainView(newDate);
+        });
+        const adminModal = document.getElementById("adminModal");
+        const adminBtn = document.getElementById("adminModeBtn");
+        const closeAdmin = document.getElementById("closeAdminModal");
+        adminBtn.onclick = () => {
+            const currentDate = datePicker.value;
+            renderAdminLists(currentDate);
+            setupAdminDropZones();
+            adminModal.style.display = "flex";
+        };
+        closeAdmin.onclick = () => { adminModal.style.display = "none"; };
+        window.onclick = (e) => { if (e.target === adminModal) adminModal.style.display = "none"; };
+        document.getElementById("resetAdminBtn").onclick = resetAdminSchedule;
+        document.getElementById("openRoleModalBtnAdmin").onclick = () => { buildRoleModalAdmin(); document.getElementById("roleModalAdmin").style.display = "flex"; };
+        document.getElementById("closeRoleModalAdmin").onclick = () => { document.getElementById("roleModalAdmin").style.display = "none"; };
+        document.getElementById("saveRoleBtnAdmin").onclick = saveRoleChangesAdmin;
+    }
+    init();
+</script>
+</body>
+</html>
