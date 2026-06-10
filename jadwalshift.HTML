@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+<title>🐒 Jadwal Shift - Tema Monyet 🐵</title>
+
+<style>
+/* ========== TEMA MONYET ========== */
+body {
+  font-family: 'Segoe UI', 'Comic Neue', 'Arial', sans-serif;
+  background: #e8d5b5;  /* warna dasar kulit pisang */
+  margin: 0;
+  padding: 20px;
+  position: relative;
+  /* background pattern monyet (jejak kaki / garis seperti bulu) */
+  background-image: repeating-linear-gradient(45deg, #c2a15b22 0px, #c2a15b22 2px, #e8d5b5 2px, #e8d5b5 8px);
+  min-height: 100vh;
+}
+
+/* tambahan dekorasi monyet di pojok (pseudo) */
+body::before {
+  content: "🐒🐵🐒";
+  font-size: 70px;
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: 0;
+  transform: rotate(-10deg);
+}
+
+body::after {
+  content: "🍌";
+  font-size: 55px;
+  position: fixed;
+  top: 20px;
+  left: 15px;
+  opacity: 0.2;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* kontainer utama agar konten di atas dekorasi */
+#app, .nav-container, .date-box {
+  position: relative;
+  z-index: 2;
+}
+
+/* navigasi dengan gaya monyet */
+.nav-container {
+  background: #fdf8ed;
+  border-radius: 60px;
+  padding: 12px 16px;
+  margin-bottom: 25px;
+  box-shadow: 0 8px 18px rgba(92, 57, 21, 0.2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  border: 2px solid #b97f44;
+}
+
+.nav-btn {
+  background: #a5672e;
+  border: none;
+  color: #fff7e8;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 10px 20px;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: 0.2s;
+  flex: 1;
+  min-width: 100px;
+  text-align: center;
+  box-shadow: 0 3px 0 #5a3412;
+  font-family: inherit;
+}
+
+.nav-btn.today-btn {
+  background: #2c6e2c;
+  box-shadow: 0 3px 0 #1d451d;
+}
+
+.nav-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #5a3412;
+}
+
+.nav-info {
+  font-size: 14px;
+  font-weight: bold;
+  background: #ecd9b4;
+  padding: 8px 15px;
+  border-radius: 40px;
+  color: #4b2f14;
+  text-align: center;
+  white-space: nowrap;
+  border: 1px solid #c99254;
+}
+
+/* date-box (kartu jadwal) dengan tema monyet */
+.date-box {
+  background: #fffef7;
+  margin-bottom: 40px;
+  padding: 20px;
+  border-radius: 35px;
+  box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+  border: 2px solid #e5b46b;
+  transition: transform 0.1s ease;
+}
+
+.date-title {
+  text-align: center;
+  font-size: 28px;
+  font-weight: bold;
+  color: #a5581c;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  background: #feeed6;
+  display: inline-block;
+  width: 100%;
+  padding: 10px 0;
+  border-radius: 60px;
+  letter-spacing: 2px;
+  text-shadow: 2px 2px 0 #f3d9ac;
+  box-shadow: inset 0 -2px 0 #dba551;
+}
+
+/* tambahan monyet di title */
+.date-title::before {
+  content: "🐒 ";
+}
+.date-title::after {
+  content: " 🐵";
+}
+
+.wrapper {
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.shift-box {
+  width: 330px;
+  margin-bottom: 20px;
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: 0 5px 12px rgba(0,0,0,0.15);
+  transition: all 0.2s;
+  background: #fff2e2;
+  border: 1px solid #e6bc87;
+}
+
+.header {
+  background: #d9a066;
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 12px;
+  color: #2f1d0b;
+  letter-spacing: 1px;
+  text-shadow: 0 1px 0 #ffddb0;
+}
+
+.jam {
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 10px;
+}
+
+.jam-pagi {
+  background-color: #f7cf8c;
+  color: #553b1a;
+}
+
+.jam-malam {
+  background-color: #6b3f1c;
+  color: #ffe2b5;
+}
+
+.offday-title {
+  background: #8b5a2b;
+  color: #fff0cf;
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 12px;
+  margin-top: 0;
+}
+
+.name {
+  text-align: center;
+  padding: 10px;
+  font-weight: bold;
+  border-bottom: 1px solid #f0cf9f;
+  color: white;
+  text-shadow: 0 0 2px black;
+  font-size: 15px;
+  transition: background 0.1s;
+}
+
+.name:hover {
+  filter: brightness(0.95);
+  transform: scale(0.99);
+}
+
+/* role warna sesuai tema monyet (tetap kontras) */
+.csline {
+  background-color: #3e2a1f;
+}
+.cs {
+  background-color: #f4b942;
+  color: #2d1d0a;
+  text-shadow: none;
+}
+.kks {
+  background-color: #9b6e42;
+}
+.ks {
+  background-color: #7c9f3e;
+  color: #1f2f0a;
+  text-shadow: none;
+}
+
+.empty {
+  text-align: center;
+  color: #ab7e4a;
+  font-style: italic;
+  padding: 15px;
+  background: #f9e5ce;
+}
+
+/* mobile responsif */
+@media (max-width: 550px) {
+  body {
+    padding: 12px;
+  }
+  .nav-container {
+    border-radius: 40px;
+    padding: 8px 10px;
+  }
+  .nav-btn {
+    padding: 8px 12px;
+    font-size: 13px;
+    min-width: 70px;
+  }
+  .nav-info {
+    font-size: 11px;
+    padding: 5px 10px;
+  }
+  .date-title {
+    font-size: 22px;
+  }
+  .shift-box {
+    width: 100%;
+    max-width: 330px;
+  }
+  .header {
+    font-size: 16px;
+  }
+  body::before {
+    font-size: 50px;
+    opacity: 0.1;
+  }
+  body::after {
+    font-size: 40px;
+    opacity: 0.15;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div id="app">🐒 Memuat jadwal gaya monyet... 🍌</div>
+
+<script>
+const SHEET_ID = "1PF5foBN9USoU7XBct6u4uOObUdnH30c1MPoKzHuhv6w";
+const GID = "0";
+
+const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}`;
+
+const roleOrder = ["CS LINE", "CS", "KKS", "KS"];
+
+// Mapping nama hari Inggris -> Indonesia
+const hariInggris = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
+const hariIndonesia = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+
+// Mapping nama bulan Inggris -> Indonesia
+const bulanInggris = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
+const bulanIndonesia = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+
+// Mendapatkan tanggal hari ini (local date, jam 00:00:00)
+function getTodayLocalDate() {
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+}
+
+// Fungsi cerdas untuk mengubah nilai apapun menjadi Date object (local date, tanpa waktu)
+function parseDateFromRaw(rawValue) {
+  if (!rawValue) return null;
+  let str = String(rawValue).trim();
+  
+  // Coba parse sebagai Date(...) dari Google Sheets
+  let dateMatch = str.match(/Date\((\d+),(\d+),(\d+)\)/);
+  if (dateMatch) {
+    let tahun = parseInt(dateMatch[1]);
+    let bulan = parseInt(dateMatch[2]); // bulan 0-index
+    let tanggal = parseInt(dateMatch[3]);
+    let dateObj = new Date(tahun, bulan, tanggal);
+    if (!isNaN(dateObj.getTime())) {
+      return new Date(tahun, bulan, tanggal);
+    }
+  }
+  
+  // Coba parse string seperti "SUNDAY, 07 JUNE 2026" atau "Sunday, 7 June 2026"
+  let regex = /([A-Za-z]+),\s*(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})/i;
+  let match = str.match(regex);
+  if (match) {
+    let hariEN = match[1].toUpperCase();
+    let tanggal = parseInt(match[2]);
+    let bulanEN = match[3].toUpperCase();
+    let tahun = parseInt(match[4]);
+    let idxBulan = bulanInggris.indexOf(bulanEN);
+    if (idxBulan !== -1) {
+      return new Date(tahun, idxBulan, tanggal);
+    }
+  }
+  
+  // Coba parse sebagai timestamp numerik (Excel serial)
+  if (!isNaN(str) && str.length > 5) {
+    let num = parseFloat(str);
+    let excelEpoch = new Date(1899, 11, 30);
+    let dateObj = new Date(excelEpoch.getTime() + num * 86400000);
+    if (!isNaN(dateObj.getTime()) && dateObj.getFullYear() > 1900) {
+      return new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
+    }
+  }
+  
+  // Fallback dengan new Date
+  let dateObj = new Date(str);
+  if (!isNaN(dateObj.getTime())) {
+    return new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
+  }
+  
+  return null;
+}
+
+// Fungsi untuk memformat Date object ke format Indonesia (tanpa jam)
+function formatDateIndonesia(dateObj) {
+  if (!dateObj || isNaN(dateObj.getTime())) return "";
+  const hariIndo = hariIndonesia[dateObj.getDay()];
+  const bulanIndo = bulanIndonesia[dateObj.getMonth()];
+  const tanggal = dateObj.getDate();
+  const tahun = dateObj.getFullYear();
+  return `${hariIndo}, ${tanggal} ${bulanIndo} ${tahun}`;
+}
+
+// Global variable untuk menyimpan daftar tanggal dan data staf
+let masterTanggalList = [];    // array of { dateObj, colIndex, rawValue }
+let masterStaffRows = [];      // array of { nama, role, shiftsByCol: [] }
+let startRowGlobal = -1;
+let endRowGlobal = -1;
+let tanggalRowIndexGlobal = -1;
+
+// untuk navigasi
+let currentIndex = -1;
+
+// render berdasarkan currentIndex
+function renderByCurrentIndex() {
+  if (!masterTanggalList.length || currentIndex < 0 || currentIndex >= masterTanggalList.length) {
+    document.getElementById("app").innerHTML = `<div style="background:#fff3cd; padding:10px;">⚠️ Data tanggal tidak valid.</div>`;
+    return;
+  }
+  
+  const target = masterTanggalList[currentIndex];
+  const dateObj = target.dateObj;
+  const colIndex = target.colIndex;
+  const tanggalFormatted = formatDateIndonesia(dateObj);
+  
+  // Kumpulkan data shift untuk kolom ini
+  const data = { PAGI: [], MALAM: [], OFFDAY: [] };
+  
+  for (let staff of masterStaffRows) {
+    const shiftRaw = staff.shiftsByCol[colIndex] || "";
+    const shift = shiftRaw.toUpperCase();
+    if (staff.nama && data[shift]) {
+      data[shift].push({ nama: staff.nama, role: staff.role });
+    } else if (staff.nama && shift && !data[shift]) {
+      // shift tidak dikenal: ignore
+    }
+  }
+  
+  // Urutkan berdasarkan roleOrder
+  Object.keys(data).forEach(shift => {
+    data[shift].sort((a, b) => roleOrder.indexOf(a.role) - roleOrder.indexOf(b.role));
+  });
+  
+  let html = `
+    <div class="nav-container">
+      <button class="nav-btn" id="prevBtn">◀ Sebelumnya</button>
+      <button class="nav-btn today-btn" id="todayBtn">📅 Hari Ini 🐵</button>
+      <button class="nav-btn" id="nextBtn">Berikutnya ▶</button>
+      <div class="nav-info" id="dateInfo">${currentIndex+1} / ${masterTanggalList.length}</div>
+    </div>
+    <div class="date-box">
+      <div class="date-title">📅 ${tanggalFormatted}</div>
+      <div class="wrapper">
+        ${renderShift("PAGI", "07:45 - 19:45", data.PAGI, "pagi")}
+        <div>
+          ${renderShift("MALAM", "19:45 - 07:45", data.MALAM, "malam")}
+          ${renderOffday(data.OFFDAY)}
+        </div>
+      </div>
+    </div>
+  `;
+  
+  document.getElementById("app").innerHTML = html;
+  
+  // attach event listeners setelah render
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const todayBtn = document.getElementById("todayBtn");
+  if (prevBtn) prevBtn.onclick = () => navigate(-1);
+  if (nextBtn) nextBtn.onclick = () => navigate(1);
+  if (todayBtn) todayBtn.onclick = () => goToToday();
+}
+
+function navigate(delta) {
+  let newIndex = currentIndex + delta;
+  if (newIndex >= 0 && newIndex < masterTanggalList.length) {
+    currentIndex = newIndex;
+    renderByCurrentIndex();
+  } else {
+    const btn = delta === -1 ? document.getElementById("prevBtn") : document.getElementById("nextBtn");
+    if (btn) {
+      btn.style.transform = "scale(0.95)";
+      setTimeout(() => { if(btn) btn.style.transform = ""; }, 150);
+    }
+  }
+}
+
+function goToToday() {
+  const todayDate = getTodayLocalDate();
+  let foundIdx = -1;
+  for (let i = 0; i < masterTanggalList.length; i++) {
+    const d = masterTanggalList[i].dateObj;
+    if (d && d.getTime() === todayDate.getTime()) {
+      foundIdx = i;
+      break;
+    }
+  }
+  if (foundIdx !== -1) {
+    currentIndex = foundIdx;
+    renderByCurrentIndex();
+  } else {
+    // jika tidak ada tanggal hari ini di sheet, cari yang terdekat
+    let closestIdx = 0;
+    let minDiff = Math.abs(masterTanggalList[0].dateObj - todayDate);
+    for (let i = 1; i < masterTanggalList.length; i++) {
+      const diff = Math.abs(masterTanggalList[i].dateObj - todayDate);
+      if (diff < minDiff) {
+        minDiff = diff;
+        closestIdx = i;
+      }
+    }
+    currentIndex = closestIdx;
+    renderByCurrentIndex();
+    // notifikasi kecil
+    setTimeout(() => {
+      const info = document.getElementById("dateInfo");
+      if(info) info.style.background = "#ffd966";
+      setTimeout(() => { if(info) info.style.background = "#ecd9b4"; }, 800);
+    }, 50);
+  }
+}
+
+// fungsi render shift & offday (sama seperti sebelumnya)
+function roleClass(role){
+  if(role === "CS LINE") return "csline";
+  if(role === "CS") return "cs";
+  if(role === "KKS") return "kks";
+  if(role === "KS") return "ks";
+  return "";
+}
+
+function renderShift(title, jam, list, shiftType){
+  const jamClass = shiftType === "pagi" ? "jam-pagi" : "jam-malam";
+  let html = `<div class="shift-box">
+                <div class="header">🐒 ${title} 🍌</div>
+                <div class="jam ${jamClass}">${jam}</div>`;
+  if(list.length === 0){
+    html += `<div class="empty">🤷 Tidak ada staff</div>`;
+  } else {
+    list.forEach(item => {
+      const roleClassname = roleClass(item.role);
+      html += `<div class="name ${roleClassname}">🐵 ${item.nama}</div>`;
+    });
+  }
+  html += `</div>`;
+  return html;
+}
+
+function renderOffday(list){
+  let html = `<div class="shift-box"><div class="offday-title">🚫 OFFDAY 🌴</div>`;
+  if(list.length === 0){
+    html += `<div class="empty">😴 Semua kerja (tidak off)</div>`;
+  } else {
+    list.forEach(item => {
+      const roleClassname = roleClass(item.role);
+      html += `<div class="name ${roleClassname}">🙈 ${item.nama}</div>`;
+    });
+  }
+  html += `</div>`;
+  return html;
+}
+
+// --- main fetch dan build data ---
+fetch(url)
+.then(res => res.text())
+.then(text => {
+  const json = JSON.parse(text.substring(47).slice(0, -2));
+  const rows = json.table.rows;
+  
+  console.log("Total baris di sheet:", rows.length);
+  
+  function getCell(r, c){
+    const cell = rows[r]?.c[c];
+    if(!cell) return "";
+    let value = "";
+    if(cell.f !== undefined && cell.f !== null) value = cell.f;
+    else if(cell.v !== undefined && cell.v !== null) value = cell.v;
+    else value = "";
+    return String(value).trim();
+  }
+
+  // Cari baris yang berisi tanggal (biasanya baris 1-3)
+  let tanggalRowIndex = -1;
+  for(let r = 0; r <= Math.min(4, rows.length-1); r++){
+    let found = false;
+    for(let col = 4; col <= 27; col++){
+      const val = getCell(r, col);
+      if(val && (val.includes("Date") || val.match(/\d/) || val.includes("/") || val.includes("-") || val.includes(","))){
+        found = true;
+        break;
+      }
+    }
+    if(found){
+      tanggalRowIndex = r;
+      console.log("Baris tanggal ditemukan di index:", r);
+      break;
+    }
+  }
+  
+  if(tanggalRowIndex === -1){
+    document.getElementById("app").innerHTML = `<div style="background:#fff3cd; padding:10px;">⚠️ Tidak dapat menemukan baris tanggal. Pastikan baris 1-4 berisi tanggal di kolom E sampai AB.</div>`;
+    return;
+  }
+  tanggalRowIndexGlobal = tanggalRowIndex;
+  
+  // Cari baris awal data staf (kolom B = nama)
+  let startRow = 5;
+  for(let r = 3; r <= 40; r++){
+    const namaTest = getCell(r, 1);
+    if(namaTest && namaTest.length > 0){
+      startRow = r;
+      console.log("Baris staf pertama ditemukan di index:", r, "nama:", namaTest);
+      break;
+    }
+  }
+  
+  // Cari baris akhir data staf
+  let endRow = startRow;
+  for(let r = startRow; r <= Math.min(100, rows.length-1); r++){
+    const nama = getCell(r, 1);
+    if(nama && nama.length > 0){
+      endRow = r;
+    } else {
+      let emptyCount = 0;
+      for(let i = r; i <= Math.min(r+2, rows.length-1); i++){
+        if(!getCell(i,1)) emptyCount++;
+      }
+      if(emptyCount >= 3) break;
+    }
+  }
+  console.log(`Range staf: baris ${startRow} sampai ${endRow}`);
+  startRowGlobal = startRow;
+  endRowGlobal = endRow;
+  
+  // Kumpulkan semua tanggal dari kolom E sampai AB (index 4-27)
+  const tanggalList = [];
+  for(let col = 4; col <= 27; col++){
+    const rawTanggal = getCell(tanggalRowIndex, col);
+    if(!rawTanggal) continue;
+    const dateObj = parseDateFromRaw(rawTanggal);
+    if(dateObj && !isNaN(dateObj.getTime())) {
+      tanggalList.push({ dateObj, colIndex: col, rawValue: rawTanggal });
+    }
+  }
+  
+  // Urutkan berdasarkan tanggal ascending
+  tanggalList.sort((a,b) => a.dateObj - b.dateObj);
+  
+  if(tanggalList.length === 0){
+    document.getElementById("app").innerHTML = `<div style="background:#fff3cd; padding:10px;">⚠️ Tidak ada tanggal valid di kolom E-AB.</div>`;
+    return;
+  }
+  masterTanggalList = tanggalList;
+  
+  // Baca data semua staff beserta shift per kolom
+  const staffData = [];
+  for(let row = startRow; row <= endRow; row++){
+    const nama = getCell(row, 1);
+    if(!nama) continue;
+    const role = getCell(row, 3).toUpperCase();
+    // siapkan array shift untuk setiap kolom tanggal (col 4-27)
+    const shiftsMap = {};
+    for(let col = 4; col <= 27; col++){
+      shiftsMap[col] = getCell(row, col);
+    }
+    staffData.push({
+      nama: nama,
+      role: role,
+      shiftsByCol: shiftsMap
+    });
+  }
+  masterStaffRows = staffData;
+  
+  // Tentukan index default = tanggal hari ini (jika ada)
+  const todayDate = getTodayLocalDate();
+  let defaultIndex = 0;
+  let foundToday = false;
+  for(let i = 0; i < masterTanggalList.length; i++){
+    if(masterTanggalList[i].dateObj.getTime() === todayDate.getTime()){
+      defaultIndex = i;
+      foundToday = true;
+      break;
+    }
+  }
+  if(!foundToday && masterTanggalList.length > 0){
+    let closestIdx = 0;
+    let minDiff = Math.abs(masterTanggalList[0].dateObj - todayDate);
+    for(let i=1; i<masterTanggalList.length; i++){
+      const diff = Math.abs(masterTanggalList[i].dateObj - todayDate);
+      if(diff < minDiff){
+        minDiff = diff;
+        closestIdx = i;
+      }
+    }
+    defaultIndex = closestIdx;
+    console.log("Hari ini tidak ada di jadwal, menampilkan tanggal terdekat:", formatDateIndonesia(masterTanggalList[defaultIndex].dateObj));
+  }
+  currentIndex = defaultIndex;
+  
+  // render pertama
+  renderByCurrentIndex();
+})
+.catch(err => {
+  document.getElementById("app").innerHTML = `<div style="background:#f8d7da; padding:10px;">❌ Gagal mengambil data: ${err.message}</div>`;
+  console.error(err);
+});
+</script>
+
+</body>
+</html>
