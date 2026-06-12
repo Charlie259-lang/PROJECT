@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>✨ Withdraw Formatter Pro + Report Pending QRIS</title>
+    <title>✨ Withdraw Formatter Pro + Report Pending QRIS (dengan Lampiran)</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -158,6 +158,7 @@
         .info-value { color: #f0f0f0; font-weight: 500; word-break: break-all; }
         .order-id-value { font-family: monospace; background: #1e1e1e; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.8rem; }
         .nominal-value { font-weight: 700; color: #2ecc71; }
+        .lampiran-value { color: #60a5fa; word-break: break-all; font-size: 0.85rem; }
         .empty-value { color: #777; font-style: italic; }
         .no-data-message { text-align: center; padding: 2rem; background: #0a0a0a; border-radius: 24px; color: #888; }
 
@@ -203,7 +204,7 @@
                 <div class="logo-icon">🎄</div>
                 <h1>Withdraw Formatter Pro</h1>
             </div>
-            <p class="subtitle">Extract & format withdraw data + Report Pending QRIS</p>
+            <p class="subtitle">Extract & format withdraw data + Report Pending QRIS (dengan Lampiran)</p>
         </header>
 
         <nav class="tabs">
@@ -266,13 +267,14 @@
             </div>
         </div>
 
-        <!-- REPORT PENDING QRIS MODE (URUTAN ASLI: ATAS KE BAWAH) -->
+        <!-- REPORT PENDING QRIS MODE (DENGAN LAMPIRAN) -->
         <div id="tab-qris" class="tab-content">
             <div class="card">
                 <div class="card-title">📥 Input Data (Report Pending QRIS)</div>
-                <p style="font-size:15px;color:var(--text-secondary);margin-bottom:12px;">Paste data transaksi <strong>PENDING</strong> (tab-separated). Support format: <code>tanggal\tuserID\torderID\tnominal\tmetode\tPENDING</code><br>
-                ✅ <strong>Urutan output: sesuai urutan input (atas ke bawah)</strong>.</p>
-                <textarea id="inputQRIS" placeholder="01/06/2026	cruser200	LIT-fd084956-fcf9-4884-b479-e026eff5e6f1	802,000	MINERAPAY	PENDING"></textarea>
+                <p style="font-size:15px;color:var(--text-secondary);margin-bottom:12px;">Paste data transaksi <strong>PENDING</strong> (tab-separated). Support format 6 atau 7 kolom:<br>
+                <code>tanggal\tuserID\torderID\tnominal\tmetode\tPENDING\tlampiran(opsional)</code><br>
+                ✅ Lampiran (link) akan otomatis ditangkap jika ada di kolom ke-7.</p>
+                <textarea id="inputQRIS" placeholder="10/06/2026	santo0123	LIT-d68018cf-0dd3-42fd-89cf-775155b53c82	4,712,000	MINERAPAY	PENDING	https://sleekshot.app/v/Eozc42A1akVG"></textarea>
                 <div class="loading-bar" id="barQRIS"></div>
                 <div class="btn-group">
                     <button class="btn btn-primary" id="btnQRIS" onclick="processQRIS()"><span>🔄</span> Proses Data</button>
@@ -285,9 +287,9 @@
                 <div class="stat-card"><div class="stat-value" id="qrisProcessed">0</div><div class="stat-label">Diproses</div></div>
             </div>
             <div class="card">
-                <div class="card-title">📤 Hasil Ekstraksi (User ID, Order ID, Nominal)</div>
+                <div class="card-title">📤 Hasil Ekstraksi (User ID, Order ID, Nominal, Lampiran)</div>
                 <div class="output-wrapper">
-                    <div class="mode-info"><span>📋</span><div><strong>Format output:</strong> User ID (diisi), Order ID, Nominal (tanpa Rp), Lampiran kosong.<br>📅 Tanggal range otomatis dari data terendah & tertinggi.<br>🔽 <strong>Urutan ditampilkan sesuai urutan input (atas ke bawah)</strong>.</div></div>
+                    <div class="mode-info"><span>📋</span><div><strong>Format output:</strong> User ID, Order ID, Nominal, Lampiran (link jika ada).<br>📅 Tanggal range otomatis dari data terendah & tertinggi.<br>🔽 <strong>Urutan ditampilkan sesuai urutan input (atas ke bawah)</strong>.</div></div>
                     <div class="btn-group">
                         <button class="btn btn-success" id="copyQRISBtn"><span>📋</span> Salin Hasil + Header</button>
                     </div>
@@ -442,17 +444,23 @@
         function processFailed() { const input = document.getElementById('inputFailed').value.trim(); if(!input) { showToast('⚠️ Paste data dulu!','warning'); return; } setLoading(document.getElementById('btnFailed'),document.getElementById('barFailed')); setTimeout(()=>{ const res = processLines(input,'failed','failed'); showStats('failed',res.total,res.filtered,res.output.length); showOutput('failed',res.output); finishLoading(document.getElementById('btnFailed'),document.getElementById('barFailed')); if(res.output.length) showToast('🎉 Data diproses!'); },500); }
         function processPending() { const input = document.getElementById('inputPending').value.trim(); if(!input) { showToast('⚠️ Paste data dulu!','warning'); return; } setLoading(document.getElementById('btnPending'),document.getElementById('barPending')); setTimeout(()=>{ const res = processLines(input,'pending','pending'); showStats('pending',res.total,res.filtered,res.output.length); showOutput('pending',res.output); finishLoading(document.getElementById('btnPending'),document.getElementById('barPending')); if(res.output.length) showToast('🎉 Data diproses!'); },500); }
 
-        // QRIS REPORT MODULE (URUTAN ASLI: TIDAK DIBALIK)
+        // QRIS REPORT MODULE (DENGAN LAMPIRAN - KOLOM KE-7)
         let currentQRISData = [];
 
         function parseQRISLine(line) {
             const parts = line.split('\t');
+            // Minimal 6 kolom: tanggal, userID, orderID, nominal, metode, PENDING
             if (parts.length >= 6 && /\bpending\b/i.test(parts[5])) {
                 const tanggal = parts[0].trim();
                 const userID = parts[1].trim();
                 const orderID = parts[2].trim();
                 const nominalRaw = parts[3].trim();
-                return { tanggal, userID, orderID, nominal: nominalRaw };
+                let lampiran = '';
+                // Jika ada kolom ke-7 (index 6), ambil sebagai lampiran
+                if (parts.length >= 7) {
+                    lampiran = parts[6].trim();
+                }
+                return { tanggal, userID, orderID, nominal: nominalRaw, lampiran };
             }
             return null;
         }
@@ -497,12 +505,13 @@
             }
             let html = '';
             for (let item of data) {
+                const lampiranDisplay = item.lampiran ? `<div class="info-line"><div class="info-label">📎 Lampiran :</div><div class="info-value lampiran-value">${escapeHtml(item.lampiran)}</div></div>` : `<div class="info-line"><div class="info-label">📎 Lampiran :</div><div class="info-value empty-value">(kosong)</div></div>`;
                 html += `
                     <div class="pending-item">
                         <div class="info-line"><div class="info-label">🆔 User ID :</div><div class="info-value">${escapeHtml(item.userID)}</div></div>
                         <div class="info-line"><div class="info-label">🔖 Order ID :</div><div class="info-value order-id-value">${escapeHtml(item.orderID)}</div></div>
                         <div class="info-line"><div class="info-label">💰 Nominal :</div><div class="info-value nominal-value">${escapeHtml(item.nominal)}</div></div>
-                        <div class="info-line"><div class="info-label">📎 Lampiran :</div><div class="info-value empty-value">(kosong)</div></div>
+                        ${lampiranDisplay}
                     </div>
                 `;
             }
@@ -511,21 +520,21 @@
 
         function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
 
-        // *** URUTAN SEMULA (TIDAK DIREVERSE) ***
+        // Proses QRIS (urutan asli, tanpa reverse)
         function processQRIS() {
             const input = document.getElementById('inputQRIS').value.trim();
             if (!input) { showToast('⚠️ Paste data dulu!','warning'); return; }
             const btn = document.getElementById('btnQRIS'); const bar = document.getElementById('barQRIS');
             setLoading(btn, bar);
             setTimeout(() => {
-                const data = processQRISData(input);  // tanpa reverse, urutan asli input
+                const data = processQRISData(input);
                 currentQRISData = data;
                 renderQRISCards(data);
                 const totalLines = input.split('\n').filter(l => l.trim()).length;
                 const filtered = data.length;
                 showStats('qris', totalLines, filtered, filtered);
                 finishLoading(btn, bar);
-                if (filtered) showToast(`✅ ${filtered} transaksi pending ditemukan (urutan asli input)`);
+                if (filtered) showToast(`✅ ${filtered} transaksi pending ditemukan (lampiran otomatis ditangkap)`);
                 else showToast('⚠️ Tidak ada data pending', 'warning');
             }, 300);
         }
@@ -536,11 +545,11 @@
             let result = `Info : Linetogel\nPerihal : Transaksi Withdraw Pending Qris Minerapay\nTanggal : ${rangeString || '(tanggal tidak tersedia)'}\n\n`;
             for (let i = 0; i < currentQRISData.length; i++) {
                 const item = currentQRISData[i];
-                result += `User ID : ${item.userID}\nOrder ID : ${item.orderID}\nNominal : ${item.nominal}\nLampiran : \n`;
+                result += `User ID : ${item.userID}\nOrder ID : ${item.orderID}\nNominal : ${item.nominal}\nLampiran : ${item.lampiran || ''}\n`;
                 if (i < currentQRISData.length - 1) result += '\n';
             }
             if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(result).then(() => showToast(`✅ ${currentQRISData.length} transaksi + header disalin (urutan asli)`)).catch(() => fallbackCopy(result));
+                navigator.clipboard.writeText(result).then(() => showToast(`✅ ${currentQRISData.length} transaksi + header disalin (dengan lampiran)`)).catch(() => fallbackCopy(result));
             } else {
                 fallbackCopy(result);
             }
