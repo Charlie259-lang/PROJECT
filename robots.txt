@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://charlie259-lang.github.io/PROJECT/sitemap.xml
