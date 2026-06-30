@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏦 Follow Up Bank Bermasalah (Ikon 3D) - Info via Toast</title>
+    <title>🏦 Follow Up Bank Bermasalah - Filter Follow Ulang ADM</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -522,7 +523,7 @@
             <label for="inputData">
                 <i aria-hidden="true">📥</i> Tempel data mentah (pisah tab, satu bank per baris)
             </label>
-            <textarea id="inputData" rows="8" placeholder="Contoh:&#10;23 Jan 2026	Muhamad Rifai/ WD MANDIRI	1680004260350	Muhamad Rifa’i	Rp90,050&#10;20 Nov 2025	BANK KAS DANAMON 5 / Derian	3688289218	Derian	Rp190,854,116"></textarea>
+            <textarea id="inputData" rows="8" placeholder="Contoh:&#10;23 Jan 2026	Muhamad Rifai/ WD MANDIRI	1680004260350	Muhamad Rifa’i	Rp90,050	FOLLOW ULANG KE ADM&#10;20 Nov 2025	BANK KAS DANAMON 5 / Derian	3688289218	Derian	Rp190,854,116	FOLLOW KE FINANCE&#10;&#10;Catatan: hanya STATUS AKHIR FOLLOW ULANG KE ADM yang masuk hasil."></textarea>
         </div>
         <div class="button-group">
             <button class="btn btn-primary" id="parseBtn">
@@ -551,7 +552,7 @@
     <!-- CONTOH & INFO -->
     <hr>
     <div class="example-block">
-        <strong>📌 Cara penggunaan:</strong> Tempel baris (dipisah tab) lalu klik parse. Hasil dikelompokkan (DEPO > WD > KAS) dan diurutkan prioritas bank: BCA, BNI, BRI, BSI, CIMB, DANAMON, MAYBANK, JAGO.
+        <strong>📌 Cara penggunaan:</strong> Tempel baris (dipisah tab) lalu klik parse. Hanya data dengan STATUS AKHIR = FOLLOW ULANG KE ADM yang akan masuk hasil. Hasil dikelompokkan (DEPO > WD > KAS) dan diurutkan prioritas bank: BCA, BNI, BRI, BSI, CIMB, DANAMON, MAYBANK, JAGO.
         <div>
             BANK DEPO BRI<br>
             Nama Rekening : Siti Komariah<br>
@@ -642,6 +643,77 @@
         }
 
         /**
+         * Pemisah baris dibuat fleksibel:
+         * - Utama: tab dari Google Sheet/Excel
+         * - Cadangan: spasi panjang jika data tidak ikut tab
+         */
+        function splitRow(line) {
+            const tabParts = line.split('\t').map(s => s.trim());
+            if (tabParts.length > 1) return tabParts;
+            return line.split(/\s{2,}/).map(s => s.trim()).filter(Boolean);
+        }
+
+        function normalizeHeaderName(value) {
+            return String(value || '')
+                .toUpperCase()
+                .replace(/[^A-Z0-9\s]/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
+        function cleanStatusAkhir(value) {
+            return String(value || '')
+                .replace(/\s+/g, ' ')
+                .replace(/^[-–—:|\s]+|[-–—:|\s]+$/g, '')
+                .trim();
+        }
+
+        function isHeaderRow(parts) {
+            const joined = parts.map(normalizeHeaderName).join(' | ');
+            return /STATUS\s+AKHIR/.test(joined) ||
+                   (/NAMA/.test(joined) && /REKENING/.test(joined) && /SALDO/.test(joined));
+        }
+
+        function buildHeaderMap(parts) {
+            const map = {};
+            parts.forEach((header, index) => {
+                const h = normalizeHeaderName(header);
+
+                if ((/STATUS\s+AKHIR/.test(h) || /^STATUS$/.test(h) || (/KETERANGAN/.test(h) && !/BANK/.test(h))) && map.statusIndex === undefined) {
+                    map.statusIndex = index;
+                }
+
+                if ((/NAMA\s+REKENING/.test(h) || /ATAS\s+NAMA/.test(h) || /^NAMA$/.test(h) || /PEMILIK/.test(h)) && map.namaIndex === undefined) {
+                    map.namaIndex = index;
+                }
+
+                if ((/NOMOR\s+REKENING/.test(h) || /NO\s+REKENING/.test(h) || /NO\s+REK/.test(h) || /^NOREK$/.test(h) || /^REKENING$/.test(h)) && map.noRekIndex === undefined) {
+                    map.noRekIndex = index;
+                }
+
+                if ((/SALDO/.test(h) || /BALANCE/.test(h) || /NOMINAL/.test(h)) && map.saldoIndex === undefined) {
+                    map.saldoIndex = index;
+                }
+
+                if ((/BANK/.test(h) || /KETERANGAN\s+BANK/.test(h) || /JENIS/.test(h)) && !/NAMA/.test(h) && map.bankIndex === undefined) {
+                    map.bankIndex = index;
+                }
+            });
+            return map;
+        }
+
+        function isFollowUlangKeAdm(statusAkhir) {
+            const status = normalizeHeaderName(statusAkhir);
+            // Hanya status ini yang boleh masuk hasil follow up.
+            // Variasi spasi / huruf besar kecil tetap dianggap sama.
+            return status === 'FOLLOW ULANG KE ADM';
+        }
+
+        function shouldSkipByStatusAkhir(statusAkhir) {
+            return !isFollowUlangKeAdm(statusAkhir);
+        }
+
+        /**
          * Mencari nama bank yang dikenal dalam string
          */
         function findKnownBank(str) {
@@ -719,21 +791,42 @@
             return result || 'BANK UNKNOWN';
         }
 
-        function parseRow(line) {
+        function parseRow(line, headerMap = null) {
             try {
-                const parts = line.split('\t');
-                if (parts.length < 5) return null;
-                const bankSource = parts[1]?.trim() || '';
-                const nama = parts[3]?.trim() || '';
+                const parts = splitRow(line);
+                if (parts.length < 5 || isHeaderRow(parts)) return null;
+
+                const bankIndex = headerMap?.bankIndex ?? 1;
+                const noRekIndex = headerMap?.noRekIndex ?? 2;
+                const namaIndex = headerMap?.namaIndex ?? 3;
+                const saldoIndex = headerMap?.saldoIndex ?? 4;
+
+                const bankSource = parts[bankIndex]?.trim() || '';
+                const nama = parts[namaIndex]?.trim() || '';
+                const noRek = parts[noRekIndex]?.trim() || '';
+                const saldoRaw = parts[saldoIndex]?.trim() || '';
+
+                // STATUS AKHIR biasanya kolom ke-6. Jika ada header, ikuti posisi header STATUS AKHIR.
+                // Hanya STATUS AKHIR = FOLLOW ULANG KE ADM yang akan masuk hasil.
+                // Kalau status berisi tab tambahan, semua sisa kolom tetap digabung agar tidak hilang.
+                let statusAkhir = '';
+                if (headerMap?.statusIndex !== undefined && headerMap.statusIndex < parts.length) {
+                    statusAkhir = parts.slice(headerMap.statusIndex).join(' ');
+                } else if (parts.length > 5) {
+                    statusAkhir = parts.slice(5).join(' ');
+                }
+                statusAkhir = cleanStatusAkhir(statusAkhir);
+
+                if (shouldSkipByStatusAkhir(statusAkhir)) return null;
+
                 const bank = extractBank(bankSource, nama);
-                const noRek = parts[2]?.trim() || '';
-                const saldoRaw = parts[4]?.trim() || '';
                 return {
                     bank,
                     nama,
                     noRek,
                     saldo: formatSaldo(saldoRaw),
-                    keterangan: '',
+                    keterangan: statusAkhir,
+                    statusAkhirLower: statusAkhir.toLowerCase(),
                     bankSourceLower: bankSource.toLowerCase()
                 };
             } catch (e) {
@@ -826,21 +919,32 @@
                 const lines = raw.split('\n').filter(l => l.trim() !== '');
                 const totalLines = lines.length;
                 const parsed = [];
+
+                let headerMap = null;
+                const dataLines = [];
                 lines.forEach(l => {
-                    if (!l.toLowerCase().includes('done')) {
-                        const row = parseRow(l);
-                        if (row) parsed.push(row);
+                    const parts = splitRow(l);
+                    if (!headerMap && isHeaderRow(parts)) {
+                        headerMap = buildHeaderMap(parts);
+                        return;
                     }
+                    dataLines.push(l);
                 });
-                const skipped = totalLines - parsed.length;
+
+                dataLines.forEach(l => {
+                    const row = parseRow(l, headerMap);
+                    if (row) parsed.push(row);
+                });
+
+                const skipped = totalLines - parsed.length - (headerMap ? 1 : 0);
                 const infoMessage = `✅ Berhasil memproses ${parsed.length} dari ${totalLines} baris` + 
-                                     (skipped > 0 ? ` (${skipped} baris dilewati karena format salah atau mengandung "DONE")` : '');
+                                     (skipped > 0 ? ` (${skipped} baris dilewati karena status bukan FOLLOW ULANG KE ADM / format salah)` : '');
                 
                 // Tampilkan info sebagai toast (durasi lebih lama 5 detik)
                 showToast(infoMessage, 'info', 5000);
 
                 if (!parsed.length) {
-                    outputEl.innerText = 'Tidak ada data valid. Periksa format baris.';
+                    outputEl.innerText = 'Tidak ada data valid. Pastikan STATUS AKHIR berisi FOLLOW ULANG KE ADM.';
                     countInfo.innerText = '0 entri';
                 } else {
                     const blocks = renderGroupedBlocks(parsed);
