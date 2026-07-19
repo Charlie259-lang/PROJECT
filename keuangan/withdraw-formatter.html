@@ -284,10 +284,56 @@
         }
         .xpay-help strong { color: #fff; }
 
+        /* XPAY PENDING FORMAT SELECTOR */
+        .pending-format-selector {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            margin: 0 0 22px;
+            padding: 8px;
+            background: rgba(10, 10, 10, 0.82);
+            border: 1px solid rgba(236, 72, 153, 0.34);
+            border-radius: 18px;
+            backdrop-filter: blur(14px);
+        }
+        .pending-format-btn {
+            min-height: 58px;
+            padding: 13px 18px;
+            border: 1px solid transparent;
+            border-radius: 13px;
+            background: rgba(40,40,40,0.55);
+            color: rgba(255,255,255,0.82);
+            font: inherit;
+            font-size: 15px;
+            font-weight: 700;
+            line-height: 1.35;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            text-align: center;
+        }
+        .pending-format-btn:hover {
+            background: rgba(236,72,153,0.12);
+            color: #fff;
+        }
+        .pending-format-btn.active {
+            color: #fff;
+            border-color: rgba(244,63,94,0.72);
+            background: linear-gradient(135deg, rgba(236,72,153,0.34), rgba(244,63,94,0.20));
+            box-shadow: inset 0 0 20px rgba(236,72,153,0.12), 0 8px 24px rgba(236,72,153,0.14);
+        }
+        .pending-format-content { display: none; }
+        .pending-format-content.active { display: block; animation: contentFade 0.35s ease; }
+
         @media (max-width: 768px) {
             .provider-selector { grid-template-columns: 1fr; }
             .provider-btn { min-height: 52px; font-size: 15px; }
             .xpay-tab-btn { font-size: 16px; padding: 15px; }
+            .pending-format-selector { grid-template-columns: 1fr; }
+            .pending-format-btn { min-height: 52px; font-size: 14px; }
         }
 
     </style>
@@ -463,7 +509,8 @@
                 <div class="card">
                     <div class="card-title">📥 Input Data XPAY Pending</div>
                     <p style="font-size:15px;color:var(--text-secondary);margin-bottom:12px;">
-                        Tempel satu atau banyak blok withdraw XPAY pending. Fee output dibuat otomatis menjadi <strong>1,500</strong> dan status menjadi <strong>PENDING</strong>.
+                        Tempel satu atau banyak blok withdraw XPAY pending. Satu kali proses akan menyiapkan dua format:
+                        <strong>REKAPAN DATA ALL PENDING QRIS X-PAY</strong> dan <strong>Cash Out / WITHDRAW</strong>.
                     </p>
                     <textarea id="inputXPayPending" placeholder="1.&#10;2026-07-19&#10;510.000&#10;1&#10;547601018539538&#10;ADEK SUZAIMI PUTRA&#10;LIT-a19f54cb-e7ae-4901-877b-d70009b540a1&#10;BKO178441710820272309295818&#10;19-07-2026 06:25:04"></textarea>
                     <div class="loading-bar" id="barXPayPending"></div>
@@ -479,18 +526,46 @@
                     <div class="stat-card"><div class="stat-value" id="xpayPendingSkipped">0</div><div class="stat-label">Dilewati</div></div>
                 </div>
 
-                <div class="card">
-                    <div class="card-title">📤 Output XPAY Pending (5 Kolom)</div>
-                    <div class="output-wrapper">
-                        <div class="mode-info"><span>📋</span><div>
-                            <strong>Format:</strong> <code>A</code>=Waktu | <code>B</code>=TxID | <code>C</code>=Nominal | <code>D</code>=1,500 | <code>E</code>=PENDING.<br>
-                            <span>💰 Contoh nominal: <strong>510.000 → 510,000</strong> | 🔽 Urutan mengikuti input.</span>
-                        </div></div>
-                        <div class="btn-group">
-                            <button class="btn btn-success" type="button" onclick="copyXPayOutput('pending')"><span>📋</span> Copy Hasil</button>
-                            <button class="btn btn-secondary" type="button" onclick="downloadXPayCSV('pending')"><span>💾</span> Download CSV</button>
+                <div class="pending-format-selector" role="tablist" aria-label="Pilih format output XPAY pending">
+                    <button class="pending-format-btn active" type="button" data-pending-format="rekap" onclick="switchXPayPendingFormat('rekap')">
+                        <span>📊</span> REKAPAN DATA ALL PENDING QRIS X-PAY
+                    </button>
+                    <button class="pending-format-btn" type="button" data-pending-format="cashout" onclick="switchXPayPendingFormat('cashout')">
+                        <span>💸</span> Cash Out / WITHDRAW
+                    </button>
+                </div>
+
+                <div id="xpay-pending-format-rekap" class="pending-format-content active">
+                    <div class="card">
+                        <div class="card-title">📤 REKAPAN DATA ALL PENDING QRIS X-PAY (5 Kolom)</div>
+                        <div class="output-wrapper">
+                            <div class="mode-info"><span>📋</span><div>
+                                <strong>Format:</strong> <code>A</code>=Waktu | <code>B</code>=TxID | <code>C</code>=Nominal | <code>D</code>=1,500 | <code>E</code>=PENDING.<br>
+                                <span>💰 Contoh nominal: <strong>510.000 → 510,000</strong> | 🔽 Urutan mengikuti input.</span>
+                            </div></div>
+                            <div class="btn-group">
+                                <button class="btn btn-success" type="button" onclick="copyXPayPendingOutput('rekap')"><span>📋</span> Copy Hasil</button>
+                                <button class="btn btn-secondary" type="button" onclick="downloadXPayPendingCSV('rekap')"><span>💾</span> Download CSV</button>
+                            </div>
+                            <div class="output-area" id="outputXPayPendingRekap"><em style="color:#888888;">✨ Hasil rekap pending XPAY akan muncul di sini...</em></div>
                         </div>
-                        <div class="output-area" id="outputXPayPending"><em style="color:#888888;">✨ Hasil XPAY pending akan muncul di sini...</em></div>
+                    </div>
+                </div>
+
+                <div id="xpay-pending-format-cashout" class="pending-format-content">
+                    <div class="card">
+                        <div class="card-title">📤 Cash Out / WITHDRAW (6 Kolom)</div>
+                        <div class="output-wrapper">
+                            <div class="mode-info"><span>📋</span><div>
+                                <strong>Format:</strong> <code>A</code>=Tanggal Indonesia | <code>B</code>=linetogelsm8899@xpayapi.com | <code>C</code>=User ID (kosong) | <code>D</code>=TxID | <code>E</code>=Nominal | <code>F</code>=Referensi BKO.<br>
+                                <span>📅 Contoh tanggal: <strong>2026-07-19 → 19 Juli 2026</strong> | 🔽 Urutan mengikuti input.</span>
+                            </div></div>
+                            <div class="btn-group">
+                                <button class="btn btn-success" type="button" onclick="copyXPayPendingOutput('cashout')"><span>📋</span> Copy Hasil</button>
+                                <button class="btn btn-secondary" type="button" onclick="downloadXPayPendingCSV('cashout')"><span>💾</span> Download CSV</button>
+                            </div>
+                            <div class="output-area" id="outputXPayPendingCashout"><em style="color:#888888;">✨ Hasil Cash Out / WITHDRAW akan muncul di sini...</em></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -817,10 +892,28 @@
             return makeNegative ? `-${formatted}` : formatted;
         }
 
+        function findXPayIsoDate(block) {
+            return block.find(line => /^\d{4}-\d{2}-\d{2}$/.test(line)) || '';
+        }
+
         function findXPayDateAmount(block) {
             const dateIndex = block.findIndex(line => /^\d{4}-\d{2}-\d{2}$/.test(line));
             if (dateIndex >= 0 && block[dateIndex + 1]) return block[dateIndex + 1];
             return '';
+        }
+
+        function formatXPayIndonesianDate(isoDate) {
+            const match = String(isoDate || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+            if (!match) return '';
+            const monthNames = [
+                'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+                'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+            ];
+            const year = match[1];
+            const monthIndex = Number(match[2]) - 1;
+            const day = Number(match[3]);
+            if (monthIndex < 0 || monthIndex > 11 || day < 1 || day > 31) return '';
+            return `${day} ${monthNames[monthIndex]} ${year}`;
         }
 
         function parseXPayFailedBlock(block) {
@@ -837,91 +930,178 @@
             return ['', '', txid, account, name, '', amount].join('\t');
         }
 
-        function parseXPayPendingBlock(block) {
+        function parseXPayPendingBlockData(block) {
             const txIndex = block.findIndex(line => /^LIT-[A-Za-z0-9-]+$/i.test(line));
             if (txIndex < 0 || block.some(line => /FAILED/i.test(line))) return null;
 
+            const isoDate = findXPayIsoDate(block);
             const timestamp = [...block].reverse().find(line => /^\d{2}-\d{2}-\d{4}\s+\d{2}:\d{2}:\d{2}$/.test(line)) || '';
             const amount = formatXPayAmount(findXPayDateAmount(block), false);
-            const txid = block[txIndex];
-            if (!timestamp || !amount || !txid) return null;
+            const txid = block[txIndex] || '';
+            const reference = block[txIndex + 1] || '';
+            const dateIndonesia = formatXPayIndonesianDate(isoDate);
 
-            return [timestamp, txid, amount, '1,500', 'PENDING'].join('\t');
+            if (!isoDate || !timestamp || !amount || !txid || !reference || !dateIndonesia) return null;
+            return { isoDate, dateIndonesia, timestamp, amount, txid, reference };
         }
 
-        function processXPayMode(mode) {
-            const cap = mode.charAt(0).toUpperCase() + mode.slice(1);
-            const input = document.getElementById(`inputXPay${cap}`).value.trim();
+        function buildXPayPendingRekapRow(data) {
+            return [data.timestamp, data.txid, data.amount, '1,500', 'PENDING'].join('\t');
+        }
+
+        function buildXPayPendingCashoutRow(data) {
+            return [
+                data.dateIndonesia,
+                'linetogelsm8899@xpayapi.com',
+                '',
+                data.txid,
+                data.amount,
+                data.reference
+            ].join('\t');
+        }
+
+        function switchXPayPendingFormat(format) {
+            document.querySelectorAll('.pending-format-btn').forEach(btn => btn.classList.remove('active'));
+            const button = document.querySelector(`.pending-format-btn[data-pending-format="${format}"]`);
+            if (button) button.classList.add('active');
+
+            document.querySelectorAll('.pending-format-content').forEach(content => content.classList.remove('active'));
+            const content = document.getElementById(`xpay-pending-format-${format}`);
+            if (content) content.classList.add('active');
+        }
+
+        function processXPayFailedMode() {
+            const input = document.getElementById('inputXPayFailed').value.trim();
             if (!input) {
                 showToast('⚠️ Paste data XPAY dulu!', 'warning');
                 return;
             }
 
-            const btn = document.getElementById(`btnXPay${cap}`);
-            const bar = document.getElementById(`barXPay${cap}`);
+            const btn = document.getElementById('btnXPayFailed');
+            const bar = document.getElementById('barXPayFailed');
             setLoading(btn, bar);
 
             setTimeout(() => {
                 const blocks = splitXPayBlocks(input);
-                const parser = mode === 'failed' ? parseXPayFailedBlock : parseXPayPendingBlock;
-                const output = blocks.map(parser).filter(Boolean);
+                const output = blocks.map(parseXPayFailedBlock).filter(Boolean);
                 const skipped = Math.max(0, blocks.length - output.length);
 
-                document.getElementById(`xpay${cap}Total`).textContent = blocks.length;
-                document.getElementById(`xpay${cap}Processed`).textContent = output.length;
-                document.getElementById(`xpay${cap}Skipped`).textContent = skipped;
-                document.getElementById(`statsXPay${cap}`).classList.remove('hidden');
+                document.getElementById('xpayFailedTotal').textContent = blocks.length;
+                document.getElementById('xpayFailedProcessed').textContent = output.length;
+                document.getElementById('xpayFailedSkipped').textContent = skipped;
+                document.getElementById('statsXPayFailed').classList.remove('hidden');
 
-                const outputElement = document.getElementById(`outputXPay${cap}`);
+                const outputElement = document.getElementById('outputXPayFailed');
                 if (output.length) {
                     outputElement.textContent = output.join('\n');
-                    showToast(`✅ ${output.length} data XPAY ${mode} berhasil diproses`);
+                    showToast(`✅ ${output.length} data XPAY failed berhasil diproses`);
                 } else {
-                    outputElement.innerHTML = `<em style="color:#ff6b6b;">❌ Tidak ditemukan format XPAY ${mode} yang valid.</em>`;
-                    showToast(`⚠️ Format XPAY ${mode} tidak terbaca`, 'warning');
+                    outputElement.innerHTML = '<em style="color:#ff6b6b;">❌ Tidak ditemukan format XPAY failed yang valid.</em>';
+                    showToast('⚠️ Format XPAY failed tidak terbaca', 'warning');
                 }
                 finishLoading(btn, bar);
             }, 300);
         }
 
-        function processXPayFailed() { processXPayMode('failed'); }
-        function processXPayPending() { processXPayMode('pending'); }
+        function processXPayPendingMode() {
+            const input = document.getElementById('inputXPayPending').value.trim();
+            if (!input) {
+                showToast('⚠️ Paste data XPAY dulu!', 'warning');
+                return;
+            }
+
+            const btn = document.getElementById('btnXPayPending');
+            const bar = document.getElementById('barXPayPending');
+            setLoading(btn, bar);
+
+            setTimeout(() => {
+                const blocks = splitXPayBlocks(input);
+                const parsed = blocks.map(parseXPayPendingBlockData).filter(Boolean);
+                const rekapOutput = parsed.map(buildXPayPendingRekapRow);
+                const cashoutOutput = parsed.map(buildXPayPendingCashoutRow);
+                const skipped = Math.max(0, blocks.length - parsed.length);
+
+                document.getElementById('xpayPendingTotal').textContent = blocks.length;
+                document.getElementById('xpayPendingProcessed').textContent = parsed.length;
+                document.getElementById('xpayPendingSkipped').textContent = skipped;
+                document.getElementById('statsXPayPending').classList.remove('hidden');
+
+                const rekapElement = document.getElementById('outputXPayPendingRekap');
+                const cashoutElement = document.getElementById('outputXPayPendingCashout');
+                if (parsed.length) {
+                    rekapElement.textContent = rekapOutput.join('\n');
+                    cashoutElement.textContent = cashoutOutput.join('\n');
+                    showToast(`✅ ${parsed.length} data XPAY pending dibuat dalam 2 format`);
+                } else {
+                    const errorHtml = '<em style="color:#ff6b6b;">❌ Tidak ditemukan format XPAY pending yang valid.</em>';
+                    rekapElement.innerHTML = errorHtml;
+                    cashoutElement.innerHTML = errorHtml;
+                    showToast('⚠️ Format XPAY pending tidak terbaca', 'warning');
+                }
+                finishLoading(btn, bar);
+            }, 300);
+        }
+
+        function processXPayFailed() { processXPayFailedMode(); }
+        function processXPayPending() { processXPayPendingMode(); }
 
         function clearXPayTab(mode) {
             const cap = mode.charAt(0).toUpperCase() + mode.slice(1);
             document.getElementById(`inputXPay${cap}`).value = '';
-            document.getElementById(`outputXPay${cap}`).innerHTML = `<em style="color:#888888;">✨ Hasil XPAY ${mode} akan muncul di sini...</em>`;
             document.getElementById(`statsXPay${cap}`).classList.add('hidden');
             document.getElementById(`barXPay${cap}`).classList.remove('active');
             const btn = document.getElementById(`btnXPay${cap}`);
             if (btn) { btn.classList.remove('loading'); btn.disabled = false; }
+
+            if (mode === 'pending') {
+                document.getElementById('outputXPayPendingRekap').innerHTML = '<em style="color:#888888;">✨ Hasil rekap pending XPAY akan muncul di sini...</em>';
+                document.getElementById('outputXPayPendingCashout').innerHTML = '<em style="color:#888888;">✨ Hasil Cash Out / WITHDRAW akan muncul di sini...</em>';
+                switchXPayPendingFormat('rekap');
+            } else {
+                document.getElementById('outputXPayFailed').innerHTML = '<em style="color:#888888;">✨ Hasil XPAY failed akan muncul di sini...</em>';
+            }
         }
 
-        function getXPayOutput(mode) {
-            const cap = mode.charAt(0).toUpperCase() + mode.slice(1);
-            const element = document.getElementById(`outputXPay${cap}`);
+        function getOutputText(elementId) {
+            const element = document.getElementById(elementId);
             const output = element ? element.textContent.trim() : '';
             if (!output || output.includes('Tidak ditemukan') || output.includes('akan muncul')) return '';
             return output;
         }
 
-        function copyXPayOutput(mode) {
-            const output = getXPayOutput(mode);
+        function getXPayOutput(mode) {
+            if (mode === 'failed') return getOutputText('outputXPayFailed');
+            return '';
+        }
+
+        function getXPayPendingOutput(format) {
+            return getOutputText(format === 'cashout' ? 'outputXPayPendingCashout' : 'outputXPayPendingRekap');
+        }
+
+        function copyTextOutput(output, successMessage) {
             if (!output) {
                 showToast('⚠️ Tidak ada hasil XPAY untuk disalin!', 'warning');
                 return;
             }
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(output)
-                    .then(() => showToast('✅ Hasil XPAY berhasil disalin!'))
+                    .then(() => showToast(successMessage))
                     .catch(() => fallbackCopy(output));
             } else {
                 fallbackCopy(output);
             }
         }
 
-        function downloadXPayCSV(mode) {
-            const output = getXPayOutput(mode);
+        function copyXPayOutput(mode) {
+            copyTextOutput(getXPayOutput(mode), '✅ Hasil XPAY berhasil disalin!');
+        }
+
+        function copyXPayPendingOutput(format) {
+            const label = format === 'cashout' ? 'Cash Out / WITHDRAW' : 'Rekapan Pending QRIS';
+            copyTextOutput(getXPayPendingOutput(format), `✅ Format ${label} berhasil disalin!`);
+        }
+
+        function downloadTabSeparatedCSV(output, filename) {
             if (!output) {
                 showToast('⚠️ Tidak ada hasil XPAY untuk didownload!', 'warning');
                 return;
@@ -938,10 +1118,24 @@
             const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = `xpay_${mode}_${new Date().toISOString().slice(0,10)}.csv`;
+            link.download = filename;
             link.click();
             URL.revokeObjectURL(link.href);
             showToast('📥 CSV XPAY didownload!');
+        }
+
+        function downloadXPayCSV(mode) {
+            downloadTabSeparatedCSV(
+                getXPayOutput(mode),
+                `xpay_${mode}_${new Date().toISOString().slice(0,10)}.csv`
+            );
+        }
+
+        function downloadXPayPendingCSV(format) {
+            downloadTabSeparatedCSV(
+                getXPayPendingOutput(format),
+                `xpay_pending_${format}_${new Date().toISOString().slice(0,10)}.csv`
+            );
         }
 
         document.getElementById('copyQRISBtn').addEventListener('click', copyQRISResult);
