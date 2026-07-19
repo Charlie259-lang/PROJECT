@@ -1327,7 +1327,11 @@
 
         function getOutputText(elementId) {
             const element = document.getElementById(elementId);
-            const output = element ? element.textContent.trim() : '';
+            // Jangan gunakan trim() karena akan menghapus TAB kosong di awal baris pertama.
+            // Untuk XPAY Failed, dua TAB pertama wajib dipertahankan agar data mulai dari kolom C.
+            const output = element
+                ? element.textContent.replace(/\r/g, '').replace(/\n+$/, '')
+                : '';
             if (!output || output.includes('Tidak ditemukan') || output.includes('akan muncul')) return '';
             return output;
         }
