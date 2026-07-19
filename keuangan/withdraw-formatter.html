@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>✨ Withdraw Formatter Pro + Report Pending QRIS (dengan Lampiran)</title>
+    <title>✨ Withdraw Formatter Pro — MINERAPAY & XPAY / M2QRIS</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -190,6 +190,106 @@
             .btn { width: 100%; }
             .santa-img { width: 180px; top: 15vh; }
         }
+
+
+        /* PROVIDER SELECTOR: MINERAPAY / XPAY */
+        .provider-selector {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            margin: 2px 0 24px;
+            padding: 8px;
+            background: rgba(5, 10, 20, 0.86);
+            border: 1px solid rgba(99, 102, 241, 0.45);
+            border-radius: 22px;
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.24);
+            backdrop-filter: blur(18px);
+        }
+        .provider-btn {
+            min-height: 58px;
+            border: 1px solid transparent;
+            border-radius: 16px;
+            background: transparent;
+            color: rgba(255,255,255,0.78);
+            font: inherit;
+            font-size: 17px;
+            font-weight: 750;
+            letter-spacing: 0.35px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: var(--transition);
+        }
+        .provider-btn:hover {
+            color: #fff;
+            background: rgba(99, 102, 241, 0.12);
+        }
+        .provider-btn.active {
+            color: #fff;
+            border-color: rgba(139, 92, 246, 0.78);
+            background: linear-gradient(135deg, rgba(99,102,241,0.30), rgba(139,92,246,0.18));
+            box-shadow: inset 0 0 24px rgba(99,102,241,0.14), 0 8px 28px rgba(99,102,241,0.18);
+        }
+        .provider-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #64748b;
+            box-shadow: 0 0 0 rgba(99,102,241,0);
+            transition: var(--transition);
+            flex: 0 0 auto;
+        }
+        .provider-btn.active .provider-dot {
+            background: #a78bfa;
+            box-shadow: 0 0 13px rgba(167,139,250,0.95);
+        }
+        .provider-content { display: none; }
+        .provider-content.active { display: block; animation: contentFade 0.4s ease; }
+
+        /* XPAY SUB TABS */
+        .xpay-tab-btn {
+            flex: 1;
+            padding: 18px 22px;
+            border: none;
+            background: rgba(40,40,40,0.8);
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 18px;
+            color: rgba(255,255,255,0.9);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .xpay-tab-btn:hover { background: rgba(60,60,60,0.9); }
+        .xpay-tab-btn.active {
+            color: #fff;
+            background: linear-gradient(135deg, var(--primary-start), var(--primary-end));
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+        }
+        .xpay-tab-btn[data-xpay-tab="pending"].active {
+            background: linear-gradient(135deg, var(--secondary-start), var(--secondary-end));
+            box-shadow: 0 10px 30px rgba(236, 72, 153, 0.35);
+        }
+        .xpay-tab-content { display: none; }
+        .xpay-tab-content.active { display: block; animation: contentFade 0.4s ease; }
+        .xpay-help {
+            margin-top: 10px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        .xpay-help strong { color: #fff; }
+
+        @media (max-width: 768px) {
+            .provider-selector { grid-template-columns: 1fr; }
+            .provider-btn { min-height: 52px; font-size: 15px; }
+            .xpay-tab-btn { font-size: 16px; padding: 15px; }
+        }
+
     </style>
 </head>
 <body>
@@ -204,9 +304,21 @@
                 <div class="logo-icon">🎄</div>
                 <h1>Withdraw Formatter Pro</h1>
             </div>
-            <p class="subtitle">Extract & format withdraw data + Report Pending QRIS (dengan Lampiran)</p>
+            <p class="subtitle">Formatter withdraw MINERAPAY dan XPAY / M2QRIS</p>
         </header>
 
+
+
+        <div class="provider-selector" role="tablist" aria-label="Pilih formatter pembayaran">
+            <button class="provider-btn active" type="button" data-provider="minerapay" onclick="switchProvider('minerapay')">
+                <span class="provider-dot"></span> MINERAPAY
+            </button>
+            <button class="provider-btn" type="button" data-provider="xpay" onclick="switchProvider('xpay')">
+                <span class="provider-dot"></span> XPAY / M2QRIS
+            </button>
+        </div>
+
+        <section id="provider-minerapay" class="provider-content active">
         <nav class="tabs">
             <button class="tab-btn failed-mode active" onclick="switchTab('failed')"><span>❌</span> Failed Status</button>
             <button class="tab-btn pending-mode" onclick="switchTab('pending')"><span>⏳</span> Pending Status</button>
@@ -299,6 +411,90 @@
                 </div>
             </div>
         </div>
+
+        </section>
+
+        <section id="provider-xpay" class="provider-content">
+            <nav class="tabs xpay-tabs">
+                <button class="xpay-tab-btn active" type="button" data-xpay-tab="failed" onclick="switchXPayTab('failed')"><span>❌</span> Failed Status</button>
+                <button class="xpay-tab-btn" type="button" data-xpay-tab="pending" onclick="switchXPayTab('pending')"><span>⏳</span> Pending Status</button>
+            </nav>
+
+            <!-- XPAY FAILED -->
+            <div id="xpay-tab-failed" class="xpay-tab-content active">
+                <div class="card">
+                    <div class="card-title">📥 Input Data XPAY Failed</div>
+                    <p style="font-size:15px;color:var(--text-secondary);margin-bottom:12px;">
+                        Tempel satu atau banyak blok withdraw XPAY berstatus <strong>FAILED - REFUND</strong>.
+                        Sistem mengambil TxID, nomor rekening, nama, dan nominal secara otomatis.
+                    </p>
+                    <textarea id="inputXPayFailed" placeholder="1.&#10;2026-07-19&#10;1.300.000&#10;165&#10;0858675*****&#10;KASBARI&#10;LIT-5a5f2aeb-4000-4d8a-a6d3-1ebe5852d217&#10;exception&#10;FAILED - REFUND&#10;19-07-2026 07:07:07&#10;SUCCESS"></textarea>
+                    <div class="loading-bar" id="barXPayFailed"></div>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" id="btnXPayFailed" type="button" onclick="processXPayFailed()"><span>🔄</span> Proses Data</button>
+                        <button class="btn btn-secondary" type="button" onclick="clearXPayTab('failed')"><span>🗑️</span> Hapus</button>
+                    </div>
+                </div>
+
+                <div class="stats hidden" id="statsXPayFailed">
+                    <div class="stat-card"><div class="stat-value" id="xpayFailedTotal">0</div><div class="stat-label">Total Blok</div></div>
+                    <div class="stat-card"><div class="stat-value" id="xpayFailedProcessed">0</div><div class="stat-label">Diproses</div></div>
+                    <div class="stat-card"><div class="stat-value" id="xpayFailedSkipped">0</div><div class="stat-label">Dilewati</div></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">📤 Output XPAY Failed (7 Kolom)</div>
+                    <div class="output-wrapper">
+                        <div class="mode-info"><span>📋</span><div>
+                            <strong>Format:</strong> <code>A</code>=kosong | <code>B</code>=kosong | <code>C</code>=TxID | <code>D</code>=Nomor Rekening | <code>E</code>=Nama | <code>F</code>=kosong | <code>G</code>=Nominal minus.<br>
+                            <span>💰 Contoh nominal: <strong>1.300.000 → -1,300,000</strong> | 🔽 Urutan mengikuti input.</span>
+                        </div></div>
+                        <div class="btn-group">
+                            <button class="btn btn-success" type="button" onclick="copyXPayOutput('failed')"><span>📋</span> Copy Hasil</button>
+                            <button class="btn btn-secondary" type="button" onclick="downloadXPayCSV('failed')"><span>💾</span> Download CSV</button>
+                        </div>
+                        <div class="output-area" id="outputXPayFailed"><em style="color:#888888;">✨ Hasil XPAY failed akan muncul di sini...</em></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- XPAY PENDING -->
+            <div id="xpay-tab-pending" class="xpay-tab-content">
+                <div class="card">
+                    <div class="card-title">📥 Input Data XPAY Pending</div>
+                    <p style="font-size:15px;color:var(--text-secondary);margin-bottom:12px;">
+                        Tempel satu atau banyak blok withdraw XPAY pending. Fee output dibuat otomatis menjadi <strong>1,500</strong> dan status menjadi <strong>PENDING</strong>.
+                    </p>
+                    <textarea id="inputXPayPending" placeholder="1.&#10;2026-07-19&#10;510.000&#10;1&#10;547601018539538&#10;ADEK SUZAIMI PUTRA&#10;LIT-a19f54cb-e7ae-4901-877b-d70009b540a1&#10;BKO178441710820272309295818&#10;19-07-2026 06:25:04"></textarea>
+                    <div class="loading-bar" id="barXPayPending"></div>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" id="btnXPayPending" type="button" onclick="processXPayPending()"><span>🔄</span> Proses Data</button>
+                        <button class="btn btn-secondary" type="button" onclick="clearXPayTab('pending')"><span>🗑️</span> Hapus</button>
+                    </div>
+                </div>
+
+                <div class="stats hidden" id="statsXPayPending">
+                    <div class="stat-card"><div class="stat-value" id="xpayPendingTotal">0</div><div class="stat-label">Total Blok</div></div>
+                    <div class="stat-card"><div class="stat-value" id="xpayPendingProcessed">0</div><div class="stat-label">Diproses</div></div>
+                    <div class="stat-card"><div class="stat-value" id="xpayPendingSkipped">0</div><div class="stat-label">Dilewati</div></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">📤 Output XPAY Pending (5 Kolom)</div>
+                    <div class="output-wrapper">
+                        <div class="mode-info"><span>📋</span><div>
+                            <strong>Format:</strong> <code>A</code>=Waktu | <code>B</code>=TxID | <code>C</code>=Nominal | <code>D</code>=1,500 | <code>E</code>=PENDING.<br>
+                            <span>💰 Contoh nominal: <strong>510.000 → 510,000</strong> | 🔽 Urutan mengikuti input.</span>
+                        </div></div>
+                        <div class="btn-group">
+                            <button class="btn btn-success" type="button" onclick="copyXPayOutput('pending')"><span>📋</span> Copy Hasil</button>
+                            <button class="btn btn-secondary" type="button" onclick="downloadXPayCSV('pending')"><span>💾</span> Download CSV</button>
+                        </div>
+                        <div class="output-area" id="outputXPayPending"><em style="color:#888888;">✨ Hasil XPAY pending akan muncul di sini...</em></div>
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
 
     <script>
@@ -321,11 +517,34 @@
         })();
 
         // GLOBAL FUNCTIONS
+        function switchProvider(provider) {
+            document.querySelectorAll('.provider-btn').forEach(btn => btn.classList.remove('active'));
+            const selectedButton = document.querySelector(`.provider-btn[data-provider="${provider}"]`);
+            if (selectedButton) selectedButton.classList.add('active');
+
+            document.querySelectorAll('.provider-content').forEach(section => section.classList.remove('active'));
+            const selectedSection = document.getElementById(`provider-${provider}`);
+            if (selectedSection) selectedSection.classList.add('active');
+        }
+
         function switchTab(mode) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelector(`.tab-btn.${mode}-mode`).classList.add('active');
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            document.getElementById(`tab-${mode}`).classList.add('active');
+            const root = document.getElementById('provider-minerapay');
+            root.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            const selectedButton = root.querySelector(`.tab-btn.${mode}-mode`);
+            if (selectedButton) selectedButton.classList.add('active');
+            root.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            const selectedTab = document.getElementById(`tab-${mode}`);
+            if (selectedTab) selectedTab.classList.add('active');
+        }
+
+        function switchXPayTab(mode) {
+            const root = document.getElementById('provider-xpay');
+            root.querySelectorAll('.xpay-tab-btn').forEach(btn => btn.classList.remove('active'));
+            const selectedButton = root.querySelector(`.xpay-tab-btn[data-xpay-tab="${mode}"]`);
+            if (selectedButton) selectedButton.classList.add('active');
+            root.querySelectorAll('.xpay-tab-content').forEach(tab => tab.classList.remove('active'));
+            const selectedTab = document.getElementById(`xpay-tab-${mode}`);
+            if (selectedTab) selectedTab.classList.add('active');
         }
         function cleanPaymentMethod(method) { return method ? method.replace(/^Bank\s+/i, '').trim() : ''; }
         function cleanAmount(amount) { return amount ? amount.replace(/Rp/gi, '').trim() : ''; }
@@ -553,6 +772,176 @@
             } else {
                 fallbackCopy(result);
             }
+        }
+
+
+
+        // XPAY / M2QRIS FORMATTER
+        function normalizeXPayLines(rawText) {
+            return String(rawText || '')
+                .replace(/\r/g, '')
+                .replace(/\t+/g, '\n')
+                .split('\n')
+                .map(line => line.trim())
+                .filter(Boolean);
+        }
+
+        function splitXPayBlocks(rawText) {
+            const lines = normalizeXPayLines(rawText);
+            if (!lines.length) return [];
+
+            const blocks = [];
+            let current = [];
+            let foundNumberMarker = false;
+
+            for (const line of lines) {
+                if (/^\d+\.\s*$/.test(line)) {
+                    foundNumberMarker = true;
+                    if (current.length) blocks.push(current);
+                    current = [line];
+                } else {
+                    current.push(line);
+                }
+            }
+            if (current.length) blocks.push(current);
+
+            // Jika data tidak memiliki penomoran, perlakukan seluruh input sebagai satu transaksi.
+            if (!foundNumberMarker) return [lines];
+            return blocks.filter(block => block.some(line => /^LIT-/i.test(line)));
+        }
+
+        function formatXPayAmount(value, makeNegative = false) {
+            const digits = String(value || '').replace(/[^\d]/g, '');
+            if (!digits) return '';
+            const formatted = digits.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            return makeNegative ? `-${formatted}` : formatted;
+        }
+
+        function findXPayDateAmount(block) {
+            const dateIndex = block.findIndex(line => /^\d{4}-\d{2}-\d{2}$/.test(line));
+            if (dateIndex >= 0 && block[dateIndex + 1]) return block[dateIndex + 1];
+            return '';
+        }
+
+        function parseXPayFailedBlock(block) {
+            const txIndex = block.findIndex(line => /^LIT-[A-Za-z0-9-]+$/i.test(line));
+            const hasFailedStatus = block.some(line => /FAILED/i.test(line));
+            if (txIndex < 2 || !hasFailedStatus) return null;
+
+            const amount = formatXPayAmount(findXPayDateAmount(block), true);
+            const txid = block[txIndex];
+            const account = block[txIndex - 2] || '';
+            const name = block[txIndex - 1] || '';
+            if (!amount || !txid || !account || !name) return null;
+
+            return ['', '', txid, account, name, '', amount].join('\t');
+        }
+
+        function parseXPayPendingBlock(block) {
+            const txIndex = block.findIndex(line => /^LIT-[A-Za-z0-9-]+$/i.test(line));
+            if (txIndex < 0 || block.some(line => /FAILED/i.test(line))) return null;
+
+            const timestamp = [...block].reverse().find(line => /^\d{2}-\d{2}-\d{4}\s+\d{2}:\d{2}:\d{2}$/.test(line)) || '';
+            const amount = formatXPayAmount(findXPayDateAmount(block), false);
+            const txid = block[txIndex];
+            if (!timestamp || !amount || !txid) return null;
+
+            return [timestamp, txid, amount, '1,500', 'PENDING'].join('\t');
+        }
+
+        function processXPayMode(mode) {
+            const cap = mode.charAt(0).toUpperCase() + mode.slice(1);
+            const input = document.getElementById(`inputXPay${cap}`).value.trim();
+            if (!input) {
+                showToast('⚠️ Paste data XPAY dulu!', 'warning');
+                return;
+            }
+
+            const btn = document.getElementById(`btnXPay${cap}`);
+            const bar = document.getElementById(`barXPay${cap}`);
+            setLoading(btn, bar);
+
+            setTimeout(() => {
+                const blocks = splitXPayBlocks(input);
+                const parser = mode === 'failed' ? parseXPayFailedBlock : parseXPayPendingBlock;
+                const output = blocks.map(parser).filter(Boolean);
+                const skipped = Math.max(0, blocks.length - output.length);
+
+                document.getElementById(`xpay${cap}Total`).textContent = blocks.length;
+                document.getElementById(`xpay${cap}Processed`).textContent = output.length;
+                document.getElementById(`xpay${cap}Skipped`).textContent = skipped;
+                document.getElementById(`statsXPay${cap}`).classList.remove('hidden');
+
+                const outputElement = document.getElementById(`outputXPay${cap}`);
+                if (output.length) {
+                    outputElement.textContent = output.join('\n');
+                    showToast(`✅ ${output.length} data XPAY ${mode} berhasil diproses`);
+                } else {
+                    outputElement.innerHTML = `<em style="color:#ff6b6b;">❌ Tidak ditemukan format XPAY ${mode} yang valid.</em>`;
+                    showToast(`⚠️ Format XPAY ${mode} tidak terbaca`, 'warning');
+                }
+                finishLoading(btn, bar);
+            }, 300);
+        }
+
+        function processXPayFailed() { processXPayMode('failed'); }
+        function processXPayPending() { processXPayMode('pending'); }
+
+        function clearXPayTab(mode) {
+            const cap = mode.charAt(0).toUpperCase() + mode.slice(1);
+            document.getElementById(`inputXPay${cap}`).value = '';
+            document.getElementById(`outputXPay${cap}`).innerHTML = `<em style="color:#888888;">✨ Hasil XPAY ${mode} akan muncul di sini...</em>`;
+            document.getElementById(`statsXPay${cap}`).classList.add('hidden');
+            document.getElementById(`barXPay${cap}`).classList.remove('active');
+            const btn = document.getElementById(`btnXPay${cap}`);
+            if (btn) { btn.classList.remove('loading'); btn.disabled = false; }
+        }
+
+        function getXPayOutput(mode) {
+            const cap = mode.charAt(0).toUpperCase() + mode.slice(1);
+            const element = document.getElementById(`outputXPay${cap}`);
+            const output = element ? element.textContent.trim() : '';
+            if (!output || output.includes('Tidak ditemukan') || output.includes('akan muncul')) return '';
+            return output;
+        }
+
+        function copyXPayOutput(mode) {
+            const output = getXPayOutput(mode);
+            if (!output) {
+                showToast('⚠️ Tidak ada hasil XPAY untuk disalin!', 'warning');
+                return;
+            }
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(output)
+                    .then(() => showToast('✅ Hasil XPAY berhasil disalin!'))
+                    .catch(() => fallbackCopy(output));
+            } else {
+                fallbackCopy(output);
+            }
+        }
+
+        function downloadXPayCSV(mode) {
+            const output = getXPayOutput(mode);
+            if (!output) {
+                showToast('⚠️ Tidak ada hasil XPAY untuk didownload!', 'warning');
+                return;
+            }
+            const csv = output
+                .split('\n')
+                .map(line => line.split('\t').map(field => {
+                    return (field.includes(',') || field.includes('"'))
+                        ? `"${field.replace(/"/g, '""')}"`
+                        : field;
+                }).join(','))
+                .join('\n');
+
+            const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `xpay_${mode}_${new Date().toISOString().slice(0,10)}.csv`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+            showToast('📥 CSV XPAY didownload!');
         }
 
         document.getElementById('copyQRISBtn').addEventListener('click', copyQRISResult);
