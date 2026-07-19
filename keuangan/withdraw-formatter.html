@@ -284,6 +284,65 @@
         }
         .xpay-help strong { color: #fff; }
 
+        /* XPAY EXCEL IMPORT */
+        .excel-import-card {
+            border-color: rgba(16, 185, 129, 0.30);
+            background: linear-gradient(145deg, rgba(20, 35, 31, 0.96), rgba(24, 24, 24, 0.96));
+        }
+        .excel-upload-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .excel-file-input {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .excel-status {
+            margin-top: 15px;
+            padding: 14px 16px;
+            border-radius: 13px;
+            background: rgba(0,0,0,0.34);
+            border: 1px solid rgba(255,255,255,0.10);
+            color: var(--text-secondary);
+            font-size: 14.5px;
+            line-height: 1.55;
+            word-break: break-word;
+        }
+        .excel-status.success {
+            border-color: rgba(16,185,129,0.45);
+            color: #a7f3d0;
+            background: rgba(16,185,129,0.09);
+        }
+        .excel-status.warning {
+            border-color: rgba(245,158,11,0.48);
+            color: #fde68a;
+            background: rgba(245,158,11,0.09);
+        }
+        .excel-status.error {
+            border-color: rgba(244,63,94,0.50);
+            color: #fecdd3;
+            background: rgba(244,63,94,0.10);
+        }
+        .lookup-info {
+            margin: 0 0 18px;
+            padding: 13px 16px;
+            border-radius: 13px;
+            border: 1px solid rgba(255,255,255,0.10);
+            background: rgba(0,0,0,0.34);
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.55;
+            word-break: break-word;
+        }
+        .lookup-info.success { border-color: rgba(16,185,129,0.42); color: #a7f3d0; }
+        .lookup-info.warning { border-color: rgba(245,158,11,0.45); color: #fde68a; }
+
         /* XPAY PENDING FORMAT SELECTOR */
         .pending-format-selector {
             display: grid;
@@ -334,6 +393,8 @@
             .xpay-tab-btn { font-size: 16px; padding: 15px; }
             .pending-format-selector { grid-template-columns: 1fr; }
             .pending-format-btn { min-height: 52px; font-size: 14px; }
+            .excel-upload-row { flex-direction: column; align-items: stretch; }
+            .excel-upload-row .btn { width: 100%; }
         }
 
     </style>
@@ -493,7 +554,7 @@
                     <div class="output-wrapper">
                         <div class="mode-info"><span>📋</span><div>
                             <strong>Format:</strong> <code>A</code>=kosong | <code>B</code>=kosong | <code>C</code>=TxID | <code>D</code>=Nomor Rekening | <code>E</code>=Nama | <code>F</code>=kosong | <code>G</code>=Nominal minus.<br>
-                            <span>💰 Contoh nominal: <strong>1.300.000 → -1,300,000</strong> | 🔽 Urutan mengikuti input.</span>
+                            <span>💰 Contoh nominal: <strong>1.300.000 → -1,300,000</strong> | 🔁 Urutan: bawah → atas, sama seperti MINERAPAY.</span>
                         </div></div>
                         <div class="btn-group">
                             <button class="btn btn-success" type="button" onclick="copyXPayOutput('failed')"><span>📋</span> Copy Hasil</button>
@@ -506,6 +567,22 @@
 
             <!-- XPAY PENDING -->
             <div id="xpay-tab-pending" class="xpay-tab-content">
+                <div class="card excel-import-card">
+                    <div class="card-title">📊 Import Excel Transaksi WD untuk Ambil User ID</div>
+                    <p style="font-size:15px;color:var(--text-secondary);margin-bottom:4px;">
+                        Pilih file Excel transaksi WD. Sistem otomatis mencocokkan <strong>ORDER ID</strong> dengan data pending XPAY,
+                        lalu mengisi <strong>User ID</strong> pada kolom C format <strong>Cash Out / WITHDRAW</strong>.
+                    </p>
+                    <div class="excel-upload-row">
+                        <input class="excel-file-input" id="xpayExcelFile" type="file" accept=".xlsx,.xls,.xlsm" onchange="handleXPayExcelFile(event)">
+                        <label for="xpayExcelFile" class="btn btn-success"><span>📂</span> Pilih File Excel</label>
+                        <button class="btn btn-secondary" type="button" onclick="clearXPayExcelLookup()"><span>🧹</span> Hapus Data Excel</button>
+                    </div>
+                    <div class="excel-status" id="xpayExcelStatus">
+                        Belum ada Excel yang dimuat. Tanpa Excel, kolom User ID pada Cash Out / WITHDRAW tetap dikosongkan.
+                    </div>
+                </div>
+
                 <div class="card">
                     <div class="card-title">📥 Input Data XPAY Pending</div>
                     <p style="font-size:15px;color:var(--text-secondary);margin-bottom:12px;">
@@ -524,7 +601,11 @@
                     <div class="stat-card"><div class="stat-value" id="xpayPendingTotal">0</div><div class="stat-label">Total Blok</div></div>
                     <div class="stat-card"><div class="stat-value" id="xpayPendingProcessed">0</div><div class="stat-label">Diproses</div></div>
                     <div class="stat-card"><div class="stat-value" id="xpayPendingSkipped">0</div><div class="stat-label">Dilewati</div></div>
+                    <div class="stat-card"><div class="stat-value" id="xpayPendingMatched">0</div><div class="stat-label">User ID Cocok</div></div>
+                    <div class="stat-card"><div class="stat-value" id="xpayPendingUnmatched">0</div><div class="stat-label">User ID Tidak Ditemukan</div></div>
                 </div>
+
+                <div class="lookup-info hidden" id="xpayPendingLookupInfo"></div>
 
                 <div class="pending-format-selector" role="tablist" aria-label="Pilih format output XPAY pending">
                     <button class="pending-format-btn active" type="button" data-pending-format="rekap" onclick="switchXPayPendingFormat('rekap')">
@@ -541,7 +622,7 @@
                         <div class="output-wrapper">
                             <div class="mode-info"><span>📋</span><div>
                                 <strong>Format:</strong> <code>A</code>=Waktu | <code>B</code>=TxID | <code>C</code>=Nominal | <code>D</code>=1,500 | <code>E</code>=PENDING.<br>
-                                <span>💰 Contoh nominal: <strong>510.000 → 510,000</strong> | 🔽 Urutan mengikuti input.</span>
+                                <span>💰 Contoh nominal: <strong>510.000 → 510,000</strong> | 🔁 Urutan: bawah → atas, sama seperti MINERAPAY.</span>
                             </div></div>
                             <div class="btn-group">
                                 <button class="btn btn-success" type="button" onclick="copyXPayPendingOutput('rekap')"><span>📋</span> Copy Hasil</button>
@@ -557,8 +638,8 @@
                         <div class="card-title">📤 Cash Out / WITHDRAW (6 Kolom)</div>
                         <div class="output-wrapper">
                             <div class="mode-info"><span>📋</span><div>
-                                <strong>Format:</strong> <code>A</code>=Tanggal Indonesia | <code>B</code>=linetogelsm8899@xpayapi.com | <code>C</code>=User ID (kosong) | <code>D</code>=TxID | <code>E</code>=Nominal | <code>F</code>=Referensi BKO.<br>
-                                <span>📅 Contoh tanggal: <strong>2026-07-19 → 19 Juli 2026</strong> | 🔽 Urutan mengikuti input.</span>
+                                <strong>Format:</strong> <code>A</code>=Tanggal Indonesia | <code>B</code>=linetogelsm8899@xpayapi.com | <code>C</code>=User ID dari Excel | <code>D</code>=TxID | <code>E</code>=Nominal | <code>F</code>=Referensi BKO.<br>
+                                <span>📅 Contoh tanggal: <strong>2026-07-19 → 19 Juli 2026</strong> | 🔎 User ID dicari berdasarkan TxID/Order ID | 🔁 Urutan: bawah → atas, sama seperti MINERAPAY.</span>
                             </div></div>
                             <div class="btn-group">
                                 <button class="btn btn-success" type="button" onclick="copyXPayPendingOutput('cashout')"><span>📋</span> Copy Hasil</button>
@@ -572,6 +653,7 @@
         </section>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script>
         // SNOW
         (function() {
@@ -851,6 +933,174 @@
 
 
 
+        // XPAY EXCEL USER ID LOOKUP
+        let xpayUserIdByOrder = new Map();
+        let xpayExcelFileName = '';
+
+        function normalizeXPayOrderId(value) {
+            return String(value ?? '').trim().toUpperCase();
+        }
+
+        function setXPayExcelStatus(message, type = '') {
+            const el = document.getElementById('xpayExcelStatus');
+            if (!el) return;
+            el.className = `excel-status${type ? ` ${type}` : ''}`;
+            el.textContent = message;
+        }
+
+        function detectXPayOrderColumn(rows) {
+            const maxCols = Math.max(0, ...rows.slice(0, 250).map(row => Array.isArray(row) ? row.length : 0));
+            let bestColumn = -1;
+            let bestCount = 0;
+
+            for (let col = 0; col < maxCols; col++) {
+                let count = 0;
+                for (let row = 0; row < Math.min(rows.length, 250); row++) {
+                    const value = String(rows[row]?.[col] ?? '').trim();
+                    if (/^LIT-[A-Za-z0-9-]+$/i.test(value)) count++;
+                }
+                if (count > bestCount) {
+                    bestCount = count;
+                    bestColumn = col;
+                }
+            }
+            return bestCount > 0 ? bestColumn : -1;
+        }
+
+        function detectXPayUserIdColumn(rows) {
+            for (let row = 0; row < Math.min(rows.length, 30); row++) {
+                for (let col = 0; col < (rows[row]?.length || 0); col++) {
+                    const value = String(rows[row][col] ?? '')
+                        .replace(/\s+/g, ' ')
+                        .trim()
+                        .toUpperCase();
+                    if (value === 'USER ID' || value === 'USERID') return col;
+                }
+            }
+            return -1;
+        }
+
+        async function handleXPayExcelFile(event) {
+            const input = event?.target;
+            const file = input?.files?.[0];
+            if (!file) return;
+
+            if (typeof XLSX === 'undefined') {
+                setXPayExcelStatus('Library pembaca Excel gagal dimuat. Pastikan internet aktif, lalu buka ulang halaman.', 'error');
+                showToast('❌ Pembaca Excel tidak tersedia', 'warning');
+                input.value = '';
+                return;
+            }
+
+            setXPayExcelStatus(`Sedang membaca ${file.name}...`, 'warning');
+
+            try {
+                const buffer = await file.arrayBuffer();
+                const workbook = XLSX.read(buffer, { type: 'array', cellDates: false });
+                const lookup = new Map();
+                let totalTransactionRows = 0;
+                let duplicateOrders = 0;
+                let sheetsRead = 0;
+
+                for (const sheetName of workbook.SheetNames) {
+                    const worksheet = workbook.Sheets[sheetName];
+                    const rows = XLSX.utils.sheet_to_json(worksheet, {
+                        header: 1,
+                        defval: '',
+                        raw: false,
+                        blankrows: false
+                    });
+                    if (!rows.length) continue;
+
+                    const orderColumn = detectXPayOrderColumn(rows);
+                    const userIdColumn = detectXPayUserIdColumn(rows);
+                    if (orderColumn < 0 || userIdColumn < 0) continue;
+                    sheetsRead++;
+
+                    for (const row of rows) {
+                        const originalOrder = String(row?.[orderColumn] ?? '').trim();
+                        const orderKey = normalizeXPayOrderId(originalOrder);
+                        if (!/^LIT-[A-Z0-9-]+$/i.test(orderKey)) continue;
+                        totalTransactionRows++;
+
+                        const userId = String(row?.[userIdColumn] ?? '').trim();
+                        if (!userId) continue;
+
+                        if (lookup.has(orderKey) && lookup.get(orderKey) !== userId) duplicateOrders++;
+                        if (!lookup.has(orderKey)) lookup.set(orderKey, userId);
+                    }
+                }
+
+                if (!sheetsRead) {
+                    throw new Error('Kolom ORDER ID atau USER ID tidak ditemukan pada file Excel.');
+                }
+                if (!lookup.size) {
+                    throw new Error('Tidak ditemukan pasangan Order ID dan User ID yang valid.');
+                }
+
+                xpayUserIdByOrder = lookup;
+                xpayExcelFileName = file.name;
+                setXPayExcelStatus(
+                    `✅ ${file.name} berhasil dimuat — ${lookup.size.toLocaleString('id-ID')} Order ID memiliki User ID dari ${totalTransactionRows.toLocaleString('id-ID')} baris transaksi${duplicateOrders ? `, ${duplicateOrders} duplikat berbeda diabaikan` : ''}.`,
+                    'success'
+                );
+                showToast(`✅ ${lookup.size.toLocaleString('id-ID')} User ID siap dicocokkan`);
+
+                const pendingInput = document.getElementById('inputXPayPending');
+                if (pendingInput?.value.trim()) processXPayPendingMode();
+            } catch (error) {
+                xpayUserIdByOrder = new Map();
+                xpayExcelFileName = '';
+                setXPayExcelStatus(`❌ Gagal membaca Excel: ${error?.message || 'format file tidak dikenali'}`, 'error');
+                showToast('❌ File Excel gagal dibaca', 'warning');
+            } finally {
+                if (input) input.value = '';
+            }
+        }
+
+        function clearXPayExcelLookup() {
+            xpayUserIdByOrder = new Map();
+            xpayExcelFileName = '';
+            const fileInput = document.getElementById('xpayExcelFile');
+            if (fileInput) fileInput.value = '';
+            setXPayExcelStatus('Belum ada Excel yang dimuat. Tanpa Excel, kolom User ID pada Cash Out / WITHDRAW tetap dikosongkan.');
+
+            const pendingInput = document.getElementById('inputXPayPending');
+            if (pendingInput?.value.trim()) processXPayPendingMode();
+            else {
+                const info = document.getElementById('xpayPendingLookupInfo');
+                if (info) info.classList.add('hidden');
+            }
+            showToast('🧹 Data Excel telah dihapus');
+        }
+
+        function lookupXPayUserId(orderId) {
+            return xpayUserIdByOrder.get(normalizeXPayOrderId(orderId)) || '';
+        }
+
+        function renderXPayLookupInfo(parsedWithUsers) {
+            const info = document.getElementById('xpayPendingLookupInfo');
+            if (!info) return;
+
+            if (!xpayUserIdByOrder.size) {
+                info.className = 'lookup-info warning';
+                info.textContent = '⚠️ Excel belum dimuat. Format Cash Out / WITHDRAW tetap dibuat, tetapi kolom User ID dikosongkan.';
+                return;
+            }
+
+            const missing = parsedWithUsers.filter(item => !item.userId).map(item => item.txid);
+            const matched = parsedWithUsers.length - missing.length;
+            if (!missing.length) {
+                info.className = 'lookup-info success';
+                info.textContent = `✅ Seluruh ${matched} Order ID berhasil mendapatkan User ID dari ${xpayExcelFileName}.`;
+            } else {
+                info.className = 'lookup-info warning';
+                const preview = missing.slice(0, 8).join(', ');
+                const suffix = missing.length > 8 ? `, dan ${missing.length - 8} lainnya` : '';
+                info.textContent = `⚠️ User ID ditemukan ${matched}/${parsedWithUsers.length}. Tidak ditemukan untuk: ${preview}${suffix}.`;
+            }
+        }
+
         // XPAY / M2QRIS FORMATTER
         function normalizeXPayLines(rawText) {
             return String(rawText || '')
@@ -953,7 +1203,7 @@
             return [
                 data.dateIndonesia,
                 'linetogelsm8899@xpayapi.com',
-                '',
+                data.userId || '',
                 data.txid,
                 data.amount,
                 data.reference
@@ -983,7 +1233,8 @@
 
             setTimeout(() => {
                 const blocks = splitXPayBlocks(input);
-                const output = blocks.map(parseXPayFailedBlock).filter(Boolean);
+                // Samakan urutan dengan MINERAPAY: data paling bawah menjadi output paling atas.
+                const output = blocks.map(parseXPayFailedBlock).filter(Boolean).reverse();
                 const skipped = Math.max(0, blocks.length - output.length);
 
                 document.getElementById('xpayFailedTotal').textContent = blocks.length;
@@ -1016,22 +1267,30 @@
 
             setTimeout(() => {
                 const blocks = splitXPayBlocks(input);
-                const parsed = blocks.map(parseXPayPendingBlockData).filter(Boolean);
-                const rekapOutput = parsed.map(buildXPayPendingRekapRow);
-                const cashoutOutput = parsed.map(buildXPayPendingCashoutRow);
-                const skipped = Math.max(0, blocks.length - parsed.length);
+                // Samakan urutan dengan MINERAPAY untuk kedua output pending.
+                const parsed = blocks.map(parseXPayPendingBlockData).filter(Boolean).reverse();
+                const parsedWithUsers = parsed.map(item => ({ ...item, userId: lookupXPayUserId(item.txid) }));
+                const rekapOutput = parsedWithUsers.map(buildXPayPendingRekapRow);
+                const cashoutOutput = parsedWithUsers.map(buildXPayPendingCashoutRow);
+                const skipped = Math.max(0, blocks.length - parsedWithUsers.length);
+                const matched = xpayUserIdByOrder.size ? parsedWithUsers.filter(item => item.userId).length : 0;
+                const unmatched = xpayUserIdByOrder.size ? parsedWithUsers.length - matched : 0;
 
                 document.getElementById('xpayPendingTotal').textContent = blocks.length;
-                document.getElementById('xpayPendingProcessed').textContent = parsed.length;
+                document.getElementById('xpayPendingProcessed').textContent = parsedWithUsers.length;
                 document.getElementById('xpayPendingSkipped').textContent = skipped;
+                document.getElementById('xpayPendingMatched').textContent = matched;
+                document.getElementById('xpayPendingUnmatched').textContent = unmatched;
                 document.getElementById('statsXPayPending').classList.remove('hidden');
+                renderXPayLookupInfo(parsedWithUsers);
 
                 const rekapElement = document.getElementById('outputXPayPendingRekap');
                 const cashoutElement = document.getElementById('outputXPayPendingCashout');
-                if (parsed.length) {
+                if (parsedWithUsers.length) {
                     rekapElement.textContent = rekapOutput.join('\n');
                     cashoutElement.textContent = cashoutOutput.join('\n');
-                    showToast(`✅ ${parsed.length} data XPAY pending dibuat dalam 2 format`);
+                    const lookupMessage = xpayUserIdByOrder.size ? ` — ${matched} User ID cocok` : ' — User ID dikosongkan';
+                    showToast(`✅ ${parsedWithUsers.length} data XPAY pending dibuat${lookupMessage}`);
                 } else {
                     const errorHtml = '<em style="color:#ff6b6b;">❌ Tidak ditemukan format XPAY pending yang valid.</em>';
                     rekapElement.innerHTML = errorHtml;
@@ -1056,6 +1315,10 @@
             if (mode === 'pending') {
                 document.getElementById('outputXPayPendingRekap').innerHTML = '<em style="color:#888888;">✨ Hasil rekap pending XPAY akan muncul di sini...</em>';
                 document.getElementById('outputXPayPendingCashout').innerHTML = '<em style="color:#888888;">✨ Hasil Cash Out / WITHDRAW akan muncul di sini...</em>';
+                document.getElementById('xpayPendingMatched').textContent = '0';
+                document.getElementById('xpayPendingUnmatched').textContent = '0';
+                const lookupInfo = document.getElementById('xpayPendingLookupInfo');
+                if (lookupInfo) lookupInfo.classList.add('hidden');
                 switchXPayPendingFormat('rekap');
             } else {
                 document.getElementById('outputXPayFailed').innerHTML = '<em style="color:#888888;">✨ Hasil XPAY failed akan muncul di sini...</em>';
