@@ -1,0 +1,7 @@
+node_modules/
+output/
+.auth/
+.runtime-config.json
+.env
+*.log
+.DS_Store

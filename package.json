@@ -1,0 +1,18 @@
+{
+  "name": "menu-image-checker-online",
+  "version": "2.1.0",
+  "private": true,
+  "description": "Web app online untuk menemukan direct link menu dan gambar rusak menggunakan Playwright.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "scan": "node scan.js config.json",
+    "check": "node --check server.js && node --check scan.js && node --check url-safety.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "playwright": "1.61.1"
+  }
+}
