@@ -3,13 +3,20 @@ services:
     name: menu-image-checker
     runtime: docker
     plan: free
+
+    rootDir: checker
     dockerfilePath: ./Dockerfile
+    dockerContext: .
+
     healthCheckPath: /health
-    autoDeploy: true
+    autoDeployTrigger: commit
+
     envVars:
       - key: HOSTED_MODE
         value: "1"
+
       - key: MAX_PAGES_LIMIT
         value: "150"
+
       - key: ALLOW_PRIVATE_TARGETS
         value: "0"
