@@ -14,9 +14,7 @@ services:
     envVars:
       - key: HOSTED_MODE
         value: "1"
-
       - key: MAX_PAGES_LIMIT
-        value: "150"
-
+        value: "50"
       - key: ALLOW_PRIVATE_TARGETS
         value: "0"
