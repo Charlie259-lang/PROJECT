@@ -1,8 +1,0 @@
-.git
-.github
-node_modules
-output
-.auth
-.runtime-config.json
-*.zip
-npm-debug.log*
