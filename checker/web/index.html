@@ -5,164 +5,51 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Menu & Image Checker</title>
   <style>
-    :root {
-      --bg: #f4f6fb;
-      --panel: #ffffff;
-      --text: #172033;
-      --muted: #667085;
-      --line: #dfe4ec;
-      --primary: #3157d5;
-      --primary-dark: #2444af;
-      --success: #087443;
-      --success-bg: #eafbf2;
-      --error: #b42318;
-      --error-bg: #fff0ef;
-      --warning: #a15c00;
-      --warning-bg: #fff7e8;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background: radial-gradient(circle at top left, #e8edff 0, transparent 34%), var(--bg);
-      color: var(--text);
-      font-family: Inter, "Segoe UI", Arial, sans-serif;
-    }
-    .page { width: min(1120px, 94%); margin: 34px auto 60px; }
-    .hero {
-      padding: 27px 30px;
-      color: #fff;
-      background: linear-gradient(135deg, #111a33, #334eac);
-      border-radius: 20px;
-      box-shadow: 0 18px 48px rgba(29, 44, 91, .22);
-    }
-    .hero h1 { margin: 0 0 8px; font-size: clamp(26px, 4vw, 42px); }
-    .hero p { margin: 0; color: #dbe3ff; line-height: 1.6; }
-    .grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: 18px; margin-top: 20px; }
-    .panel {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 22px;
-      box-shadow: 0 8px 28px rgba(25, 36, 61, .07);
-    }
-    h2 { margin: 0 0 18px; font-size: 20px; }
-    label { display: block; margin-bottom: 7px; color: #344054; font-size: 13px; font-weight: 700; }
-    .field { margin-bottom: 16px; }
-    input[type="url"], input[type="number"], input[type="password"], textarea {
-      width: 100%;
-      border: 1px solid #cfd6e2;
-      border-radius: 10px;
-      padding: 12px 13px;
-      color: var(--text);
-      background: #fff;
-      font: inherit;
-      outline: none;
-      transition: border-color .16s, box-shadow .16s;
-    }
-    input:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(49, 87, 213, .13); }
-    textarea { min-height: 76px; resize: vertical; }
-    .hint { margin-top: 6px; color: var(--muted); font-size: 12px; line-height: 1.5; }
-    .options { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 14px 0 18px; }
-    .check {
-      display: flex;
-      align-items: flex-start;
-      gap: 9px;
-      padding: 11px;
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      background: #fafbfc;
-      cursor: pointer;
-    }
-    .check input { margin-top: 2px; }
-    .check span { font-size: 13px; font-weight: 600; }
-    .actions { display: flex; gap: 10px; flex-wrap: wrap; }
-    button, .button-link {
-      appearance: none;
-      border: 0;
-      border-radius: 10px;
-      padding: 11px 16px;
-      font: inherit;
-      font-weight: 750;
-      cursor: pointer;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-    button.primary { background: var(--primary); color: #fff; }
-    button.primary:hover { background: var(--primary-dark); }
-    button:disabled { opacity: .55; cursor: not-allowed; }
-    .button-link { background: #edf1ff; color: var(--primary-dark); }
-    .button-link.disabled { pointer-events: none; opacity: .48; }
-    .status-card { border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin-bottom: 14px; }
-    .status-line { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-    .badge { display: inline-flex; border-radius: 999px; padding: 5px 10px; font-size: 12px; font-weight: 800; }
-    .badge.idle { color: #475467; background: #f2f4f7; }
-    .badge.running { color: var(--warning); background: var(--warning-bg); }
-    .badge.success { color: var(--success); background: var(--success-bg); }
-    .badge.error { color: var(--error); background: var(--error-bg); }
-    .meta { margin-top: 9px; color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
-    .notice { display: none; margin-bottom: 14px; padding: 11px 12px; border-radius: 10px; font-size: 13px; line-height: 1.5; }
-    .notice.show { display: block; }
-    .notice.error { color: var(--error); background: var(--error-bg); border: 1px solid #ffd1cd; }
-    .notice.warning { color: var(--warning); background: var(--warning-bg); border: 1px solid #f5d9a3; }
-    pre {
-      height: 390px;
-      margin: 0;
-      padding: 14px;
-      overflow: auto;
-      border-radius: 12px;
-      color: #d8e1ff;
-      background: #111827;
-      font-family: Consolas, "Courier New", monospace;
-      font-size: 12px;
-      line-height: 1.55;
-      white-space: pre-wrap;
-      overflow-wrap: anywhere;
-    }
-    .steps { margin-top: 18px; padding: 18px 22px; }
-    .steps ol { margin: 0; padding-left: 20px; color: #475467; line-height: 1.8; }
-    .footer { margin-top: 18px; text-align: center; color: var(--muted); font-size: 12px; }
-    @media (max-width: 820px) { .grid { grid-template-columns: 1fr; } }
-    @media (max-width: 520px) { .page { width: 94%; margin-top: 14px; } .hero, .panel { padding: 18px; } .options { grid-template-columns: 1fr; } .actions > * { width: 100%; } }
+    :root{--bg:#f4f6fb;--panel:#fff;--text:#172033;--muted:#667085;--line:#dfe4ec;--primary:#3157d5;--primary-dark:#2444af;--success:#087443;--success-bg:#eafbf2;--error:#b42318;--error-bg:#fff0ef;--warning:#a15c00;--warning-bg:#fff7e8}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at top left,#e8edff 0,transparent 34%),var(--bg);color:var(--text);font-family:Inter,"Segoe UI",Arial,sans-serif}.page{width:min(1180px,94%);margin:34px auto 60px}.hero{padding:27px 30px;color:#fff;background:linear-gradient(135deg,#111a33,#334eac);border-radius:20px;box-shadow:0 18px 48px rgba(29,44,91,.22)}.hero h1{margin:0 0 8px;font-size:clamp(26px,4vw,42px)}.hero p{margin:0;color:#dbe3ff;line-height:1.6}.grid{display:grid;grid-template-columns:1.05fr .95fr;gap:18px;margin-top:20px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:0 8px 28px rgba(25,36,61,.07)}h2{margin:0 0 18px;font-size:20px}label{display:block;margin-bottom:7px;color:#344054;font-size:13px;font-weight:700}.field{margin-bottom:16px}input[type=url],input[type=number],textarea{width:100%;border:1px solid #cfd6e2;border-radius:10px;padding:12px 13px;color:var(--text);background:#fff;font:inherit;outline:none;transition:border-color .16s,box-shadow .16s}input:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(49,87,213,.13)}textarea{min-height:76px;resize:vertical}.hint{margin-top:6px;color:var(--muted);font-size:12px;line-height:1.5}.two-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}.options{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:14px 0 18px}.check{display:flex;align-items:flex-start;gap:9px;padding:11px;border:1px solid var(--line);border-radius:10px;background:#fafbfc;cursor:pointer}.check input{margin-top:2px}.check span{font-size:13px;font-weight:600}.actions{display:flex;gap:10px;flex-wrap:wrap}button,.button-link{appearance:none;border:0;border-radius:10px;padding:11px 16px;font:inherit;font-weight:750;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px}button.primary{background:var(--primary);color:#fff}button.primary:hover{background:var(--primary-dark)}button:disabled{opacity:.55;cursor:not-allowed}.button-link{background:#edf1ff;color:var(--primary-dark)}.button-link.disabled{pointer-events:none;opacity:.48}.status-card{border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px}.status-line{display:flex;justify-content:space-between;align-items:center;gap:12px}.badge{display:inline-flex;border-radius:999px;padding:5px 10px;font-size:12px;font-weight:800}.badge.idle{color:#475467;background:#f2f4f7}.badge.running{color:var(--warning);background:var(--warning-bg)}.badge.success{color:var(--success);background:var(--success-bg)}.badge.error{color:var(--error);background:var(--error-bg)}.meta{margin-top:9px;color:var(--muted);font-size:12px;overflow-wrap:anywhere}.notice{display:none;margin-bottom:14px;padding:11px 12px;border-radius:10px;font-size:13px;line-height:1.5}.notice.show{display:block}.notice.error{color:var(--error);background:var(--error-bg);border:1px solid #ffd1cd}.notice.warning{color:var(--warning);background:var(--warning-bg);border:1px solid #f5d9a3}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}.stat{padding:10px;border:1px solid var(--line);border-radius:10px;background:#fafbfc}.stat .n{font-size:20px;font-weight:800}.stat .l{font-size:11px;color:var(--muted);margin-top:3px}pre{height:330px;margin:0;padding:14px;overflow:auto;border-radius:12px;color:#d8e1ff;background:#111827;font-family:Consolas,"Courier New",monospace;font-size:12px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}.steps{margin-top:18px;padding:18px 22px}.steps ol{margin:0;padding-left:20px;color:#475467;line-height:1.8}.report-panel{display:none;margin-top:18px}.report-panel.show{display:block}.report-frame{width:100%;height:720px;border:1px solid var(--line);border-radius:12px;background:#fff}.footer{margin-top:18px;text-align:center;color:var(--muted);font-size:12px}@media(max-width:820px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}@media(max-width:520px){.page{width:94%;margin-top:14px}.hero,.panel{padding:18px}.options,.two-fields{grid-template-columns:1fr}.actions>*{width:100%}}
   </style>
 </head>
 <body>
   <main class="page">
     <section class="hero">
       <h1>Menu & Image Checker</h1>
-      <p>Masukkan link website atau dashboard. Sistem akan mencari direct link menu, membuka halaman internal, dan membuat laporan gambar yang gagal dimuat.</p>
+      <p>Mencari menu/direct link, membuka halaman internal, memeriksa gambar yang gagal dimuat, dan menampilkan laporan langsung di halaman ini.</p>
     </section>
 
     <section class="grid">
       <div class="panel">
         <h2>Mulai Pemeriksaan</h2>
         <div id="formError" class="notice error"></div>
-        <div class="notice warning show">Halaman ini dapat digunakan langsung tanpa kata sandi. Jangan membagikan link hosting bila pemakaiannya ingin dibatasi.</div>
+        <div class="notice warning show">Untuk Render paket gratis, mulai dari 10–30 halaman dan matikan screenshot agar penggunaan RAM lebih ringan.</div>
         <form id="scanForm">
           <div class="field">
             <label for="startUrl">Link yang ingin diperiksa</label>
-            <input id="startUrl" name="startUrl" type="url" required placeholder="https://example.com/">
-            <div class="hint">Gunakan link lengkap yang diawali http:// atau https://.</div>
+            <input id="startUrl" type="url" required placeholder="https://example.com/">
+            <div class="hint">Gunakan URL lengkap yang diawali http:// atau https://.</div>
           </div>
 
-          <div class="field">
-            <label for="maxPages">Maksimal halaman</label>
-            <input id="maxPages" name="maxPages" type="number" min="1" max="1000" value="100">
-            <div class="hint">Semakin besar angkanya, semakin banyak direct link internal yang diperiksa.</div>
+          <div class="two-fields">
+            <div class="field">
+              <label for="maxPages">Maksimal halaman</label>
+              <input id="maxPages" type="number" min="1" max="50" value="30">
+              <div class="hint">Naikkan bertahap setelah tes pertama berhasil.</div>
+            </div>
+            <div class="field">
+              <label for="maxDynamicMenuClicks">Klik menu dinamis</label>
+              <input id="maxDynamicMenuClicks" type="number" min="0" max="20" value="8">
+              <div class="hint">Untuk menu tombol/SPA yang tidak mempunyai href.</div>
+            </div>
           </div>
 
           <div class="field">
             <label for="allowedOrigins">Origin tambahan (opsional)</label>
-            <textarea id="allowedOrigins" name="allowedOrigins" placeholder="https://admin.example.com&#10;https://member.example.com"></textarea>
-            <div class="hint">Isi satu per baris bila menu berpindah ke subdomain lain yang tetap ingin diperiksa.</div>
+            <textarea id="allowedOrigins" placeholder="https://admin.example.com&#10;https://member.example.com"></textarea>
+            <div class="hint">Isi satu per baris bila menu menuju subdomain lain yang tetap ingin dipindai.</div>
           </div>
 
           <div class="options">
             <label class="check"><input id="autoScroll" type="checkbox" checked><span>Scroll gambar lazy-load</span></label>
-            <label class="check"><input id="saveScreenshots" type="checkbox" checked><span>Simpan screenshot error</span></label>
+            <label class="check"><input id="saveScreenshots" type="checkbox"><span>Simpan screenshot error</span></label>
           </div>
 
           <div class="actions">
@@ -175,38 +62,52 @@
       <div class="panel">
         <h2>Status dan Log</h2>
         <div class="status-card">
-          <div class="status-line">
-            <strong>Status</strong>
-            <span id="statusBadge" class="badge idle">Siap</span>
-          </div>
+          <div class="status-line"><strong>Status</strong><span id="statusBadge" class="badge idle">Siap</span></div>
           <div id="statusMeta" class="meta">Belum ada pemeriksaan yang dijalankan.</div>
+        </div>
+        <div class="stats">
+          <div class="stat"><div id="pagesStat" class="n">0</div><div class="l">Halaman</div></div>
+          <div class="stat"><div id="menusStat" class="n">0</div><div class="l">Menu/tautan</div></div>
+          <div class="stat"><div id="imagesStat" class="n">0</div><div class="l">Gambar error</div></div>
+          <div class="stat"><div id="memoryStat" class="n">—</div><div class="l">RAM Node</div></div>
         </div>
         <pre id="logBox">Menunggu pemeriksaan...</pre>
       </div>
     </section>
 
+    <section id="reportPanel" class="panel report-panel">
+      <h2>Hasil Pemeriksaan</h2>
+      <iframe id="reportFrame" class="report-frame" title="Laporan hasil pemeriksaan"></iframe>
+    </section>
+
     <section class="panel steps">
-      <h2>Cara Menggunakan</h2>
+      <h2>Catatan</h2>
       <ol>
-        <li>Masukkan link website publik yang ingin diperiksa.</li>
-        <li>Atur jumlah halaman, lalu klik <strong>Mulai Check</strong>.</li>
-        <li>Pantau prosesnya melalui bagian Status dan Log.</li>
-        <li>Setelah selesai, klik <strong>Buka Laporan HTML</strong>.</li>
+        <li>Laporan sementara mulai tersedia setelah halaman pertama selesai diperiksa.</li>
+        <li>Menu dengan direct link dibaca dari seluruh tautan internal; menu tombol tanpa href dicoba melalui klik aman terbatas.</li>
+        <li>Dashboard yang membutuhkan login manual belum dapat dipindai penuh pada versi hosting publik.</li>
       </ol>
     </section>
 
-    <div class="footer">Aplikasi online berbasis Node.js dan Playwright. Kode dapat disimpan di GitHub dan dijalankan melalui layanan hosting Docker.</div>
+    <div class="footer">Node.js + Playwright · laporan disimpan sementara pada server Render.</div>
   </main>
 
   <script>
     const form = document.getElementById('scanForm');
     const scanButton = document.getElementById('scanButton');
     const reportButton = document.getElementById('reportButton');
+    const reportPanel = document.getElementById('reportPanel');
+    const reportFrame = document.getElementById('reportFrame');
     const statusBadge = document.getElementById('statusBadge');
     const statusMeta = document.getElementById('statusMeta');
     const logBox = document.getElementById('logBox');
     const formError = document.getElementById('formError');
-    let lastLogCount = -1;
+    const pagesStat = document.getElementById('pagesStat');
+    const menusStat = document.getElementById('menusStat');
+    const imagesStat = document.getElementById('imagesStat');
+    const memoryStat = document.getElementById('memoryStat');
+    let lastLogSignature = '';
+    let loadedReportUrl = '';
 
     function showError(message) {
       formError.textContent = message || '';
@@ -219,8 +120,15 @@
     }
 
     function setStatus(status) {
-      scanButton.disabled = status.running;
+      scanButton.disabled = Boolean(status.running);
       scanButton.textContent = status.running ? 'Sedang Memeriksa...' : 'Mulai Check';
+
+      const expectedActive = localStorage.getItem('checkerScanActive') === '1';
+      const progress = status.progress || {};
+      pagesStat.textContent = progress.pagesScanned ?? 0;
+      menusStat.textContent = progress.menusFound ?? 0;
+      imagesStat.textContent = progress.brokenImages ?? 0;
+      memoryStat.textContent = progress.memoryMb ? `${progress.memoryMb} MB` : '—';
 
       if (status.running) {
         statusBadge.className = 'badge running';
@@ -228,32 +136,48 @@
       } else if (status.exitCode === 0 && status.reportReady) {
         statusBadge.className = 'badge success';
         statusBadge.textContent = 'Selesai';
+        localStorage.removeItem('checkerScanActive');
       } else if (status.error || (status.exitCode !== null && status.exitCode !== 0)) {
         statusBadge.className = 'badge error';
-        statusBadge.textContent = 'Gagal';
+        statusBadge.textContent = status.reportReady ? 'Terhenti' : 'Gagal';
+        localStorage.removeItem('checkerScanActive');
+      } else if (expectedActive && !status.logs?.length) {
+        statusBadge.className = 'badge error';
+        statusBadge.textContent = 'Server restart';
+        statusMeta.textContent = 'Proses terputus dan status server kembali kosong. Periksa Runtime Logs Render; penyebab paling umum adalah batas RAM.';
+        scanButton.disabled = false;
       } else {
         statusBadge.className = 'badge idle';
         statusBadge.textContent = 'Siap';
       }
 
-      const details = [];
-      if (status.targetUrl) details.push(`Target: ${status.targetUrl}`);
-      if (status.startedAt) details.push(`Mulai: ${formatDate(status.startedAt)}`);
-      if (status.finishedAt) details.push(`Selesai: ${formatDate(status.finishedAt)}`);
-      if (status.error) details.push(`Error: ${status.error}`);
-      statusMeta.textContent = details.join(' | ') || 'Belum ada pemeriksaan yang dijalankan.';
+      if (!(expectedActive && !status.logs?.length && !status.running && status.exitCode === null)) {
+        const details = [];
+        if (status.targetUrl) details.push(`Target: ${status.targetUrl}`);
+        if (status.startedAt) details.push(`Mulai: ${formatDate(status.startedAt)}`);
+        if (status.finishedAt) details.push(`Selesai: ${formatDate(status.finishedAt)}`);
+        if (progress.currentUrl) details.push(`Sekarang: ${progress.currentUrl}`);
+        if (status.error) details.push(`Error: ${status.error}`);
+        statusMeta.textContent = details.join(' | ') || 'Belum ada pemeriksaan yang dijalankan.';
+      }
 
       if (status.reportReady && status.reportUrl) {
         reportButton.href = status.reportUrl;
         reportButton.classList.remove('disabled');
+        reportPanel.classList.add('show');
+        if (loadedReportUrl !== status.reportUrl) {
+          loadedReportUrl = status.reportUrl;
+          reportFrame.src = status.reportUrl;
+        }
       } else {
         reportButton.href = '#';
         reportButton.classList.add('disabled');
       }
 
       const logs = Array.isArray(status.logs) ? status.logs : [];
-      if (logs.length !== lastLogCount) {
-        lastLogCount = logs.length;
+      const signature = logs.map(item => `${item.time}|${item.message}`).join('\n');
+      if (signature !== lastLogSignature) {
+        lastLogSignature = signature;
         logBox.textContent = logs.length
           ? logs.map(item => `[${new Date(item.time).toLocaleTimeString('id-ID')}] ${item.message}`).join('\n')
           : 'Menunggu pemeriksaan...';
@@ -263,18 +187,20 @@
 
     async function loadConfig() {
       const response = await fetch('/api/config', { cache: 'no-store' });
+      if (!response.ok) throw new Error('Konfigurasi server tidak dapat dibaca.');
       const config = await response.json();
-      document.getElementById('maxPages').value = config.maxPages || 100;
-      document.getElementById('maxPages').max = config.maxPagesLimit || 300;
+      document.getElementById('maxPages').value = config.maxPages || 30;
+      document.getElementById('maxPages').max = config.maxPagesLimit || 50;
+      document.getElementById('maxDynamicMenuClicks').value = config.maxDynamicMenuClicks || 8;
       document.getElementById('autoScroll').checked = config.autoScroll !== false;
-      document.getElementById('saveScreenshots').checked = config.saveScreenshots !== false;
+      document.getElementById('saveScreenshots').checked = config.saveScreenshots === true;
       document.getElementById('allowedOrigins').value = (config.allowedOrigins || []).join('\n');
       scanButton.disabled = false;
     }
 
     async function pollStatus() {
       try {
-        const response = await fetch('/api/status', { cache: 'no-store' });
+        const response = await fetch(`/api/status?t=${Date.now()}`, { cache: 'no-store' });
         if (!response.ok) throw new Error('Status server tidak dapat dibaca.');
         setStatus(await response.json());
       } catch (error) {
@@ -287,11 +213,10 @@
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
       showError('');
-
-
       const payload = {
         startUrl: document.getElementById('startUrl').value.trim(),
         maxPages: Number(document.getElementById('maxPages').value),
+        maxDynamicMenuClicks: Number(document.getElementById('maxDynamicMenuClicks').value),
         allowedOrigins: document.getElementById('allowedOrigins').value,
         autoScroll: document.getElementById('autoScroll').checked,
         saveScreenshots: document.getElementById('saveScreenshots').checked
@@ -299,6 +224,9 @@
 
       try {
         scanButton.disabled = true;
+        localStorage.setItem('checkerScanActive', '1');
+        loadedReportUrl = '';
+        reportPanel.classList.remove('show');
         const response = await fetch('/api/scan', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -308,6 +236,7 @@
         if (!response.ok) throw new Error(result.error || 'Pemeriksaan gagal dimulai.');
         await pollStatus();
       } catch (error) {
+        localStorage.removeItem('checkerScanActive');
         showError(error.message);
         scanButton.disabled = false;
       }
@@ -316,7 +245,7 @@
     (async () => {
       try { await loadConfig(); } catch (error) { showError(error.message); }
       await pollStatus();
-      setInterval(pollStatus, 1000);
+      setInterval(pollStatus, 1200);
     })();
   </script>
 </body>
