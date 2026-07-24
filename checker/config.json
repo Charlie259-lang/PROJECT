@@ -1,11 +1,12 @@
 {
   "startUrl": "https://example.com/",
   "headless": true,
-  "maxPages": 50,
-  "navigationTimeoutMs": 45000,
-  "waitAfterLoadMs": 1200,
+  "maxPages": 30,
+  "maxDynamicMenuClicks": 8,
+  "navigationTimeoutMs": 30000,
+  "waitAfterLoadMs": 900,
   "autoScroll": true,
-  "saveScreenshots": true,
+  "saveScreenshots": false,
   "outputDirectory": "output",
   "useSavedLogin": false,
   "authStatePath": ".auth/state.json",
@@ -13,6 +14,7 @@
   "menuSelectors": [
     "nav a",
     "nav button",
+    "header a",
     "aside a",
     "aside button",
     ".sidebar a",
@@ -21,7 +23,9 @@
     ".menu button",
     "[role='navigation'] a",
     "[role='navigation'] button",
-    "[role='menuitem']"
+    "[role='menuitem']",
+    "[role='treeitem']",
+    "a[href]"
   ],
   "excludeUrlPatterns": [
     "logout",
