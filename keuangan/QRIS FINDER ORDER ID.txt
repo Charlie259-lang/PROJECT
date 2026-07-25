@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QRIS Order Finder</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    :root {
+      --bg: #f4f2ff;
+      --card: #ffffff;
+      --primary: #6c34ea;
+      --primary-dark: #5322c7;
+      --primary-soft: #eee8ff;
+      --text: #1f2430;
+      --muted: #687083;
+      --border: #ded9ef;
+      --success: #14804a;
+      --success-bg: #e9f8f0;
+      --warning: #9a6700;
+      --warning-bg: #fff5d6;
+      --danger: #c53030;
+      --danger-bg: #fff0f0;
+      --shadow: 0 12px 32px rgba(44, 25, 89, 0.10);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top right, rgba(108,52,234,.16), transparent 30%),
+        linear-gradient(180deg, #faf9ff 0%, var(--bg) 100%);
+      min-height: 100vh;
+    }
+
+    .container { width: min(1180px, calc(100% - 28px)); margin: 28px auto 56px; }
+    .hero {
+      padding: 24px 26px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, #5221c5, #7b49ef);
+      color: #fff;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .hero h1 { margin: 0 0 8px; font-size: clamp(24px, 4vw, 36px); letter-spacing: -.5px; }
+    .hero p { margin: 0; color: rgba(255,255,255,.86); line-height: 1.55; }
+    .hero-badge {
+      flex: 0 0 auto;
+      background: rgba(255,255,255,.14);
+      border: 1px solid rgba(255,255,255,.25);
+      border-radius: 16px;
+      padding: 12px 16px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 18px; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+    .card.full { grid-column: 1 / -1; }
+    .section-title { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .step {
+      width: 32px; height: 32px; border-radius: 10px;
+      display: grid; place-items: center;
+      background: var(--primary-soft); color: var(--primary); font-weight: 800;
+    }
+    h2 { margin: 0; font-size: 18px; }
+    .hint { margin: 6px 0 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
+
+    .dropzone {
+      border: 2px dashed #b8a7e8;
+      border-radius: 16px;
+      min-height: 148px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 18px;
+      background: #fbfaff;
+      transition: .2s ease;
+      cursor: pointer;
+    }
+    .dropzone.dragover { border-color: var(--primary); background: var(--primary-soft); transform: translateY(-1px); }
+    .dropzone input { display: none; }
+    .upload-icon { font-size: 34px; margin-bottom: 8px; }
+    .dropzone strong { display: block; margin-bottom: 4px; }
+
+    .status-box {
+      margin-top: 12px;
+      border-radius: 12px;
+      padding: 11px 13px;
+      font-size: 13px;
+      line-height: 1.5;
+      display: none;
+    }
+    .status-box.show { display: block; }
+    .status-box.success { background: var(--success-bg); color: var(--success); }
+    .status-box.warning { background: var(--warning-bg); color: var(--warning); }
+    .status-box.danger { background: var(--danger-bg); color: var(--danger); }
+
+    .mapping {
+      margin-top: 14px;
+      display: none;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      padding: 14px;
+      border-radius: 14px;
+      background: #faf9ff;
+      border: 1px solid var(--border);
+    }
+    .mapping.show { display: grid; }
+    label.field { display: grid; gap: 6px; font-size: 12px; font-weight: 700; color: #4a4f5d; }
+    select, textarea, input[type="text"] {
+      width: 100%;
+      border: 1px solid #cfc9df;
+      border-radius: 12px;
+      background: #fff;
+      padding: 11px 12px;
+      font: inherit;
+      color: var(--text);
+      outline: none;
+    }
+    select:focus, textarea:focus, input[type="text"]:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(108,52,234,.12); }
+    textarea { min-height: 190px; resize: vertical; line-height: 1.5; }
+
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+    button {
+      border: 0;
+      border-radius: 11px;
+      padding: 10px 14px;
+      font: inherit;
+      font-weight: 750;
+      cursor: pointer;
+      transition: .16s ease;
+    }
+    button:hover { transform: translateY(-1px); }
+    button:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-secondary { background: var(--primary-soft); color: var(--primary-dark); }
+    .btn-light { background: #f2f3f7; color: #394052; }
+    .btn-danger { background: var(--danger-bg); color: var(--danger); }
+    .btn-small { padding: 7px 10px; border-radius: 9px; font-size: 12px; }
+
+    .options-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .check { display: inline-flex; align-items: center; gap: 7px; cursor: pointer; }
+    .check input { accent-color: var(--primary); width: 16px; height: 16px; }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .metric { border: 1px solid var(--border); background: #fbfaff; border-radius: 14px; padding: 12px; }
+    .metric span { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+    .metric strong { font-size: 22px; }
+
+    .table-wrap { overflow: auto; border: 1px solid var(--border); border-radius: 14px; }
+    table { width: 100%; border-collapse: collapse; min-width: 920px; }
+    th { position: sticky; top: 0; z-index: 1; background: #f6f3ff; color: #4a3c72; font-size: 12px; text-align: left; padding: 12px; border-bottom: 1px solid var(--border); }
+    td { padding: 12px; border-bottom: 1px solid #ece9f4; vertical-align: top; font-size: 13px; }
+    tr:last-child td { border-bottom: 0; }
+    .order-id { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-weight: 700; word-break: break-all; }
+    .proof-link { max-width: 270px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; color: var(--primary); }
+    .badge { display: inline-flex; padding: 5px 9px; border-radius: 999px; font-size: 11px; font-weight: 800; }
+    .badge.pending { background: var(--warning-bg); color: var(--warning); }
+    .badge.found { background: var(--success-bg); color: var(--success); }
+    .badge.missing { background: var(--danger-bg); color: var(--danger); }
+    .row-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+    .empty { padding: 30px; text-align: center; color: var(--muted); }
+    .footer-note { text-align: center; margin-top: 16px; color: var(--muted); font-size: 12px; }
+
+    @media (max-width: 820px) {
+      .hero { align-items: flex-start; flex-direction: column; }
+      .grid { grid-template-columns: 1fr; }
+      .card.full { grid-column: auto; }
+      .summary { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    }
+    @media (max-width: 520px) {
+      .container { width: min(100% - 18px, 1180px); margin-top: 10px; }
+      .hero, .card { border-radius: 16px; padding: 16px; }
+      .mapping { grid-template-columns: 1fr; }
+      .summary { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <section class="hero">
+      <div>
+        <h1>🔎 QRIS Order Finder</h1>
+        <p>Cari Order ID transaksi QRIS pending berdasarkan User ID dan buka bukti transfer langsung dari hasil pencarian.</p>
+      </div>
+      <div class="hero-badge" id="databaseBadge">Belum ada database</div>
+    </section>
+
+    <section class="grid">
+      <article class="card">
+        <div class="section-title">
+          <div class="step">1</div>
+          <div>
+            <h2>Masukkan Excel Pending QRIS</h2>
+            <p class="hint">Mendukung .xlsx, .xls, dan .csv. Data terakhir akan diingat di browser.</p>
+          </div>
+        </div>
+
+        <label class="dropzone" id="dropzone">
+          <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" />
+          <div>
+            <div class="upload-icon">📥</div>
+            <strong>Klik atau seret file Excel ke sini</strong>
+            <span class="hint">File export yang berisi User ID dan Order ID</span>
+          </div>
+        </label>
+
+        <div id="fileStatus" class="status-box"></div>
+
+        <div id="mapping" class="mapping">
+          <label class="field">Kolom User ID *<select id="mapUser"></select></label>
+          <label class="field">Kolom Order ID *<select id="mapOrder"></select></label>
+          <label class="field">Kolom Status<select id="mapStatus"></select></label>
+          <label class="field">Kolom Tanggal<select id="mapDate"></select></label>
+          <label class="field">Kolom Nominal<select id="mapAmount"></select></label>
+          <div style="align-self:end"><button id="applyMapping" class="btn-primary" style="width:100%">Gunakan Data Excel</button></div>
+        </div>
+
+        <div class="actions">
+          <button id="clearDatabase" class="btn-danger" disabled>Hapus Database Tersimpan</button>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="section-title">
+          <div class="step">2</div>
+          <div>
+            <h2>Tempel Data Pencarian</h2>
+            <p class="hint">Satu data per baris: <b>User ID</b> lalu <b>link bukti transfer</b>.</p>
+          </div>
+        </div>
+
+        <textarea id="searchInput" spellcheck="false" placeholder="Ray31boy https://cdn.files-text.com/us-south1/api/lc/att/13376070/859af7e91472afeba050e1be646cf389/17848512277943937985396835913049"></textarea>
+
+        <div class="options-row">
+          <label class="check"><input id="pendingOnly" type="checkbox" checked /> Hanya status Pending</label>
+          <label class="check"><input id="autoOpenSingle" type="checkbox" /> Buka bukti otomatis jika 1 data</label>
+        </div>
+
+        <div class="actions">
+          <button id="searchBtn" class="btn-primary">Cari Order ID</button>
+          <button id="clearInput" class="btn-light">Bersihkan Input</button>
+          <button id="pasteExample" class="btn-secondary">Isi Contoh</button>
+        </div>
+        <div id="searchStatus" class="status-box"></div>
+      </article>
+
+      <article class="card full">
+        <div class="section-title">
+          <div class="step">3</div>
+          <div>
+            <h2>Hasil Pencarian</h2>
+            <p class="hint">Order ID dapat disalin satu per satu atau sekaligus. Bukti transfer dibuka di tab baru.</p>
+          </div>
+        </div>
+
+        <div class="summary">
+          <div class="metric"><span>Data ditempel</span><strong id="metricInput">0</strong></div>
+          <div class="metric"><span>Order ditemukan</span><strong id="metricFound">0</strong></div>
+          <div class="metric"><span>Tidak ditemukan</span><strong id="metricMissing">0</strong></div>
+          <div class="metric"><span>Baris database</span><strong id="metricDatabase">0</strong></div>
+        </div>
+
+        <div class="actions" style="margin: 0 0 12px">
+          <button id="copyAll" class="btn-secondary" disabled>Salin Semua Hasil</button>
+          <button id="openAll" class="btn-light" disabled>Buka Semua Bukti</button>
+          <button id="downloadCsv" class="btn-light" disabled>Download Hasil CSV</button>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>No.</th>
+                <th>User ID</th>
+                <th>Order ID</th>
+                <th>Status</th>
+                <th>Tanggal</th>
+                <th>Nominal</th>
+                <th>Bukti Transfer</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="resultBody">
+              <tr><td colspan="8" class="empty">Belum ada hasil pencarian.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
+    <div class="footer-note">Semua data diproses di browser dan tidak dikirim ke server.</div>
+  </main>
+
+<script>
+(() => {
+  'use strict';
+
+  const STORAGE_KEY = 'qris_order_finder_database_v1';
+  const META_KEY = 'qris_order_finder_meta_v1';
+  const EXAMPLE = 'Ray31boy https://cdn.files-text.com/us-south1/api/lc/att/13376070/859af7e91472afeba050e1be646cf389/17848512277943937985396835913049';
+
+  const els = {
+    fileInput: document.getElementById('fileInput'),
+    dropzone: document.getElementById('dropzone'),
+    fileStatus: document.getElementById('fileStatus'),
+    mapping: document.getElementById('mapping'),
+    mapUser: document.getElementById('mapUser'),
+    mapOrder: document.getElementById('mapOrder'),
+    mapStatus: document.getElementById('mapStatus'),
+    mapDate: document.getElementById('mapDate'),
+    mapAmount: document.getElementById('mapAmount'),
+    applyMapping: document.getElementById('applyMapping'),
+    clearDatabase: document.getElementById('clearDatabase'),
+    searchInput: document.getElementById('searchInput'),
+    pendingOnly: document.getElementById('pendingOnly'),
+    autoOpenSingle: document.getElementById('autoOpenSingle'),
+    searchBtn: document.getElementById('searchBtn'),
+    clearInput: document.getElementById('clearInput'),
+    pasteExample: document.getElementById('pasteExample'),
+    searchStatus: document.getElementById('searchStatus'),
+    resultBody: document.getElementById('resultBody'),
+    copyAll: document.getElementById('copyAll'),
+    openAll: document.getElementById('openAll'),
+    downloadCsv: document.getElementById('downloadCsv'),
+    metricInput: document.getElementById('metricInput'),
+    metricFound: document.getElementById('metricFound'),
+    metricMissing: document.getElementById('metricMissing'),
+    metricDatabase: document.getElementById('metricDatabase'),
+    databaseBadge: document.getElementById('databaseBadge')
+  };
+
+  let rawRows = [];
+  let headers = [];
+  let database = [];
+  let lastResults = [];
+  let currentFileName = '';
+
+  const normalizeHeader = (value) => String(value ?? '')
+    .toLowerCase()
+    .replace(/[._\-]+/g, ' ')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  const normalizeUser = (value) => String(value ?? '').trim().toLowerCase();
+  const safeText = (value) => String(value ?? '').trim();
+  const isPending = (value) => {
+    const status = normalizeHeader(value);
+    return !status || status.includes('pending') || status.includes('menunggu') || status.includes('process') || status.includes('proses');
+  };
+
+  function setStatus(el, message, type = 'success') {
+    el.className = `status-box show ${type}`;
+    el.textContent = message;
+  }
+
+  function clearStatus(el) {
+    el.className = 'status-box';
+    el.textContent = '';
+  }
+
+  function detectHeader(candidates) {
+    const normalized = headers.map(h => ({ original: h, normalized: normalizeHeader(h) }));
+    for (const candidate of candidates) {
+      const exact = normalized.find(item => item.normalized === candidate);
+      if (exact) return exact.original;
+    }
+    for (const candidate of candidates) {
+      const partial = normalized.find(item => item.normalized.includes(candidate));
+      if (partial) return partial.original;
+    }
+    return '';
+  }
+
+  function fillSelect(select, selected = '', optional = false) {
+    select.innerHTML = '';
+    if (optional) {
+      const option = document.createElement('option');
+      option.value = '';
+      option.textContent = '— Tidak digunakan —';
+      select.appendChild(option);
+    }
+    headers.forEach(header => {
+      const option = document.createElement('option');
+      option.value = header;
+      option.textContent = header;
+      select.appendChild(option);
+    });
+    if (selected && headers.includes(selected)) select.value = selected;
+  }
+
+  function setupMapping() {
+    const detected = {
+      user: detectHeader(['user id', 'userid', 'username', 'user', 'member id', 'member', 'account']),
+      order: detectHeader(['order id', 'orderid', 'id order', 'transaction id', 'transactionid', 'trx id', 'kode order', 'reference id', 'ref id']),
+      status: detectHeader(['status', 'order status', 'transaction status']),
+      date: detectHeader(['created at', 'created date', 'tanggal', 'date', 'waktu', 'time']),
+      amount: detectHeader(['nominal', 'amount', 'jumlah', 'total', 'deposit amount'])
+    };
+
+    fillSelect(els.mapUser, detected.user, false);
+    fillSelect(els.mapOrder, detected.order, false);
+    fillSelect(els.mapStatus, detected.status, true);
+    fillSelect(els.mapDate, detected.date, true);
+    fillSelect(els.mapAmount, detected.amount, true);
+    els.mapping.classList.add('show');
+
+    if (!detected.user || !detected.order) {
+      setStatus(els.fileStatus, `File dibaca (${rawRows.length.toLocaleString('id-ID')} baris), tetapi kolom User ID atau Order ID belum terdeteksi. Pilih kolom yang benar di bawah.`, 'warning');
+    } else {
+      setStatus(els.fileStatus, `File dibaca (${rawRows.length.toLocaleString('id-ID')} baris). Kolom terdeteksi otomatis; periksa lalu klik “Gunakan Data Excel”.`, 'success');
+    }
+  }
+
+  function readFile(file) {
+    if (!window.XLSX) {
+      setStatus(els.fileStatus, 'Pustaka pembaca Excel gagal dimuat. Pastikan koneksi internet aktif lalu buka ulang shortcut.', 'danger');
+      return;
+    }
+
+    currentFileName = file.name;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const workbook = XLSX.read(event.target.result, { type: 'array', cellDates: false });
+        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+        rawRows = XLSX.utils.sheet_to_json(firstSheet, { defval: '', raw: false });
+        if (!rawRows.length) throw new Error('File tidak memiliki data.');
+        headers = Array.from(new Set(rawRows.flatMap(row => Object.keys(row))));
+        if (!headers.length) throw new Error('Judul kolom tidak ditemukan.');
+        setupMapping();
+      } catch (error) {
+        rawRows = [];
+        headers = [];
+        els.mapping.classList.remove('show');
+        setStatus(els.fileStatus, `Gagal membaca file: ${error.message}`, 'danger');
+      }
+    };
+    reader.onerror = () => setStatus(els.fileStatus, 'File tidak dapat dibaca oleh browser.', 'danger');
+    reader.readAsArrayBuffer(file);
+  }
+
+  function applyMapping() {
+    const userColumn = els.mapUser.value;
+    const orderColumn = els.mapOrder.value;
+    const statusColumn = els.mapStatus.value;
+    const dateColumn = els.mapDate.value;
+    const amountColumn = els.mapAmount.value;
+
+    if (!userColumn || !orderColumn) {
+      setStatus(els.fileStatus, 'Kolom User ID dan Order ID wajib dipilih.', 'danger');
+      return;
+    }
+
+    const mapped = rawRows.map((row, index) => ({
+      row: index + 2,
+      userId: safeText(row[userColumn]),
+      userKey: normalizeUser(row[userColumn]),
+      orderId: safeText(row[orderColumn]),
+      status: statusColumn ? safeText(row[statusColumn]) : 'PENDING',
+      date: dateColumn ? safeText(row[dateColumn]) : '',
+      amount: amountColumn ? safeText(row[amountColumn]) : ''
+    })).filter(item => item.userKey && item.orderId);
+
+    if (!mapped.length) {
+      setStatus(els.fileStatus, 'Tidak ada baris valid. Periksa kembali pemetaan kolom.', 'danger');
+      return;
+    }
+
+    database = mapped;
+    const meta = {
+      fileName: currentFileName,
+      importedAt: new Date().toISOString(),
+      rows: mapped.length,
+      hasStatusColumn: Boolean(statusColumn)
+    };
+
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(database));
+      localStorage.setItem(META_KEY, JSON.stringify(meta));
+      setStatus(els.fileStatus, `${mapped.length.toLocaleString('id-ID')} transaksi berhasil disimpan dari ${currentFileName}.`, 'success');
+    } catch (error) {
+      setStatus(els.fileStatus, `${mapped.length.toLocaleString('id-ID')} transaksi berhasil digunakan, tetapi tidak dapat disimpan permanen di browser.`, 'warning');
+    }
+
+    updateDatabaseUi(meta);
+    els.mapping.classList.remove('show');
+  }
+
+  function loadSavedDatabase() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      const meta = JSON.parse(localStorage.getItem(META_KEY) || 'null');
+      if (Array.isArray(saved) && saved.length) {
+        database = saved;
+        updateDatabaseUi(meta || { rows: saved.length, fileName: 'Database tersimpan' });
+        setStatus(els.fileStatus, `${saved.length.toLocaleString('id-ID')} transaksi dimuat dari penyimpanan browser.`, 'success');
+      }
+    } catch (error) {
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(META_KEY);
+    }
+  }
+
+  function updateDatabaseUi(meta = null) {
+    const count = database.length;
+    els.metricDatabase.textContent = count.toLocaleString('id-ID');
+    els.clearDatabase.disabled = count === 0;
+    if (count) {
+      const fileName = meta?.fileName || 'Database Excel';
+      els.databaseBadge.textContent = `${count.toLocaleString('id-ID')} transaksi aktif`;
+      els.databaseBadge.title = fileName;
+    } else {
+      els.databaseBadge.textContent = 'Belum ada database';
+      els.databaseBadge.removeAttribute('title');
+    }
+  }
+
+  function parseInput(text) {
+    const lines = text.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+    return lines.map((line, index) => {
+      const match = line.match(/^(\S+)\s+(https?:\/\/\S+)\s*$/i);
+      if (!match) return { lineNumber: index + 1, raw: line, valid: false, userId: '', proofUrl: '' };
+      return {
+        lineNumber: index + 1,
+        raw: line,
+        valid: true,
+        userId: match[1].trim(),
+        userKey: normalizeUser(match[1]),
+        proofUrl: match[2].trim()
+      };
+    });
+  }
+
+  function searchOrders() {
+    clearStatus(els.searchStatus);
+    const parsed = parseInput(els.searchInput.value);
+    if (!parsed.length) {
+      setStatus(els.searchStatus, 'Tempel minimal satu User ID dan link bukti transfer.', 'warning');
+      return;
+    }
+    if (!database.length) {
+      setStatus(els.searchStatus, 'Masukkan file Excel pending QRIS terlebih dahulu.', 'warning');
+      return;
+    }
+
+    const invalid = parsed.filter(item => !item.valid);
+    const valid = parsed.filter(item => item.valid);
+    const byUser = new Map();
+    database.forEach(record => {
+      if (!byUser.has(record.userKey)) byUser.set(record.userKey, []);
+      byUser.get(record.userKey).push(record);
+    });
+
+    const results = [];
+    valid.forEach(input => {
+      let matches = byUser.get(input.userKey) || [];
+      if (els.pendingOnly.checked) matches = matches.filter(record => isPending(record.status));
+
+      if (matches.length) {
+        matches.forEach(record => results.push({ ...input, ...record, found: true }));
+      } else {
+        results.push({ ...input, orderId: '', status: '', date: '', amount: '', found: false });
+      }
+    });
+
+    invalid.forEach(item => results.push({ ...item, found: false, invalid: true, orderId: '', status: '', date: '', amount: '', proofUrl: '' }));
+    lastResults = results;
+    renderResults(parsed.length, results);
+
+    const foundCount = results.filter(item => item.found).length;
+    const missingCount = results.filter(item => !item.found).length;
+    const messageParts = [`${foundCount} Order ID ditemukan`, `${missingCount} data tidak ditemukan/format salah`];
+    setStatus(els.searchStatus, messageParts.join(' • '), missingCount ? 'warning' : 'success');
+
+    if (els.autoOpenSingle.checked && valid.length === 1 && valid[0].proofUrl) {
+      window.open(valid[0].proofUrl, '_blank', 'noopener,noreferrer');
+    }
+  }
+
+  function renderResults(inputCount, results) {
+    els.metricInput.textContent = inputCount.toLocaleString('id-ID');
+    els.metricFound.textContent = results.filter(item => item.found).length.toLocaleString('id-ID');
+    els.metricMissing.textContent = results.filter(item => !item.found).length.toLocaleString('id-ID');
+    els.copyAll.disabled = !results.some(item => item.found);
+    els.openAll.disabled = !results.some(item => item.proofUrl);
+    els.downloadCsv.disabled = results.length === 0;
+
+    if (!results.length) {
+      els.resultBody.innerHTML = '<tr><td colspan="8" class="empty">Belum ada hasil pencarian.</td></tr>';
+      return;
+    }
+
+    els.resultBody.innerHTML = '';
+    results.forEach((item, index) => {
+      const tr = document.createElement('tr');
+      const statusText = item.invalid ? 'FORMAT SALAH' : item.found ? (item.status || 'PENDING') : 'TIDAK DITEMUKAN';
+      const statusClass = item.invalid || !item.found ? 'missing' : isPending(item.status) ? 'pending' : 'found';
+
+      tr.innerHTML = `
+        <td>${index + 1}</td>
+        <td><strong>${escapeHtml(item.userId || item.raw || '-')}</strong></td>
+        <td class="order-id">${item.orderId ? escapeHtml(item.orderId) : '—'}</td>
+        <td><span class="badge ${statusClass}">${escapeHtml(statusText)}</span></td>
+        <td>${escapeHtml(item.date || '—')}</td>
+        <td>${escapeHtml(item.amount || '—')}</td>
+        <td>${item.proofUrl ? `<a class="proof-link" href="${escapeAttr(item.proofUrl)}" target="_blank" rel="noopener noreferrer" title="${escapeAttr(item.proofUrl)}">${escapeHtml(item.proofUrl)}</a>` : '—'}</td>
+        <td><div class="row-actions"></div></td>
+      `;
+
+      const actionBox = tr.querySelector('.row-actions');
+      if (item.orderId) {
+        const copyButton = makeButton('Salin Order ID', 'btn-secondary btn-small', () => copyText(item.orderId, copyButton));
+        actionBox.appendChild(copyButton);
+      }
+      if (item.proofUrl) {
+        const openButton = makeButton('Buka Gambar', 'btn-primary btn-small', () => window.open(item.proofUrl, '_blank', 'noopener,noreferrer'));
+        actionBox.appendChild(openButton);
+      }
+      if (!item.orderId && !item.proofUrl) actionBox.textContent = '—';
+      els.resultBody.appendChild(tr);
+    });
+  }
+
+  function makeButton(text, className, onClick) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = className;
+    button.textContent = text;
+    button.addEventListener('click', onClick);
+    return button;
+  }
+
+  function escapeHtml(value) {
+    return String(value).replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[char]);
+  }
+
+  function escapeAttr(value) { return escapeHtml(value); }
+
+  async function copyText(text, button = null) {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch (_) {
+      const temp = document.createElement('textarea');
+      temp.value = text;
+      document.body.appendChild(temp);
+      temp.select();
+      document.execCommand('copy');
+      temp.remove();
+    }
+    if (button) {
+      const original = button.textContent;
+      button.textContent = 'Tersalin ✓';
+      setTimeout(() => button.textContent = original, 1200);
+    }
+  }
+
+  function copyAllResults() {
+    const lines = lastResults.filter(item => item.found).map(item => `${item.userId}\t${item.orderId}\t${item.proofUrl}`);
+    if (lines.length) copyText(lines.join('\n'), els.copyAll);
+  }
+
+  function openAllProofs() {
+    const urls = [...new Set(lastResults.map(item => item.proofUrl).filter(Boolean))];
+    if (!urls.length) return;
+    urls.forEach((url, index) => setTimeout(() => window.open(url, '_blank', 'noopener,noreferrer'), index * 120));
+  }
+
+  function downloadResultsCsv() {
+    if (!lastResults.length) return;
+    const headers = ['User ID', 'Order ID', 'Status', 'Tanggal', 'Nominal', 'Bukti Transfer', 'Hasil'];
+    const rows = lastResults.map(item => [
+      item.userId || item.raw || '', item.orderId || '', item.status || '', item.date || '', item.amount || '', item.proofUrl || '', item.found ? 'DITEMUKAN' : item.invalid ? 'FORMAT SALAH' : 'TIDAK DITEMUKAN'
+    ]);
+    const csv = [headers, ...rows].map(row => row.map(csvCell).join(',')).join('\r\n');
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `hasil-order-qris-${new Date().toISOString().slice(0,10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+  }
+
+  function csvCell(value) {
+    const text = String(value ?? '');
+    return `"${text.replace(/"/g, '""')}"`;
+  }
+
+  function clearDatabase() {
+    database = [];
+    rawRows = [];
+    headers = [];
+    currentFileName = '';
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(META_KEY);
+    els.fileInput.value = '';
+    els.mapping.classList.remove('show');
+    updateDatabaseUi();
+    setStatus(els.fileStatus, 'Database tersimpan telah dihapus.', 'warning');
+  }
+
+  els.fileInput.addEventListener('change', event => {
+    const file = event.target.files?.[0];
+    if (file) readFile(file);
+  });
+  ['dragenter', 'dragover'].forEach(type => els.dropzone.addEventListener(type, event => {
+    event.preventDefault();
+    els.dropzone.classList.add('dragover');
+  }));
+  ['dragleave', 'drop'].forEach(type => els.dropzone.addEventListener(type, event => {
+    event.preventDefault();
+    els.dropzone.classList.remove('dragover');
+  }));
+  els.dropzone.addEventListener('drop', event => {
+    const file = event.dataTransfer.files?.[0];
+    if (file) readFile(file);
+  });
+
+  els.applyMapping.addEventListener('click', applyMapping);
+  els.clearDatabase.addEventListener('click', clearDatabase);
+  els.searchBtn.addEventListener('click', searchOrders);
+  els.clearInput.addEventListener('click', () => {
+    els.searchInput.value = '';
+    lastResults = [];
+    clearStatus(els.searchStatus);
+    renderResults(0, []);
+  });
+  els.pasteExample.addEventListener('click', () => { els.searchInput.value = EXAMPLE; els.searchInput.focus(); });
+  els.copyAll.addEventListener('click', copyAllResults);
+  els.openAll.addEventListener('click', openAllProofs);
+  els.downloadCsv.addEventListener('click', downloadResultsCsv);
+  els.searchInput.addEventListener('keydown', event => {
+    if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') searchOrders();
+  });
+
+  loadSavedDatabase();
+  updateDatabaseUi(database.length ? JSON.parse(localStorage.getItem(META_KEY) || 'null') : null);
+})();
+</script>
+</body>
+</html>
