@@ -107,19 +107,7 @@
     .status-box.warning { background: var(--warning-bg); color: var(--warning); }
     .status-box.danger { background: var(--danger-bg); color: var(--danger); }
 
-    .mapping {
-      margin-top: 14px;
-      display: none;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-      padding: 14px;
-      border-radius: 14px;
-      background: #faf9ff;
-      border: 1px solid var(--border);
-    }
-    .mapping.show { display: grid; }
-    label.field { display: grid; gap: 6px; font-size: 12px; font-weight: 700; color: #4a4f5d; }
-    select, textarea, input[type="text"] {
+    textarea, input[type="text"] {
       width: 100%;
       border: 1px solid #cfc9df;
       border-radius: 12px;
@@ -129,7 +117,7 @@
       color: var(--text);
       outline: none;
     }
-    select:focus, textarea:focus, input[type="text"]:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(108,52,234,.12); }
+    textarea:focus, input[type="text"]:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(108,52,234,.12); }
     textarea { min-height: 190px; resize: vertical; line-height: 1.5; }
 
     .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
@@ -197,7 +185,6 @@
     @media (max-width: 520px) {
       .container { width: min(100% - 18px, 1180px); margin-top: 10px; }
       .hero, .card { border-radius: 16px; padding: 16px; }
-      .mapping { grid-template-columns: 1fr; }
       .summary { grid-template-columns: 1fr 1fr; }
     }
   </style>
@@ -227,20 +214,11 @@
           <div>
             <div class="upload-icon">📥</div>
             <strong>Klik atau seret file Excel ke sini</strong>
-            <span class="hint">File export yang berisi User ID dan Order ID</span>
+            <span class="hint">File export akan dibaca otomatis berdasarkan kolom User ID dan Order ID</span>
           </div>
         </label>
 
         <div id="fileStatus" class="status-box"></div>
-
-        <div id="mapping" class="mapping">
-          <label class="field">Kolom User ID *<select id="mapUser"></select></label>
-          <label class="field">Kolom Order ID *<select id="mapOrder"></select></label>
-          <label class="field">Kolom Status<select id="mapStatus"></select></label>
-          <label class="field">Kolom Tanggal<select id="mapDate"></select></label>
-          <label class="field">Kolom Nominal<select id="mapAmount"></select></label>
-          <div style="align-self:end"><button id="applyMapping" class="btn-primary" style="width:100%">Gunakan Data Excel</button></div>
-        </div>
 
         <div class="actions">
           <button id="clearDatabase" class="btn-danger" disabled>Hapus Database Tersimpan</button>
@@ -328,13 +306,6 @@
     fileInput: document.getElementById('fileInput'),
     dropzone: document.getElementById('dropzone'),
     fileStatus: document.getElementById('fileStatus'),
-    mapping: document.getElementById('mapping'),
-    mapUser: document.getElementById('mapUser'),
-    mapOrder: document.getElementById('mapOrder'),
-    mapStatus: document.getElementById('mapStatus'),
-    mapDate: document.getElementById('mapDate'),
-    mapAmount: document.getElementById('mapAmount'),
-    applyMapping: document.getElementById('applyMapping'),
     clearDatabase: document.getElementById('clearDatabase'),
     searchInput: document.getElementById('searchInput'),
     pendingOnly: document.getElementById('pendingOnly'),
@@ -383,57 +354,150 @@
     el.textContent = '';
   }
 
+  const COLUMN_ALIASES = {
+    user: [
+      'user id', 'userid', 'user name', 'username', 'user',
+      'member id', 'member name', 'member',
+      'player id', 'player name', 'player',
+      'customer id', 'customer name', 'customer',
+      'account id', 'account name', 'account',
+      'akun', 'nama akun', 'login id', 'login'
+    ],
+    order: [
+      'order id', 'orderid', 'id order', 'order no', 'order number',
+      'nomor order', 'no order', 'kode order',
+      'transaction id', 'transactionid', 'transaction no', 'transaction number',
+      'trx id', 'trxid', 'trx no', 'kode transaksi', 'nomor transaksi', 'no transaksi',
+      'reference id', 'reference no', 'ref id', 'ref no',
+      'invoice id', 'invoice no', 'merchant order id', 'merchant reference'
+    ],
+    status: [
+      'status', 'order status', 'transaction status', 'trx status',
+      'payment status', 'deposit status', 'status transaksi'
+    ],
+    date: [
+      'created at', 'created date', 'creation date', 'request date',
+      'transaction date', 'order date', 'tanggal', 'date', 'waktu', 'time'
+    ],
+    amount: [
+      'nominal', 'amount', 'deposit amount', 'transaction amount',
+      'jumlah', 'total', 'nilai', 'value'
+    ]
+  };
+
   function detectHeader(candidates) {
-    const normalized = headers.map(h => ({ original: h, normalized: normalizeHeader(h) }));
+    const normalized = headers.map(header => ({
+      original: header,
+      normalized: normalizeHeader(header)
+    }));
+
     for (const candidate of candidates) {
       const exact = normalized.find(item => item.normalized === candidate);
       if (exact) return exact.original;
     }
+
     for (const candidate of candidates) {
-      const partial = normalized.find(item => item.normalized.includes(candidate));
+      if (candidate.length < 6) continue;
+      const partial = normalized.find(item =>
+        item.normalized.startsWith(candidate + ' ') ||
+        item.normalized.endsWith(' ' + candidate) ||
+        item.normalized.includes(' ' + candidate + ' ')
+      );
       if (partial) return partial.original;
     }
     return '';
   }
 
-  function fillSelect(select, selected = '', optional = false) {
-    select.innerHTML = '';
-    if (optional) {
-      const option = document.createElement('option');
-      option.value = '';
-      option.textContent = '— Tidak digunakan —';
-      select.appendChild(option);
-    }
-    headers.forEach(header => {
-      const option = document.createElement('option');
-      option.value = header;
-      option.textContent = header;
-      select.appendChild(option);
-    });
-    if (selected && headers.includes(selected)) select.value = selected;
+  function detectByKeywords(type) {
+    const rules = {
+      user: {
+        include: ['user', 'username', 'member', 'player', 'customer', 'account', 'akun', 'login'],
+        exclude: ['order', 'transaction', 'trx', 'status', 'site', 'situs']
+      },
+      order: {
+        include: ['order', 'transaction', 'trx', 'reference', 'invoice'],
+        exclude: ['status', 'date', 'tanggal', 'amount', 'nominal']
+      }
+    };
+    const rule = rules[type];
+    if (!rule) return '';
+
+    const candidates = headers.map(header => {
+      const normalized = normalizeHeader(header);
+      let score = 0;
+      rule.include.forEach(word => {
+        if (normalized === word) score += 8;
+        else if (normalized.includes(word)) score += 3;
+      });
+      if (/\b(id|no|number|nomor|kode)\b/.test(normalized)) score += 2;
+      rule.exclude.forEach(word => {
+        if (normalized.includes(word)) score -= 6;
+      });
+      return { header, score };
+    }).sort((a, b) => b.score - a.score);
+
+    return candidates[0]?.score > 0 ? candidates[0].header : '';
   }
 
-  function setupMapping() {
-    const detected = {
-      user: detectHeader(['user id', 'userid', 'username', 'user', 'member id', 'member', 'account']),
-      order: detectHeader(['order id', 'orderid', 'id order', 'transaction id', 'transactionid', 'trx id', 'kode order', 'reference id', 'ref id']),
-      status: detectHeader(['status', 'order status', 'transaction status']),
-      date: detectHeader(['created at', 'created date', 'tanggal', 'date', 'waktu', 'time']),
-      amount: detectHeader(['nominal', 'amount', 'jumlah', 'total', 'deposit amount'])
+  function importExcelAutomatically() {
+    const userColumn = detectHeader(COLUMN_ALIASES.user) || detectByKeywords('user');
+    const orderColumn = detectHeader(COLUMN_ALIASES.order) || detectByKeywords('order');
+    const statusColumn = detectHeader(COLUMN_ALIASES.status);
+    const dateColumn = detectHeader(COLUMN_ALIASES.date);
+    const amountColumn = detectHeader(COLUMN_ALIASES.amount);
+
+    if (!userColumn || !orderColumn || userColumn === orderColumn) {
+      const available = headers.slice(0, 12).join(', ');
+      setStatus(
+        els.fileStatus,
+        `Kolom User ID atau Order ID tidak terdeteksi otomatis. Pastikan Excel memiliki judul kolom User ID dan Order ID. Kolom terbaca: ${available || 'tidak ada'}.`,
+        'danger'
+      );
+      return;
+    }
+
+    const mapped = rawRows.map((row, index) => ({
+      row: index + 2,
+      userId: safeText(row[userColumn]),
+      userKey: normalizeUser(row[userColumn]),
+      orderId: safeText(row[orderColumn]),
+      status: statusColumn ? safeText(row[statusColumn]) : 'PENDING',
+      date: dateColumn ? safeText(row[dateColumn]) : '',
+      amount: amountColumn ? safeText(row[amountColumn]) : ''
+    })).filter(item => item.userKey && item.orderId);
+
+    if (!mapped.length) {
+      setStatus(els.fileStatus, 'File berhasil dibaca, tetapi tidak ditemukan baris User ID dan Order ID yang valid.', 'danger');
+      return;
+    }
+
+    database = mapped;
+    const meta = {
+      fileName: currentFileName,
+      importedAt: new Date().toISOString(),
+      rows: mapped.length,
+      hasStatusColumn: Boolean(statusColumn),
+      userColumn,
+      orderColumn
     };
 
-    fillSelect(els.mapUser, detected.user, false);
-    fillSelect(els.mapOrder, detected.order, false);
-    fillSelect(els.mapStatus, detected.status, true);
-    fillSelect(els.mapDate, detected.date, true);
-    fillSelect(els.mapAmount, detected.amount, true);
-    els.mapping.classList.add('show');
-
-    if (!detected.user || !detected.order) {
-      setStatus(els.fileStatus, `File dibaca (${rawRows.length.toLocaleString('id-ID')} baris), tetapi kolom User ID atau Order ID belum terdeteksi. Pilih kolom yang benar di bawah.`, 'warning');
-    } else {
-      setStatus(els.fileStatus, `File dibaca (${rawRows.length.toLocaleString('id-ID')} baris). Kolom terdeteksi otomatis; periksa lalu klik “Gunakan Data Excel”.`, 'success');
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(database));
+      localStorage.setItem(META_KEY, JSON.stringify(meta));
+      setStatus(
+        els.fileStatus,
+        `${mapped.length.toLocaleString('id-ID')} transaksi berhasil digunakan otomatis dari ${currentFileName}.`,
+        'success'
+      );
+    } catch (error) {
+      setStatus(
+        els.fileStatus,
+        `${mapped.length.toLocaleString('id-ID')} transaksi berhasil digunakan, tetapi tidak dapat disimpan permanen di browser.`,
+        'warning'
+      );
     }
+
+    updateDatabaseUi(meta);
   }
 
   function readFile(file) {
@@ -452,63 +516,15 @@
         if (!rawRows.length) throw new Error('File tidak memiliki data.');
         headers = Array.from(new Set(rawRows.flatMap(row => Object.keys(row))));
         if (!headers.length) throw new Error('Judul kolom tidak ditemukan.');
-        setupMapping();
+        importExcelAutomatically();
       } catch (error) {
         rawRows = [];
         headers = [];
-        els.mapping.classList.remove('show');
         setStatus(els.fileStatus, `Gagal membaca file: ${error.message}`, 'danger');
       }
     };
     reader.onerror = () => setStatus(els.fileStatus, 'File tidak dapat dibaca oleh browser.', 'danger');
     reader.readAsArrayBuffer(file);
-  }
-
-  function applyMapping() {
-    const userColumn = els.mapUser.value;
-    const orderColumn = els.mapOrder.value;
-    const statusColumn = els.mapStatus.value;
-    const dateColumn = els.mapDate.value;
-    const amountColumn = els.mapAmount.value;
-
-    if (!userColumn || !orderColumn) {
-      setStatus(els.fileStatus, 'Kolom User ID dan Order ID wajib dipilih.', 'danger');
-      return;
-    }
-
-    const mapped = rawRows.map((row, index) => ({
-      row: index + 2,
-      userId: safeText(row[userColumn]),
-      userKey: normalizeUser(row[userColumn]),
-      orderId: safeText(row[orderColumn]),
-      status: statusColumn ? safeText(row[statusColumn]) : 'PENDING',
-      date: dateColumn ? safeText(row[dateColumn]) : '',
-      amount: amountColumn ? safeText(row[amountColumn]) : ''
-    })).filter(item => item.userKey && item.orderId);
-
-    if (!mapped.length) {
-      setStatus(els.fileStatus, 'Tidak ada baris valid. Periksa kembali pemetaan kolom.', 'danger');
-      return;
-    }
-
-    database = mapped;
-    const meta = {
-      fileName: currentFileName,
-      importedAt: new Date().toISOString(),
-      rows: mapped.length,
-      hasStatusColumn: Boolean(statusColumn)
-    };
-
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(database));
-      localStorage.setItem(META_KEY, JSON.stringify(meta));
-      setStatus(els.fileStatus, `${mapped.length.toLocaleString('id-ID')} transaksi berhasil disimpan dari ${currentFileName}.`, 'success');
-    } catch (error) {
-      setStatus(els.fileStatus, `${mapped.length.toLocaleString('id-ID')} transaksi berhasil digunakan, tetapi tidak dapat disimpan permanen di browser.`, 'warning');
-    }
-
-    updateDatabaseUi(meta);
-    els.mapping.classList.remove('show');
   }
 
   function loadSavedDatabase() {
@@ -720,7 +736,6 @@
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem(META_KEY);
     els.fileInput.value = '';
-    els.mapping.classList.remove('show');
     updateDatabaseUi();
     setStatus(els.fileStatus, 'Database tersimpan telah dihapus.', 'warning');
   }
@@ -742,7 +757,6 @@
     if (file) readFile(file);
   });
 
-  els.applyMapping.addEventListener('click', applyMapping);
   els.clearDatabase.addEventListener('click', clearDatabase);
   els.searchBtn.addEventListener('click', searchOrders);
   els.clearInput.addEventListener('click', () => {
