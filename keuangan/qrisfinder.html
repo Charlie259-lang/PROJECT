@@ -266,7 +266,6 @@
         <div class="actions">
           <button id="searchBtn" class="btn-primary">Cari Order ID</button>
           <button id="clearInput" class="btn-light">Bersihkan Input</button>
-          <button id="pasteExample" class="btn-secondary">Isi Contoh</button>
         </div>
         <div id="searchStatus" class="status-box"></div>
       </article>
@@ -324,7 +323,6 @@
 
   const STORAGE_KEY = 'qris_order_finder_database_v1';
   const META_KEY = 'qris_order_finder_meta_v1';
-  const EXAMPLE = 'Ray31boy https://cdn.files-text.com/us-south1/api/lc/att/13376070/859af7e91472afeba050e1be646cf389/17848512277943937985396835913049';
 
   const els = {
     fileInput: document.getElementById('fileInput'),
@@ -343,7 +341,6 @@
     autoOpenSingle: document.getElementById('autoOpenSingle'),
     searchBtn: document.getElementById('searchBtn'),
     clearInput: document.getElementById('clearInput'),
-    pasteExample: document.getElementById('pasteExample'),
     searchStatus: document.getElementById('searchStatus'),
     resultBody: document.getElementById('resultBody'),
     copyAll: document.getElementById('copyAll'),
@@ -754,7 +751,6 @@
     clearStatus(els.searchStatus);
     renderResults(0, []);
   });
-  els.pasteExample.addEventListener('click', () => { els.searchInput.value = EXAMPLE; els.searchInput.focus(); });
   els.copyAll.addEventListener('click', copyAllResults);
   els.openAll.addEventListener('click', openAllProofs);
   els.downloadCsv.addEventListener('click', downloadResultsCsv);
