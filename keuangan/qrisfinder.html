@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>QRIS Order Finder</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <style>
     :root {
       --bg: #f4f2ff;
@@ -153,7 +154,7 @@
 
     .summary {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0,1fr));
+      grid-template-columns: repeat(5, minmax(0,1fr));
       gap: 10px;
       margin-bottom: 14px;
     }
@@ -172,6 +173,10 @@
     .badge.pending { background: var(--warning-bg); color: var(--warning); }
     .badge.found { background: var(--success-bg); color: var(--success); }
     .badge.missing { background: var(--danger-bg); color: var(--danger); }
+    .badge.processing { background: #e8f1ff; color: #275ea8; }
+    .badge.ocr-error { background: var(--danger-bg); color: var(--danger); }
+    .ocr-value { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-weight: 800; white-space: nowrap; }
+    .ocr-note { display: block; margin-top: 4px; font-size: 10px; color: var(--muted); font-family: inherit; font-weight: 500; white-space: normal; }
     .row-actions { display: flex; flex-wrap: wrap; gap: 6px; }
     .empty { padding: 30px; text-align: center; color: var(--muted); }
     .footer-note { text-align: center; margin-top: 16px; color: var(--muted); font-size: 12px; }
@@ -194,7 +199,7 @@
     <section class="hero">
       <div>
         <h1>🔎 QRIS Order Finder</h1>
-        <p>Cari Order ID transaksi QRIS pending berdasarkan User ID dan buka bukti transfer langsung dari hasil pencarian.</p>
+        <p>Cari Order ID transaksi QRIS pending sekaligus membaca RRN dan nominal langsung dari gambar bukti transfer.</p>
       </div>
       <div class="hero-badge" id="databaseBadge">Belum ada database</div>
     </section>
@@ -230,7 +235,7 @@
           <div class="step">2</div>
           <div>
             <h2>Tempel Data Pencarian</h2>
-            <p class="hint">Satu data per baris: <b>User ID</b> lalu <b>link bukti transfer</b>.</p>
+            <p class="hint">Satu data per baris: <b>User ID</b> lalu <b>link bukti transfer</b>. RRN dan nominal akan dibaca otomatis dari gambar.</p>
           </div>
         </div>
 
@@ -239,6 +244,7 @@
         <div class="options-row">
           <label class="check"><input id="pendingOnly" type="checkbox" checked /> Hanya status Pending</label>
           <label class="check"><input id="autoOpenSingle" type="checkbox" /> Buka bukti otomatis jika 1 data</label>
+          <label class="check"><input id="ocrEnabled" type="checkbox" checked /> OCR RRN &amp; Nominal otomatis</label>
         </div>
 
         <div class="actions">
@@ -253,7 +259,7 @@
           <div class="step">3</div>
           <div>
             <h2>Hasil Pencarian</h2>
-            <p class="hint">Order ID dapat disalin satu per satu atau sekaligus. Bukti transfer dibuka di tab baru.</p>
+            <p class="hint">Hasil menampilkan Order ID, RRN, dan nominal. Untuk bukti BCA, RRN yang kurang dari 12 angka otomatis ditambahkan angka 0 di depan.</p>
           </div>
         </div>
 
@@ -261,6 +267,7 @@
           <div class="metric"><span>Data ditempel</span><strong id="metricInput">0</strong></div>
           <div class="metric"><span>Order ditemukan</span><strong id="metricFound">0</strong></div>
           <div class="metric"><span>Tidak ditemukan</span><strong id="metricMissing">0</strong></div>
+          <div class="metric"><span>OCR terbaca</span><strong id="metricOcr">0</strong></div>
           <div class="metric"><span>Baris database</span><strong id="metricDatabase">0</strong></div>
         </div>
 
@@ -279,20 +286,22 @@
                 <th>Order ID</th>
                 <th>Status</th>
                 <th>Tanggal</th>
-                <th>Nominal</th>
+                <th>Nominal Excel</th>
+                <th>RRN OCR</th>
+                <th>Nominal OCR</th>
                 <th>Bukti Transfer</th>
                 <th>Aksi</th>
               </tr>
             </thead>
             <tbody id="resultBody">
-              <tr><td colspan="8" class="empty">Belum ada hasil pencarian.</td></tr>
+              <tr><td colspan="10" class="empty">Belum ada hasil pencarian.</td></tr>
             </tbody>
           </table>
         </div>
       </article>
     </section>
 
-    <div class="footer-note">Semua data diproses di browser dan tidak dikirim ke server.</div>
+    <div class="footer-note">Excel diproses di browser. OCR gambar dilakukan di perangkat; apabila link gambar menolak akses langsung, gambar dapat dimuat melalui proxy gambar sebagai jalur cadangan.</div>
   </main>
 
 <script>
@@ -310,6 +319,7 @@
     searchInput: document.getElementById('searchInput'),
     pendingOnly: document.getElementById('pendingOnly'),
     autoOpenSingle: document.getElementById('autoOpenSingle'),
+    ocrEnabled: document.getElementById('ocrEnabled'),
     searchBtn: document.getElementById('searchBtn'),
     clearInput: document.getElementById('clearInput'),
     searchStatus: document.getElementById('searchStatus'),
@@ -320,6 +330,7 @@
     metricInput: document.getElementById('metricInput'),
     metricFound: document.getElementById('metricFound'),
     metricMissing: document.getElementById('metricMissing'),
+    metricOcr: document.getElementById('metricOcr'),
     metricDatabase: document.getElementById('metricDatabase'),
     databaseBadge: document.getElementById('databaseBadge')
   };
@@ -329,6 +340,9 @@
   let database = [];
   let lastResults = [];
   let currentFileName = '';
+  let ocrWorker = null;
+  let activeOcrUrl = '';
+  let activeOcrProgress = 0;
 
   const normalizeHeader = (value) => String(value ?? '')
     .toLowerCase()
@@ -572,7 +586,7 @@
     });
   }
 
-  function searchOrders() {
+  async function searchOrders() {
     clearStatus(els.searchStatus);
     const parsed = parseInput(els.searchInput.value);
     if (!parsed.length) {
@@ -598,23 +612,40 @@
       if (els.pendingOnly.checked) matches = matches.filter(record => isPending(record.status));
 
       if (matches.length) {
-        matches.forEach(record => results.push({ ...input, ...record, found: true }));
+        matches.forEach(record => results.push({
+          ...input, ...record, found: true,
+          rrn: '', ocrAmount: '', ocrStatus: els.ocrEnabled.checked ? 'waiting' : 'disabled', ocrError: '', ocrText: ''
+        }));
       } else {
-        results.push({ ...input, orderId: '', status: '', date: '', amount: '', found: false });
+        results.push({
+          ...input, orderId: '', status: '', date: '', amount: '', found: false,
+          rrn: '', ocrAmount: '', ocrStatus: els.ocrEnabled.checked ? 'waiting' : 'disabled', ocrError: '', ocrText: ''
+        });
       }
     });
 
-    invalid.forEach(item => results.push({ ...item, found: false, invalid: true, orderId: '', status: '', date: '', amount: '', proofUrl: '' }));
+    invalid.forEach(item => results.push({
+      ...item, found: false, invalid: true, orderId: '', status: '', date: '', amount: '', proofUrl: '',
+      rrn: '', ocrAmount: '', ocrStatus: 'disabled', ocrError: '', ocrText: ''
+    }));
+
     lastResults = results;
     renderResults(parsed.length, results);
 
     const foundCount = results.filter(item => item.found).length;
     const missingCount = results.filter(item => !item.found).length;
-    const messageParts = [`${foundCount} Order ID ditemukan`, `${missingCount} data tidak ditemukan/format salah`];
-    setStatus(els.searchStatus, messageParts.join(' • '), missingCount ? 'warning' : 'success');
+    setStatus(
+      els.searchStatus,
+      `${foundCount} Order ID ditemukan • ${missingCount} data tidak ditemukan/format salah${els.ocrEnabled.checked ? ' • OCR akan diproses' : ''}`,
+      missingCount ? 'warning' : 'success'
+    );
 
     if (els.autoOpenSingle.checked && valid.length === 1 && valid[0].proofUrl) {
       window.open(valid[0].proofUrl, '_blank', 'noopener,noreferrer');
+    }
+
+    if (els.ocrEnabled.checked && results.some(item => item.proofUrl)) {
+      await runOcrForResults();
     }
   }
 
@@ -622,12 +653,13 @@
     els.metricInput.textContent = inputCount.toLocaleString('id-ID');
     els.metricFound.textContent = results.filter(item => item.found).length.toLocaleString('id-ID');
     els.metricMissing.textContent = results.filter(item => !item.found).length.toLocaleString('id-ID');
-    els.copyAll.disabled = !results.some(item => item.found);
+    els.metricOcr.textContent = results.filter(item => item.rrn || item.ocrAmount).length.toLocaleString('id-ID');
+    els.copyAll.disabled = !results.some(item => item.found || item.rrn || item.ocrAmount);
     els.openAll.disabled = !results.some(item => item.proofUrl);
     els.downloadCsv.disabled = results.length === 0;
 
     if (!results.length) {
-      els.resultBody.innerHTML = '<tr><td colspan="8" class="empty">Belum ada hasil pencarian.</td></tr>';
+      els.resultBody.innerHTML = '<tr><td colspan="10" class="empty">Belum ada hasil pencarian.</td></tr>';
       return;
     }
 
@@ -636,6 +668,8 @@
       const tr = document.createElement('tr');
       const statusText = item.invalid ? 'FORMAT SALAH' : item.found ? (item.status || 'PENDING') : 'TIDAK DITEMUKAN';
       const statusClass = item.invalid || !item.found ? 'missing' : isPending(item.status) ? 'pending' : 'found';
+      const rrnHtml = buildOcrCell(item, 'rrn');
+      const amountHtml = buildOcrCell(item, 'amount');
 
       tr.innerHTML = `
         <td>${index + 1}</td>
@@ -644,6 +678,8 @@
         <td><span class="badge ${statusClass}">${escapeHtml(statusText)}</span></td>
         <td>${escapeHtml(item.date || '—')}</td>
         <td>${escapeHtml(item.amount || '—')}</td>
+        <td>${rrnHtml}</td>
+        <td>${amountHtml}</td>
         <td>${item.proofUrl ? `<a class="proof-link" href="${escapeAttr(item.proofUrl)}" target="_blank" rel="noopener noreferrer" title="${escapeAttr(item.proofUrl)}">${escapeHtml(item.proofUrl)}</a>` : '—'}</td>
         <td><div class="row-actions"></div></td>
       `;
@@ -653,14 +689,484 @@
         const copyButton = makeButton('Salin Order ID', 'btn-secondary btn-small', () => copyText(item.orderId, copyButton));
         actionBox.appendChild(copyButton);
       }
+      if (item.rrn || item.ocrAmount) {
+        const copyOcrButton = makeButton('Salin RRN & Nominal', 'btn-secondary btn-small', () => {
+          const value = `RRN : ${item.rrn || '-'}\nNominal : ${item.ocrAmount || '-'}`;
+          copyText(value, copyOcrButton);
+        });
+        actionBox.appendChild(copyOcrButton);
+      }
       if (item.proofUrl) {
+        const retryButton = makeButton('Ulangi OCR', 'btn-light btn-small', () => retryOcrForUrl(item.proofUrl));
+        retryButton.disabled = item.ocrStatus === 'processing';
+        actionBox.appendChild(retryButton);
         const openButton = makeButton('Buka Gambar', 'btn-primary btn-small', () => window.open(item.proofUrl, '_blank', 'noopener,noreferrer'));
         actionBox.appendChild(openButton);
       }
-      if (!item.orderId && !item.proofUrl) actionBox.textContent = '—';
+      if (!actionBox.children.length) actionBox.textContent = '—';
       els.resultBody.appendChild(tr);
     });
   }
+
+  function buildOcrCell(item, type) {
+    const value = type === 'rrn' ? item.rrn : item.ocrAmount;
+    if (value) {
+      const note = item.ocrStatus === 'partial' ? '<span class="ocr-note">Sebagian data terbaca</span>' : '';
+      return `<span class="ocr-value">${escapeHtml(value)}</span>${note}`;
+    }
+    if (item.ocrStatus === 'processing') {
+      const progress = item.proofUrl === activeOcrUrl && activeOcrProgress ? ` ${activeOcrProgress}%` : '';
+      return `<span class="badge processing">MEMBACA${progress}</span>`;
+    }
+    if (item.ocrStatus === 'error') {
+      return `<span class="badge ocr-error" title="${escapeAttr(item.ocrError || 'OCR gagal')}">GAGAL OCR</span>`;
+    }
+    if (item.ocrStatus === 'done' || item.ocrStatus === 'partial') return '—';
+    if (item.ocrStatus === 'disabled') return '<span class="ocr-note">OCR nonaktif</span>';
+    return '<span class="badge processing">MENUNGGU</span>';
+  }
+
+  async function runOcrForResults() {
+    const urls = [...new Set(lastResults.map(item => item.proofUrl).filter(Boolean))];
+    if (!urls.length) return;
+
+    els.searchBtn.disabled = true;
+    const originalText = els.searchBtn.textContent;
+    els.searchBtn.textContent = 'Memproses OCR...';
+
+    try {
+      for (let index = 0; index < urls.length; index++) {
+        const url = urls[index];
+        setOcrStateForUrl(url, { ocrStatus: 'processing', ocrError: '' });
+        activeOcrUrl = url;
+        activeOcrProgress = 0;
+        renderResults(Number(els.metricInput.textContent.replace(/\D/g, '')) || 0, lastResults);
+        setStatus(els.searchStatus, `OCR bukti ${index + 1} dari ${urls.length} sedang diproses...`, 'warning');
+
+        try {
+          const data = await recognizeReceipt(url);
+          setOcrStateForUrl(url, {
+            rrn: data.rrn,
+            ocrAmount: data.amount,
+            ocrText: data.text,
+            ocrStatus: data.rrn && data.amount ? 'done' : (data.rrn || data.amount ? 'partial' : 'error'),
+            ocrError: data.rrn || data.amount ? '' : 'RRN dan nominal tidak ditemukan pada gambar.'
+          });
+        } catch (error) {
+          setOcrStateForUrl(url, {
+            rrn: '', ocrAmount: '', ocrStatus: 'error',
+            ocrError: error?.message || 'Gambar tidak dapat diproses.'
+          });
+        }
+        activeOcrProgress = 0;
+        renderResults(Number(els.metricInput.textContent.replace(/\D/g, '')) || 0, lastResults);
+      }
+
+      const success = lastResults.filter(item => item.rrn || item.ocrAmount).length;
+      const failed = lastResults.filter(item => item.proofUrl && !(item.rrn || item.ocrAmount)).length;
+      setStatus(
+        els.searchStatus,
+        `OCR selesai • ${success} hasil terbaca • ${failed} hasil belum terbaca. Klik Ulangi OCR untuk mencoba kembali.`,
+        failed ? 'warning' : 'success'
+      );
+    } finally {
+      activeOcrUrl = '';
+      activeOcrProgress = 0;
+      els.searchBtn.disabled = false;
+      els.searchBtn.textContent = originalText;
+    }
+  }
+
+  async function retryOcrForUrl(url) {
+    if (!url) return;
+    setOcrStateForUrl(url, { rrn: '', ocrAmount: '', ocrStatus: 'processing', ocrError: '' });
+    activeOcrUrl = url;
+    activeOcrProgress = 0;
+    renderResults(Number(els.metricInput.textContent.replace(/\D/g, '')) || 0, lastResults);
+    try {
+      const data = await recognizeReceipt(url, true);
+      setOcrStateForUrl(url, {
+        rrn: data.rrn,
+        ocrAmount: data.amount,
+        ocrText: data.text,
+        ocrStatus: data.rrn && data.amount ? 'done' : (data.rrn || data.amount ? 'partial' : 'error'),
+        ocrError: data.rrn || data.amount ? '' : 'RRN dan nominal tidak ditemukan pada gambar.'
+      });
+    } catch (error) {
+      setOcrStateForUrl(url, { rrn: '', ocrAmount: '', ocrStatus: 'error', ocrError: error?.message || 'OCR gagal.' });
+    } finally {
+      activeOcrUrl = '';
+      activeOcrProgress = 0;
+      renderResults(Number(els.metricInput.textContent.replace(/\D/g, '')) || 0, lastResults);
+    }
+  }
+
+  function setOcrStateForUrl(url, patch) {
+    lastResults.forEach(item => {
+      if (item.proofUrl === url) Object.assign(item, patch);
+    });
+  }
+
+  async function ensureOcrWorker() {
+    if (!window.Tesseract) {
+      throw new Error('Pustaka OCR gagal dimuat. Pastikan internet aktif lalu buka ulang shortcut.');
+    }
+    if (!ocrWorker) {
+      ocrWorker = await Tesseract.createWorker('eng', 1, {
+        logger: message => {
+          if (message.status === 'recognizing text') {
+            activeOcrProgress = Math.max(0, Math.min(100, Math.round((message.progress || 0) * 100)));
+            const processing = lastResults.some(item => item.ocrStatus === 'processing');
+            if (processing) renderResults(Number(els.metricInput.textContent.replace(/\D/g, '')) || 0, lastResults);
+          }
+        }
+      });
+      await ocrWorker.setParameters({
+        tessedit_pageseg_mode: '6',
+        preserve_interword_spaces: '1'
+      });
+    }
+    return ocrWorker;
+  }
+
+  async function recognizeReceipt(url, forceRetry = false) {
+    const blob = await fetchImageBlob(url, forceRetry);
+    const worker = await ensureOcrWorker();
+
+    const firstCanvas = await preprocessReceipt(blob, 'gray');
+    const firstResult = await worker.recognize(firstCanvas, { rotateAuto: true });
+    let combinedText = firstResult?.data?.text || '';
+    let parsed = parseReceiptText(combinedText);
+
+    if (!parsed.rrn || !parsed.amount) {
+      const secondCanvas = await preprocessReceipt(blob, 'binary');
+      const secondResult = await worker.recognize(secondCanvas, { rotateAuto: true });
+      const secondText = secondResult?.data?.text || '';
+      combinedText += `\n${secondText}`;
+      const secondParsed = parseReceiptText(secondText);
+      parsed = {
+        rrn: parsed.rrn || secondParsed.rrn,
+        amount: parsed.amount || secondParsed.amount
+      };
+    }
+
+    return { ...parsed, text: combinedText.trim() };
+  }
+
+  async function fetchImageBlob(url, forceRetry = false) {
+    const normalizedUrl = String(url || '').trim();
+    if (!/^https?:\/\//i.test(normalizedUrl)) throw new Error('Link bukti transfer tidak valid.');
+
+    const withoutProtocol = normalizedUrl.replace(/^https?:\/\//i, '');
+    const sources = forceRetry
+      ? [
+          `https://wsrv.nl/?url=${encodeURIComponent(withoutProtocol)}&output=png&q=100`,
+          normalizedUrl
+        ]
+      : [
+          normalizedUrl,
+          `https://wsrv.nl/?url=${encodeURIComponent(withoutProtocol)}&output=png&q=100`
+        ];
+
+    let lastError = null;
+    for (const source of sources) {
+      try {
+        const response = await fetchWithTimeout(source, 30000);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const blob = await response.blob();
+        if (!blob.size) throw new Error('File gambar kosong.');
+        return blob;
+      } catch (error) {
+        lastError = error;
+      }
+    }
+    throw new Error(`Gambar tidak dapat dimuat untuk OCR${lastError?.message ? `: ${lastError.message}` : '.'}`);
+  }
+
+  async function fetchWithTimeout(url, timeoutMs) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      return await fetch(url, { mode: 'cors', cache: 'no-store', signal: controller.signal });
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+
+  async function preprocessReceipt(blob, mode = 'gray') {
+    const objectUrl = URL.createObjectURL(blob);
+    try {
+      const image = await loadImage(objectUrl);
+      const crop = detectReceiptBounds(image);
+      const targetWidth = Math.min(1800, Math.max(1100, crop.width * 2));
+      const scale = targetWidth / crop.width;
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, Math.round(crop.width * scale));
+      canvas.height = Math.max(1, Math.round(crop.height * scale));
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(image, crop.x, crop.y, crop.width, crop.height, 0, 0, canvas.width, canvas.height);
+
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const pixels = imageData.data;
+      const histogram = new Uint32Array(256);
+      const grayValues = new Uint8Array(canvas.width * canvas.height);
+
+      for (let i = 0, p = 0; i < pixels.length; i += 4, p++) {
+        const gray = Math.round(pixels[i] * 0.299 + pixels[i + 1] * 0.587 + pixels[i + 2] * 0.114);
+        grayValues[p] = gray;
+        histogram[gray]++;
+      }
+
+      const low = percentileFromHistogram(histogram, grayValues.length, 0.04);
+      const high = percentileFromHistogram(histogram, grayValues.length, 0.96);
+      const range = Math.max(35, high - low);
+      const binaryThreshold = Math.round(low + range * 0.58);
+
+      for (let i = 0, p = 0; i < pixels.length; i += 4, p++) {
+        let value = Math.round((grayValues[p] - low) * 255 / range);
+        value = Math.max(0, Math.min(255, value));
+        if (mode === 'binary') value = value >= binaryThreshold ? 255 : 0;
+        else value = Math.max(0, Math.min(255, Math.round((value - 128) * 1.35 + 128)));
+        pixels[i] = pixels[i + 1] = pixels[i + 2] = value;
+        pixels[i + 3] = 255;
+      }
+      ctx.putImageData(imageData, 0, 0);
+      return canvas;
+    } finally {
+      URL.revokeObjectURL(objectUrl);
+    }
+  }
+
+  function loadImage(src) {
+    return new Promise((resolve, reject) => {
+      const image = new Image();
+      image.onload = () => resolve(image);
+      image.onerror = () => reject(new Error('Format gambar tidak didukung.'));
+      image.src = src;
+    });
+  }
+
+  function detectReceiptBounds(image) {
+    const sampleWidth = Math.min(420, image.naturalWidth || image.width);
+    const ratio = sampleWidth / (image.naturalWidth || image.width);
+    const sampleHeight = Math.max(1, Math.round((image.naturalHeight || image.height) * ratio));
+    const canvas = document.createElement('canvas');
+    canvas.width = sampleWidth;
+    canvas.height = sampleHeight;
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    ctx.drawImage(image, 0, 0, sampleWidth, sampleHeight);
+    const data = ctx.getImageData(0, 0, sampleWidth, sampleHeight).data;
+
+    const rowScores = new Float32Array(sampleHeight);
+    for (let y = 0; y < sampleHeight; y++) {
+      let bright = 0;
+      for (let x = 0; x < sampleWidth; x++) {
+        const i = (y * sampleWidth + x) * 4;
+        const lum = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
+        if (lum > 112) bright++;
+      }
+      rowScores[y] = bright / sampleWidth;
+    }
+
+    const rowRange = longestActiveRange(rowScores, 0.24, Math.round(sampleHeight * 0.16));
+    if (!rowRange) return { x: 0, y: 0, width: image.naturalWidth || image.width, height: image.naturalHeight || image.height };
+
+    const colScores = new Float32Array(sampleWidth);
+    for (let x = 0; x < sampleWidth; x++) {
+      let bright = 0;
+      const count = rowRange.end - rowRange.start + 1;
+      for (let y = rowRange.start; y <= rowRange.end; y++) {
+        const i = (y * sampleWidth + x) * 4;
+        const lum = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
+        if (lum > 112) bright++;
+      }
+      colScores[x] = bright / count;
+    }
+    const colRange = longestActiveRange(colScores, 0.30, Math.round(sampleWidth * 0.22));
+    if (!colRange) return { x: 0, y: 0, width: image.naturalWidth || image.width, height: image.naturalHeight || image.height };
+
+    const padX = Math.round(sampleWidth * 0.035);
+    const padY = Math.round(sampleHeight * 0.025);
+    const x1 = Math.max(0, colRange.start - padX);
+    const x2 = Math.min(sampleWidth - 1, colRange.end + padX);
+    const y1 = Math.max(0, rowRange.start - padY);
+    const y2 = Math.min(sampleHeight - 1, rowRange.end + padY);
+    const inv = 1 / ratio;
+
+    return {
+      x: Math.max(0, Math.round(x1 * inv)),
+      y: Math.max(0, Math.round(y1 * inv)),
+      width: Math.min(image.naturalWidth || image.width, Math.round((x2 - x1 + 1) * inv)),
+      height: Math.min(image.naturalHeight || image.height, Math.round((y2 - y1 + 1) * inv))
+    };
+  }
+
+  function longestActiveRange(values, threshold, minimumLength) {
+    let best = null;
+    let start = -1;
+    let gap = 0;
+    for (let i = 0; i < values.length; i++) {
+      if (values[i] >= threshold) {
+        if (start < 0) start = i;
+        gap = 0;
+      } else if (start >= 0 && gap < 3) {
+        gap++;
+      } else if (start >= 0) {
+        const end = i - gap - 1;
+        if (!best || end - start > best.end - best.start) best = { start, end };
+        start = -1;
+        gap = 0;
+      }
+    }
+    if (start >= 0) {
+      const end = values.length - gap - 1;
+      if (!best || end - start > best.end - best.start) best = { start, end };
+    }
+    return best && best.end - best.start + 1 >= minimumLength ? best : null;
+  }
+
+  function percentileFromHistogram(histogram, total, percentile) {
+    const target = total * percentile;
+    let cumulative = 0;
+    for (let i = 0; i < histogram.length; i++) {
+      cumulative += histogram[i];
+      if (cumulative >= target) return i;
+    }
+    return 255;
+  }
+
+  function parseReceiptText(text) {
+    return {
+      rrn: extractRrn(text),
+      amount: extractNominal(text)
+    };
+  }
+
+  function extractRrn(text) {
+    const lines = String(text || '').split(/\r?\n/).map(line => line.replace(/\s+/g, ' ').trim()).filter(Boolean);
+    const labelRegex = /(?:\bR\s*R\s*[NMBH]\b|\bRRN\b|\bRBN\b|RETRIEVAL\s+REFERENCE)/i;
+    const candidates = [];
+
+    lines.forEach((line, index) => {
+      const label = line.match(labelRegex);
+      if (!label) return;
+      const after = line.slice((label.index || 0) + label[0].length);
+      collectNumericCandidates(after, 20, candidates);
+      if (index + 1 < lines.length) collectNumericCandidates(lines[index + 1], 12, candidates);
+    });
+
+    if (!candidates.length) {
+      lines.forEach((line, index) => {
+        const upper = line.toUpperCase();
+        if (/\bDARI\b|FROM|TOTAL\s*PEMBAYARAN|TOTAL\s*BAYAR/.test(upper)) {
+          for (let offset = 1; offset <= 3 && index + offset < lines.length; offset++) {
+            const next = lines[index + offset];
+            if (/\bREF\b|REFERENSI|REFERENCE/i.test(next)) break;
+            collectNumericCandidates(next, 4 - offset, candidates);
+          }
+        }
+      });
+    }
+
+    const filtered = candidates
+      .filter(item => item.digits.length >= 8 && item.digits.length <= 14)
+      .filter(item => !/^0+$/.test(item.digits))
+      .sort((a, b) => {
+        const aLen = a.digits.length === 12 ? 8 : a.digits.length === 9 ? 6 : 0;
+        const bLen = b.digits.length === 12 ? 8 : b.digits.length === 9 ? 6 : 0;
+        return (b.score + bLen) - (a.score + aLen);
+      });
+
+    if (!filtered.length) return '';
+    let rrn = filtered[0].digits;
+    const upperText = String(text || '').toUpperCase();
+    const looksLikeBca = /\bBCA\b|BANK\s+CENTRAL\s+ASIA/.test(upperText) ||
+      (/PEMBAYARAN\s*QR/.test(upperText) && /TOTAL\s*PEMBAYARAN/.test(upperText) && /\bREF\b/.test(upperText));
+
+    if (looksLikeBca && rrn.length < 12) rrn = rrn.padStart(12, '0');
+    return rrn;
+  }
+
+  function collectNumericCandidates(source, baseScore, target) {
+    const matches = String(source || '').match(/[0-9OQDILSZBGTR|][0-9OQDILSZBGTR| .,:;\-]{6,24}/gi) || [];
+    matches.forEach(raw => {
+      const digits = ocrTokenToDigits(raw);
+      if (digits) target.push({ digits, score: baseScore - Math.abs(12 - digits.length) * 0.15 });
+    });
+  }
+
+  function ocrTokenToDigits(value) {
+    return String(value || '')
+      .toUpperCase()
+      .replace(/[OQD]/g, '0')
+      .replace(/[IL|]/g, '1')
+      .replace(/Z/g, '2')
+      .replace(/S/g, '5')
+      .replace(/G/g, '6')
+      .replace(/[TR]/g, '7')
+      .replace(/B/g, '8')
+      .replace(/[^0-9]/g, '');
+  }
+
+  function extractNominal(text) {
+    const lines = String(text || '').split(/\r?\n/).map(line => line.replace(/\s+/g, ' ').trim()).filter(Boolean);
+    const candidates = [];
+
+    lines.forEach(line => {
+      const upper = line.toUpperCase();
+      let score = 0;
+      if (/TOTAL\s*(PEMBAYARAN|BAYAR|PAYMENT)/.test(upper)) score += 20;
+      if (/NOMINAL|JUMLAH|AMOUNT/.test(upper)) score += 14;
+      if (/\bRP\b|RP\s*[:.]?|RUPIAH/.test(upper)) score += 8;
+      if (!score) return;
+
+      const tokens = line.match(/[0-9OQDILSZBGTR|][0-9OQDILSZBGTR|.,\s]{3,24}/gi) || [];
+      tokens.forEach(token => {
+        const parsed = parseAmountToken(token);
+        if (parsed) candidates.push({ value: parsed.value, rawDigits: parsed.rawDigits, score: score + parsed.score });
+      });
+    });
+
+    if (!candidates.length) {
+      const rpMatches = String(text || '').match(/R\s*[P]?\s*[:.]?\s*([0-9OQDILSZBGTR|][0-9OQDILSZBGTR|.,\s]{3,24})/gi) || [];
+      rpMatches.forEach(match => {
+        const parsed = parseAmountToken(match);
+        if (parsed) candidates.push({ value: parsed.value, rawDigits: parsed.rawDigits, score: 6 + parsed.score });
+      });
+    }
+
+    candidates.sort((a, b) => b.score - a.score || b.rawDigits.length - a.rawDigits.length);
+    return candidates[0]?.value || '';
+  }
+
+  function parseAmountToken(token) {
+    let normalized = String(token || '').toUpperCase()
+      .replace(/[OQD]/g, '0')
+      .replace(/[IL|]/g, '1')
+      .replace(/Z/g, '2')
+      .replace(/S/g, '5')
+      .replace(/G/g, '6')
+      .replace(/[TR]/g, '7')
+      .replace(/B/g, '8')
+      .replace(/[^0-9.,]/g, '');
+
+    if (!normalized) return null;
+    const hasDecimal = /[.,]\d{2}$/.test(normalized);
+    let digits = normalized.replace(/\D/g, '');
+    if (hasDecimal && digits.length > 2) digits = digits.slice(0, -2);
+    digits = digits.replace(/^0+(?=\d)/, '');
+    if (digits.length < 3 || digits.length > 15) return null;
+
+    const numeric = Number(digits);
+    if (!Number.isFinite(numeric) || numeric <= 0) return null;
+    const value = digits.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    const separatorBonus = /[.,]/.test(normalized) ? 4 : 0;
+    const rangeBonus = numeric >= 1000 ? 3 : 0;
+    return { value, rawDigits: digits, score: separatorBonus + rangeBonus };
+  }
+
 
   function makeButton(text, className, onClick) {
     const button = document.createElement('button');
@@ -708,9 +1214,11 @@
 
   function downloadResultsCsv() {
     if (!lastResults.length) return;
-    const headers = ['User ID', 'Order ID', 'Status', 'Tanggal', 'Nominal', 'Bukti Transfer', 'Hasil'];
+    const headers = ['User ID', 'Order ID', 'Status', 'Tanggal', 'Nominal Excel', 'RRN OCR', 'Nominal OCR', 'Bukti Transfer', 'Hasil'];
     const rows = lastResults.map(item => [
-      item.userId || item.raw || '', item.orderId || '', item.status || '', item.date || '', item.amount || '', item.proofUrl || '', item.found ? 'DITEMUKAN' : item.invalid ? 'FORMAT SALAH' : 'TIDAK DITEMUKAN'
+      item.userId || item.raw || '', item.orderId || '', item.status || '', item.date || '', item.amount || '',
+      item.rrn || '', item.ocrAmount || '', item.proofUrl || '',
+      item.found ? 'DITEMUKAN' : item.invalid ? 'FORMAT SALAH' : 'TIDAK DITEMUKAN'
     ]);
     const csv = [headers, ...rows].map(row => row.map(csvCell).join(',')).join('\r\n');
     const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
@@ -758,7 +1266,7 @@
   });
 
   els.clearDatabase.addEventListener('click', clearDatabase);
-  els.searchBtn.addEventListener('click', searchOrders);
+  els.searchBtn.addEventListener('click', () => searchOrders().catch(error => setStatus(els.searchStatus, error.message || 'Terjadi kesalahan.', 'danger')));
   els.clearInput.addEventListener('click', () => {
     els.searchInput.value = '';
     lastResults = [];
@@ -769,7 +1277,7 @@
   els.openAll.addEventListener('click', openAllProofs);
   els.downloadCsv.addEventListener('click', downloadResultsCsv);
   els.searchInput.addEventListener('keydown', event => {
-    if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') searchOrders();
+    if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') searchOrders().catch(error => setStatus(els.searchStatus, error.message || 'Terjadi kesalahan.', 'danger'));
   });
 
   loadSavedDatabase();
