@@ -660,6 +660,22 @@
                 <button class="tab-btn failed-mode active" type="button"><span>❌</span> Failed Status</button>
             </nav>
 
+            <div class="card excel-import-card">
+                <div class="card-title">📊 Import Data Zonamain untuk Ambil User ID</div>
+                <p style="font-size:15px;color:var(--text-secondary);margin-bottom:4px;">
+                    Pilih hasil export transaksi WD dari Zonamain dalam format <strong>CSV / XLS / XLSX / XLSM</strong>.
+                    Sistem akan mencocokkan <strong>ORDER ID / LIT</strong> dengan data P2MIH dan otomatis mengisi <strong>User ID pada Kolom B</strong>.
+                </p>
+                <div class="excel-upload-row">
+                    <input class="excel-file-input" id="p2mihZonamainFile" type="file" accept=".csv,.xlsx,.xls,.xlsm" onchange="handleP2MIHZonamainFile(event)">
+                    <label for="p2mihZonamainFile" class="btn btn-success"><span>📂</span> Pilih Export Zonamain</label>
+                    <button class="btn btn-secondary" type="button" onclick="clearP2MIHZonamainLookup()"><span>🧹</span> Hapus Data Zonamain</button>
+                </div>
+                <div class="excel-status" id="p2mihZonamainStatus">
+                    Belum ada data Zonamain yang dimuat. Tanpa data Zonamain, Kolom B (User ID) akan dikosongkan.
+                </div>
+            </div>
+
             <div class="card">
                 <div class="card-title">📥 Input Data P2MIH Failed</div>
                 <p style="font-size:15px;color:var(--text-secondary);margin-bottom:12px;">
@@ -677,14 +693,18 @@
                 <div class="stat-card"><div class="stat-value" id="p2mihFailedTotal">0</div><div class="stat-label">Total Baris</div></div>
                 <div class="stat-card"><div class="stat-value" id="p2mihFailedFiltered">0</div><div class="stat-label">Status REJECTED</div></div>
                 <div class="stat-card"><div class="stat-value" id="p2mihFailedProcessed">0</div><div class="stat-label">Diproses</div></div>
+                <div class="stat-card"><div class="stat-value" id="p2mihFailedMatched">0</div><div class="stat-label">User ID Cocok</div></div>
+                <div class="stat-card"><div class="stat-value" id="p2mihFailedUnmatched">0</div><div class="stat-label">User ID Tidak Ditemukan</div></div>
             </div>
+
+            <div class="lookup-info hidden" id="p2mihLookupInfo"></div>
 
             <div class="card">
                 <div class="card-title">📤 Output P2MIH Failed (7 Kolom)</div>
                 <div class="output-wrapper">
                     <div class="mode-info"><span>📋</span><div>
-                        <strong>Format:</strong> <code>A</code>=Payment | <code>B</code>=User ID (kosong) | <code>C</code>=TxID / LIT | <code>D</code>=Nomor Rekening | <code>E</code>=Nama | <code>F</code>=(kosong) | <code>G</code>=Nominal minus.<br>
-                        <span>💰 Contoh: <strong>202.000,00 → -202,000</strong> | 🔁 Urutan: bawah → atas.</span>
+                        <strong>Format:</strong> <code>A</code>=Payment (HURUF KAPITAL, awalan BANK dihapus) | <code>B</code>=User ID Zonamain | <code>C</code>=TxID / LIT | <code>D</code>=Nomor Rekening | <code>E</code>=Nama | <code>F</code>=(kosong) | <code>G</code>=Nominal minus.<br>
+                        <span>🏦 Bank BCA → <strong>BCA</strong> | Bank Mandiri → <strong>MANDIRI</strong> | 💰 202.000,00 → <strong>-202,000</strong> | 🔁 Urutan: bawah → atas.</span>
                     </div></div>
                     <div class="btn-group">
                         <button class="btn btn-success" type="button" onclick="copyP2MIHFailed()"><span>📋</span> Copy Hasil</button>
@@ -746,7 +766,7 @@
             const selectedTab = document.getElementById(`xpay-tab-${mode}`);
             if (selectedTab) selectedTab.classList.add('active');
         }
-        function cleanPaymentMethod(method) { return method ? method.replace(/^Bank\s+/i, '').trim() : ''; }
+        function cleanPaymentMethod(method) { return method ? method.replace(/^Bank\s+/i, '').trim().toUpperCase() : ''; }
         function cleanAmount(amount) { return amount ? amount.replace(/Rp/gi, '').trim() : ''; }
         
         // Mapping kode virtual account untuk E-WALLET
@@ -1450,7 +1470,193 @@
 
 
 
-        // P2MIH FAILED / REJECTED
+        // P2MIH - ZONAMAIN USER ID LOOKUP + FAILED / REJECTED
+        let p2mihUserIdByOrder = new Map();
+        let p2mihZonamainFileName = '';
+
+        function normalizeP2MIHOrderId(value) {
+            return String(value ?? '').trim().toUpperCase();
+        }
+
+        function setP2MIHZonamainStatus(message, type = '') {
+            const el = document.getElementById('p2mihZonamainStatus');
+            if (!el) return;
+            el.className = `excel-status${type ? ` ${type}` : ''}`;
+            el.textContent = message;
+        }
+
+        function normalizeP2MIHHeader(value) {
+            return String(value ?? '')
+                .replace(/[\r\n]+/g, ' ')
+                .replace(/[_-]+/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim()
+                .toUpperCase();
+        }
+
+        function detectP2MIHOrderColumn(rows) {
+            const headerNames = new Set([
+                'ORDER ID', 'ORDERID', 'TX ID', 'TXID',
+                'TRANSACTION ID', 'TRANSACTIONID', 'ORDER NO', 'ORDER NUMBER'
+            ]);
+
+            for (let row = 0; row < Math.min(rows.length, 40); row++) {
+                const current = Array.isArray(rows[row]) ? rows[row] : [];
+                for (let col = 0; col < current.length; col++) {
+                    if (headerNames.has(normalizeP2MIHHeader(current[col]))) return col;
+                }
+            }
+
+            // Fallback: cari kolom yang paling banyak berisi LIT-...
+            const maxCols = Math.max(0, ...rows.slice(0, 500).map(row => Array.isArray(row) ? row.length : 0));
+            let bestColumn = -1;
+            let bestCount = 0;
+            for (let col = 0; col < maxCols; col++) {
+                let count = 0;
+                for (let row = 0; row < Math.min(rows.length, 500); row++) {
+                    const value = String(rows[row]?.[col] ?? '').trim();
+                    if (/^LIT-[A-Za-z0-9-]+$/i.test(value)) count++;
+                }
+                if (count > bestCount) {
+                    bestCount = count;
+                    bestColumn = col;
+                }
+            }
+            return bestCount > 0 ? bestColumn : -1;
+        }
+
+        function detectP2MIHUserIdColumn(rows) {
+            const headerNames = new Set([
+                'USER ID', 'USERID', 'MEMBER ID', 'MEMBERID', 'USERNAME', 'USER NAME'
+            ]);
+
+            for (let row = 0; row < Math.min(rows.length, 40); row++) {
+                const current = Array.isArray(rows[row]) ? rows[row] : [];
+                for (let col = 0; col < current.length; col++) {
+                    if (headerNames.has(normalizeP2MIHHeader(current[col]))) return col;
+                }
+            }
+            return -1;
+        }
+
+        function extractP2MIHZonamainRows(rows, targetMap) {
+            if (!Array.isArray(rows) || !rows.length) return { found: 0, orderCol: -1, userCol: -1 };
+
+            const orderCol = detectP2MIHOrderColumn(rows);
+            const userCol = detectP2MIHUserIdColumn(rows);
+            if (orderCol < 0 || userCol < 0) return { found: 0, orderCol, userCol };
+
+            let found = 0;
+            rows.forEach(row => {
+                if (!Array.isArray(row)) return;
+                const orderId = normalizeP2MIHOrderId(row[orderCol]);
+                const userId = String(row[userCol] ?? '').trim();
+                if (!/^LIT-[A-Z0-9-]+$/i.test(orderId) || !userId) return;
+                targetMap.set(orderId, userId);
+                found++;
+            });
+
+            return { found, orderCol, userCol };
+        }
+
+        async function handleP2MIHZonamainFile(event) {
+            const input = event?.target;
+            const file = input?.files?.[0];
+            if (!file) return;
+
+            if (typeof XLSX === 'undefined') {
+                setP2MIHZonamainStatus('Library Excel belum termuat. Refresh halaman lalu coba lagi.', 'error');
+                return;
+            }
+
+            setP2MIHZonamainStatus(`Membaca ${file.name}...`);
+
+            try {
+                const buffer = await file.arrayBuffer();
+                const workbook = XLSX.read(buffer, { type: 'array', raw: false });
+                const newMap = new Map();
+                let sheetsRead = 0;
+                let sheetsMatched = 0;
+
+                workbook.SheetNames.forEach(sheetName => {
+                    const sheet = workbook.Sheets[sheetName];
+                    if (!sheet) return;
+                    const rows = XLSX.utils.sheet_to_json(sheet, {
+                        header: 1,
+                        defval: '',
+                        raw: false,
+                        blankrows: false
+                    });
+                    sheetsRead++;
+                    const result = extractP2MIHZonamainRows(rows, newMap);
+                    if (result.found > 0) sheetsMatched++;
+                });
+
+                if (!newMap.size) {
+                    p2mihUserIdByOrder = new Map();
+                    p2mihZonamainFileName = '';
+                    setP2MIHZonamainStatus(
+                        'Tidak ditemukan pasangan ORDER ID/LIT dan USER ID. Pastikan export Zonamain memiliki kolom USER ID serta ORDER ID/LIT.',
+                        'error'
+                    );
+                    if (input) input.value = '';
+                    return;
+                }
+
+                p2mihUserIdByOrder = newMap;
+                p2mihZonamainFileName = file.name;
+                setP2MIHZonamainStatus(
+                    `✅ ${p2mihUserIdByOrder.size.toLocaleString('id-ID')} Order ID/User ID berhasil dimuat dari ${file.name} (${sheetsMatched}/${sheetsRead} sheet terbaca).`,
+                    'success'
+                );
+            } catch (error) {
+                console.error('P2MIH Zonamain import error:', error);
+                p2mihUserIdByOrder = new Map();
+                p2mihZonamainFileName = '';
+                setP2MIHZonamainStatus(`Gagal membaca file: ${error?.message || error}`, 'error');
+                if (input) input.value = '';
+            }
+        }
+
+        function clearP2MIHZonamainLookup() {
+            p2mihUserIdByOrder = new Map();
+            p2mihZonamainFileName = '';
+            const input = document.getElementById('p2mihZonamainFile');
+            if (input) input.value = '';
+            setP2MIHZonamainStatus('Belum ada data Zonamain yang dimuat. Tanpa data Zonamain, Kolom B (User ID) akan dikosongkan.');
+
+            const matched = document.getElementById('p2mihFailedMatched');
+            const unmatched = document.getElementById('p2mihFailedUnmatched');
+            if (matched) matched.textContent = '0';
+            if (unmatched) unmatched.textContent = '0';
+            const info = document.getElementById('p2mihLookupInfo');
+            if (info) info.classList.add('hidden');
+        }
+
+        function lookupP2MIHUserId(orderId) {
+            return p2mihUserIdByOrder.get(normalizeP2MIHOrderId(orderId)) || '';
+        }
+
+        function renderP2MIHLookupInfo(items) {
+            const info = document.getElementById('p2mihLookupInfo');
+            if (!info) return;
+
+            if (!p2mihUserIdByOrder.size) {
+                info.className = 'lookup-info warning';
+                info.textContent = '⚠️ Data Zonamain belum dimuat. Kolom B (User ID) dikosongkan.';
+                info.classList.remove('hidden');
+                return;
+            }
+
+            const matched = items.filter(item => item.userId).length;
+            const unmatched = items.length - matched;
+            info.className = unmatched ? 'lookup-info warning' : 'lookup-info success';
+            info.textContent = unmatched
+                ? `Zonamain: ${matched} Order ID cocok, ${unmatched} tidak ditemukan. Sumber: ${p2mihZonamainFileName}.`
+                : `✅ Semua ${matched} Order ID berhasil mendapatkan User ID dari ${p2mihZonamainFileName}.`;
+            info.classList.remove('hidden');
+        }
+
         function formatP2MIHAmount(value) {
             let raw = String(value ?? '').trim().replace(/\s/g, '').replace(/Rp/gi, '');
             if (!raw) return '';
@@ -1493,34 +1699,44 @@
                     if (status !== 'REJECTED') return;
                     rejectedCount++;
 
-                    const payment = String(fields[4] || '').trim();
+                    const payment = cleanPaymentMethod(String(fields[4] || '').trim());
                     const txid = String(fields[10] || '').trim();
                     const account = String(fields[2] || '').trim();
                     const name = String(fields[3] || '').trim();
                     const amount = formatP2MIHAmount(fields[6]);
+                    const userId = lookupP2MIHUserId(txid);
 
                     if (!payment || !txid || !account || !name || !amount) return;
 
-                    // A=Payment, B=User ID kosong, C=LIT, D=Rekening, E=Nama, F=kosong, G=Nominal minus
                     results.push({
                         idx,
-                        line: [payment, '', txid, account, name, '', amount].join('\t')
+                        txid,
+                        userId,
+                        line: [payment, userId, txid, account, name, '', amount].join('\t')
                     });
                 });
 
                 // Samakan dengan formatter lain: data paling bawah menjadi output paling atas.
                 results.sort((a, b) => b.idx - a.idx);
                 const output = results.map(item => item.line);
+                const matched = p2mihUserIdByOrder.size ? results.filter(item => item.userId).length : 0;
+                const unmatched = p2mihUserIdByOrder.size ? results.length - matched : 0;
 
                 document.getElementById('p2mihFailedTotal').textContent = lines.length;
                 document.getElementById('p2mihFailedFiltered').textContent = rejectedCount;
                 document.getElementById('p2mihFailedProcessed').textContent = output.length;
+                document.getElementById('p2mihFailedMatched').textContent = matched;
+                document.getElementById('p2mihFailedUnmatched').textContent = unmatched;
                 document.getElementById('statsP2MIHFailed').classList.remove('hidden');
+                renderP2MIHLookupInfo(results);
 
                 const outputElement = document.getElementById('outputP2MIHFailed');
                 if (output.length) {
                     outputElement.textContent = output.join('\n');
-                    showToast(`✅ ${output.length} data P2MIH REJECTED berhasil diproses`);
+                    const lookupMessage = p2mihUserIdByOrder.size
+                        ? ` — ${matched} User ID cocok, ${unmatched} tidak ditemukan`
+                        : ' — User ID dikosongkan';
+                    showToast(`✅ ${output.length} data P2MIH REJECTED berhasil diproses${lookupMessage}`);
                 } else {
                     outputElement.innerHTML = '<em style="color:#ff6b6b;">❌ Tidak ditemukan data P2MIH berstatus REJECTED yang valid.</em>';
                     showToast('⚠️ Data P2MIH REJECTED tidak ditemukan', 'warning');
@@ -1574,6 +1790,10 @@
                 btn.classList.remove('loading');
                 btn.disabled = false;
             }
+            document.getElementById('p2mihFailedMatched').textContent = '0';
+            document.getElementById('p2mihFailedUnmatched').textContent = '0';
+            const info = document.getElementById('p2mihLookupInfo');
+            if (info) info.classList.add('hidden');
             document.getElementById('outputP2MIHFailed').innerHTML = '<em style="color:#888888;">✨ Hasil P2MIH failed akan muncul di sini...</em>';
         }
 
