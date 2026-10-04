@@ -708,6 +708,8 @@
                     </div></div>
                     <div class="btn-group">
                         <button class="btn btn-success" type="button" onclick="copyP2MIHFailed()"><span>📋</span> Copy Hasil</button>
+                        <button class="btn btn-success" type="button" onclick="copyP2MIHUserIds()"><span>👤</span> Copy User ID Saja</button>
+                        <button class="btn btn-success" type="button" onclick="copyP2MIHOrderAndUserIds()"><span>🔗</span> Copy Order ID + User ID</button>
                         <button class="btn btn-secondary" type="button" onclick="downloadP2MIHFailedCSV()"><span>💾</span> Download CSV</button>
                     </div>
                     <div class="output-area" id="outputP2MIHFailed"><em style="color:#888888;">✨ Hasil P2MIH failed akan muncul di sini...</em></div>
@@ -1766,6 +1768,54 @@
                     .catch(() => fallbackCopy(output));
             } else {
                 fallbackCopy(output);
+            }
+        }
+
+        function copyP2MIHUserIds() {
+            const output = getP2MIHFailedOutput();
+            if (!output) {
+                showToast('⚠️ Tidak ada hasil P2MIH untuk disalin!', 'warning');
+                return;
+            }
+
+            // Pertahankan satu baris per transaksi agar saat ditempel ke spreadsheet
+            // posisi User ID tetap sejajar dengan output P2MIH, termasuk jika ada yang kosong.
+            const rows = output.split('\n');
+            const userIds = rows.map(row => {
+                const cols = row.split('\t');
+                return cols[1] || '';
+            }).join('\n');
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(userIds)
+                    .then(() => showToast(`✅ ${rows.length} baris User ID berhasil disalin!`))
+                    .catch(() => fallbackCopy(userIds));
+            } else {
+                fallbackCopy(userIds);
+            }
+        }
+
+        function copyP2MIHOrderAndUserIds() {
+            const output = getP2MIHFailedOutput();
+            if (!output) {
+                showToast('⚠️ Tidak ada hasil P2MIH untuk disalin!', 'warning');
+                return;
+            }
+
+            const rows = output.split('\n');
+            const pairs = rows.map(row => {
+                const cols = row.split('\t');
+                const userId = cols[1] || '';
+                const orderId = cols[2] || '';
+                return [orderId, userId].join('\t');
+            }).join('\n');
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(pairs)
+                    .then(() => showToast(`✅ ${rows.length} Order ID + User ID berhasil disalin!`))
+                    .catch(() => fallbackCopy(pairs));
+            } else {
+                fallbackCopy(pairs);
             }
         }
 
