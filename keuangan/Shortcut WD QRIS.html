@@ -32,7 +32,7 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
             background: 
                 linear-gradient(135deg, rgba(15, 23, 42, 0.75) 0%, rgba(30, 41, 59, 0.65) 50%, rgba(15, 23, 42, 0.75) 100%),
-                url('https://cdn.areabermain.club/assets/cdn/az6/2025/12/10/20251210/7f0bdc56062fceb10a05b6412f5ce6e2/linetogel-bg-natal2025.webp');
+                url('https://cdn.areabermain.club/assets/cdn/az6/2026/10/04/20261004/c5b5ab37e1a53514efdfacffce20f6c5/linetogel-bg-natal2025-1.png');
             background-size: cover;
             background-position: center;
             background-attachment: scroll;
@@ -684,9 +684,11 @@
 
         <section id="provider-p2mih" class="provider-content">
             <nav class="tabs">
-                <button class="tab-btn failed-mode active" type="button"><span>❌</span> Failed Status</button>
+                <button class="tab-btn failed-mode active" type="button" data-p2mih-tab="failed" onclick="switchP2MIHTab('failed')"><span>❌</span> Failed Status</button>
+                <button class="tab-btn pending-mode" type="button" data-p2mih-tab="pending" onclick="switchP2MIHTab('pending')"><span>⏳</span> Pending Status</button>
             </nav>
 
+            <div id="p2mih-tab-failed" class="tab-content active">
             <div class="card excel-import-card">
                 <div class="card-title">📊 Import Data Zonamain untuk Ambil User ID</div>
                 <p style="font-size:15px;color:var(--text-secondary);margin-bottom:4px;">
@@ -741,6 +743,43 @@
                         <button class="btn btn-secondary" type="button" onclick="downloadP2MIHFailedCSV()"><span>💾</span> Download CSV</button>
                     </div>
                     <div class="output-area" id="outputP2MIHFailed"><em style="color:#888888;">✨ Hasil P2MIH failed akan muncul di sini...</em></div>
+                </div>
+            </div>
+            </div>
+
+            <div id="p2mih-tab-pending" class="tab-content">
+                <div class="card">
+                    <div class="card-title">📥 Input Data P2MIH Pending</div>
+                    <p style="font-size:15px;color:var(--text-secondary);margin-bottom:12px;">
+                        Tempel satu atau banyak baris transaksi P2MIH berstatus <strong>PENDING</strong> (tab-separated).
+                    </p>
+                    <textarea id="inputP2MIHPending" placeholder="LEON PBR 1	XX - XX	901710348904	MEL GIBSON SITUMEANG	Seabank	B2C	600.000,00	1.600,00	b2c-20261004184113911562-01m43bfn39n7ntfsc5g1wkcy3b	I027nmx2o69hqhn1k7n_da	LIT-3d9ff15b-6364-47ff-a5c4-5f965f9d2c40		2026-10-04 18:41:13	PENDING	2026-10-04 18:41:14"></textarea>
+                    <div class="loading-bar" id="barP2MIHPending"></div>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" id="btnP2MIHPending" type="button" onclick="processP2MIHPending()"><span>🔄</span> Proses Data</button>
+                        <button class="btn btn-secondary" type="button" onclick="clearP2MIHPending()"><span>🗑️</span> Hapus</button>
+                    </div>
+                </div>
+
+                <div class="stats hidden" id="statsP2MIHPending">
+                    <div class="stat-card"><div class="stat-value" id="p2mihPendingTotal">0</div><div class="stat-label">Total Baris</div></div>
+                    <div class="stat-card"><div class="stat-value" id="p2mihPendingFiltered">0</div><div class="stat-label">Status PENDING</div></div>
+                    <div class="stat-card"><div class="stat-value" id="p2mihPendingProcessed">0</div><div class="stat-label">Diproses</div></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">📤 Output P2MIH Pending (5 Kolom)</div>
+                    <div class="output-wrapper">
+                        <div class="mode-info"><span>📋</span><div>
+                            <strong>Format:</strong> <code>A</code>=Waktu Update | <code>B</code>=TxID / LIT | <code>C</code>=Nominal | <code>D</code>=Fee | <code>E</code>=PENDING.<br>
+                            <span>💰 600.000,00 → <strong>600,000</strong> | 1.600,00 → <strong>1,600</strong> | 🔁 Urutan: bawah → atas.</span>
+                        </div></div>
+                        <div class="btn-group">
+                            <button class="btn btn-success" type="button" onclick="copyP2MIHPending()"><span>📋</span> Copy Hasil</button>
+                            <button class="btn btn-secondary" type="button" onclick="downloadP2MIHPendingCSV()"><span>💾</span> Download CSV</button>
+                        </div>
+                        <div class="output-area" id="outputP2MIHPending"><em style="color:#888888;">✨ Hasil P2MIH pending akan muncul di sini...</em></div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -1768,6 +1807,36 @@
             info.classList.remove('hidden');
         }
 
+        function switchP2MIHTab(mode) {
+            const root = document.getElementById('provider-p2mih');
+            if (!root) return;
+
+            root.querySelectorAll('.tab-btn[data-p2mih-tab]').forEach(btn => btn.classList.remove('active'));
+            const selectedButton = root.querySelector(`.tab-btn[data-p2mih-tab="${mode}"]`);
+            if (selectedButton) selectedButton.classList.add('active');
+
+            root.querySelectorAll('#p2mih-tab-failed, #p2mih-tab-pending').forEach(tab => tab.classList.remove('active'));
+            const selectedTab = document.getElementById(`p2mih-tab-${mode}`);
+            if (selectedTab) selectedTab.classList.add('active');
+        }
+
+        function formatP2MIHPendingAmount(value) {
+            let raw = String(value ?? '').trim().replace(/\s/g, '').replace(/Rp/gi, '');
+            if (!raw) return '';
+
+            if (/^\d{1,3}(?:\.\d{3})+(?:,\d{1,2})?$/.test(raw)) {
+                raw = raw.replace(/\./g, '').replace(/,\d{1,2}$/, '');
+            } else if (/^\d+(?:,\d{1,2})$/.test(raw)) {
+                raw = raw.replace(/,\d{1,2}$/, '');
+            } else {
+                raw = raw.replace(/[^0-9]/g, '');
+            }
+
+            const number = parseInt(raw, 10);
+            if (!Number.isFinite(number)) return '';
+            return number.toLocaleString('en-US');
+        }
+
         function formatP2MIHAmount(value) {
             let raw = String(value ?? '').trim().replace(/\s/g, '').replace(/Rp/gi, '');
             if (!raw) return '';
@@ -2004,6 +2073,114 @@
             const info = document.getElementById('p2mihLookupInfo');
             if (info) info.classList.add('hidden');
             document.getElementById('outputP2MIHFailed').innerHTML = '<em style="color:#888888;">✨ Hasil P2MIH failed akan muncul di sini...</em>';
+        }
+
+        function processP2MIHPending() {
+            const input = document.getElementById('inputP2MIHPending').value.trim();
+            if (!input) {
+                showToast('⚠️ Paste data P2MIH Pending dulu!', 'warning');
+                return;
+            }
+
+            const btn = document.getElementById('btnP2MIHPending');
+            const bar = document.getElementById('barP2MIHPending');
+            setLoading(btn, bar);
+
+            setTimeout(() => {
+                const lines = input.split(/\r?\n/).filter(line => line.trim());
+                const results = [];
+                let pendingCount = 0;
+
+                lines.forEach((line, idx) => {
+                    const fields = line.split('\t');
+                    if (fields.length < 15) return;
+
+                    const status = String(fields[13] || '').trim().toUpperCase();
+                    if (status !== 'PENDING') return;
+                    pendingCount++;
+
+                    const updateTime = String(fields[14] || '').trim();
+                    const txid = String(fields[10] || '').trim();
+                    const amount = formatP2MIHPendingAmount(fields[6]);
+                    const fee = formatP2MIHPendingAmount(fields[7]);
+
+                    if (!updateTime || !txid || !amount || !fee) return;
+
+                    results.push({
+                        idx,
+                        line: [updateTime, txid, amount, fee, 'PENDING'].join('\t')
+                    });
+                });
+
+                results.sort((a, b) => b.idx - a.idx);
+                const output = results.map(item => item.line);
+
+                document.getElementById('p2mihPendingTotal').textContent = lines.length;
+                document.getElementById('p2mihPendingFiltered').textContent = pendingCount;
+                document.getElementById('p2mihPendingProcessed').textContent = output.length;
+                document.getElementById('statsP2MIHPending').classList.remove('hidden');
+
+                const outputElement = document.getElementById('outputP2MIHPending');
+                if (output.length) {
+                    outputElement.textContent = output.join('\n');
+                    showToast(`✅ ${output.length} data P2MIH PENDING berhasil diproses`);
+                } else {
+                    outputElement.innerHTML = '<em style="color:#ff6b6b;">❌ Tidak ditemukan data P2MIH berstatus PENDING yang valid.</em>';
+                    showToast('⚠️ Data P2MIH PENDING tidak ditemukan', 'warning');
+                }
+
+                finishLoading(btn, bar);
+            }, 250);
+        }
+
+        function getP2MIHPendingOutput() {
+            const element = document.getElementById('outputP2MIHPending');
+            if (!element) return '';
+            const output = element.textContent.replace(/\r/g, '').replace(/\n+$/, '');
+            if (!output || output.includes('Tidak ditemukan') || output.includes('akan muncul')) return '';
+            return output;
+        }
+
+        function copyP2MIHPending() {
+            const output = getP2MIHPendingOutput();
+            if (!output) {
+                showToast('⚠️ Tidak ada hasil P2MIH Pending untuk disalin!', 'warning');
+                return;
+            }
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(output)
+                    .then(() => showToast('✅ Hasil P2MIH Pending berhasil disalin!'))
+                    .catch(() => fallbackCopy(output));
+            } else {
+                fallbackCopy(output);
+            }
+        }
+
+        function downloadP2MIHPendingCSV() {
+            const output = getP2MIHPendingOutput();
+            if (!output) {
+                showToast('⚠️ Tidak ada hasil P2MIH Pending untuk didownload!', 'warning');
+                return;
+            }
+            downloadTabSeparatedCSV(
+                output,
+                `p2mih_pending_${new Date().toISOString().slice(0,10)}.csv`
+            );
+        }
+
+        function clearP2MIHPending() {
+            document.getElementById('inputP2MIHPending').value = '';
+            document.getElementById('statsP2MIHPending').classList.add('hidden');
+            document.getElementById('barP2MIHPending').classList.remove('active');
+            const btn = document.getElementById('btnP2MIHPending');
+            if (btn) {
+                btn.classList.remove('loading');
+                btn.disabled = false;
+            }
+            document.getElementById('p2mihPendingTotal').textContent = '0';
+            document.getElementById('p2mihPendingFiltered').textContent = '0';
+            document.getElementById('p2mihPendingProcessed').textContent = '0';
+            document.getElementById('outputP2MIHPending').innerHTML = '<em style="color:#888888;">✨ Hasil P2MIH pending akan muncul di sini...</em>';
         }
 
         document.getElementById('copyQRISBtn').addEventListener('click', copyQRISResult);
