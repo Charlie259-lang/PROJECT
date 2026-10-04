@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>✨ Withdraw Formatter Pro — MINERAPAY & XPAY / M2QRIS</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <title>⚡ Withdraw Formatter Pro FAST/LITE — MINERAPAY, XPAY & P2MIH</title>
     <style>
         :root {
             --primary-start: #6366f1;
@@ -20,7 +19,7 @@
             --text-primary: #ffffff;
             --text-secondary: #b0b0b0;
             --border-radius: 20px;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition: all 0.18s ease;
             --dark-bg: #000000;
             --dark-border: #333333;
             --dark-text: #ffffff;
@@ -30,13 +29,13 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
             background: 
                 linear-gradient(135deg, rgba(15, 23, 42, 0.75) 0%, rgba(30, 41, 59, 0.65) 50%, rgba(15, 23, 42, 0.75) 100%),
                 url('https://cdn.areabermain.club/assets/cdn/az6/2025/12/10/20251210/7f0bdc56062fceb10a05b6412f5ce6e2/linetogel-bg-natal2025.webp');
             background-size: cover;
             background-position: center;
-            background-attachment: fixed;
+            background-attachment: scroll;
             background-repeat: no-repeat;
             padding: 20px;
             min-height: 100vh;
@@ -51,7 +50,7 @@
                 radial-gradient(ellipse at top, rgba(236, 72, 153, 0.08) 0%, transparent 60%),
                 radial-gradient(ellipse at bottom, rgba(99, 102, 241, 0.08) 0%, transparent 60%);
             pointer-events: none; z-index: 0;
-            animation: festiveGlow 8s ease-in-out infinite alternate;
+            /* FAST/LITE: glow dibuat statis agar tidak memakai GPU terus-menerus */
         }
         @keyframes festiveGlow { from { opacity: 0.7; } to { opacity: 1; } }
 
@@ -91,7 +90,7 @@
         h1 { font-size: 42px; font-weight: 700; background: linear-gradient(135deg, #fff, #e2e8f0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         .subtitle { color: rgba(255,255,255,0.85); font-size: 19px; margin-top: 8px; }
 
-        .tabs { display: flex; gap: 12px; margin: 25px 0 30px; padding: 10px; background: rgba(20, 20, 20, 0.8); backdrop-filter: blur(20px); border-radius: 18px; border: 1px solid rgba(255, 255, 255, 0.1); }
+        .tabs { display: flex; gap: 12px; margin: 25px 0 30px; padding: 10px; background: rgba(20, 20, 20, 0.8); backdrop-filter: blur(6px); border-radius: 18px; border: 1px solid rgba(255, 255, 255, 0.1); }
         .tab-btn { flex: 1; padding: 18px 22px; border: none; background: rgba(40,40,40,0.8); border-radius: 14px; font-weight: 600; font-size: 18px; color: rgba(255,255,255,0.9); cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 10px; }
         .tab-btn:hover { background: rgba(60,60,60,0.9); }
         .tab-btn.active { color: white; background: linear-gradient(135deg, var(--primary-start), var(--primary-end)); box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4); }
@@ -102,7 +101,7 @@
         .tab-content.active { display: block; animation: contentFade 0.4s ease; }
         @keyframes contentFade { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-        .card { background: var(--card-bg); border-radius: var(--border-radius); padding: 28px; margin-bottom: 22px; box-shadow: var(--card-shadow); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); transition: var(--transition); display: flex; flex-direction: column; }
+        .card { background: var(--card-bg); border-radius: var(--border-radius); padding: 28px; margin-bottom: 22px; box-shadow: var(--card-shadow); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(4px); transition: var(--transition); display: flex; flex-direction: column; }
         .card-title { font-weight: 600; font-size: 20px; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
         .card-title::before { content: ''; width: 5px; height: 20px; background: linear-gradient(135deg, var(--primary-start), var(--primary-end)); border-radius: 2px; }
         .pending-mode .card-title::before { background: linear-gradient(135deg, var(--secondary-start), var(--secondary-end)); }
@@ -170,7 +169,7 @@
 
         .processing-text { color: #cccccc; font-size: 17px; display: flex; align-items: center; gap: 10px; }
         .stats { display: flex; gap: 18px; margin: 22px 0; flex-wrap: wrap; }
-        .stat-card { flex: 1; min-width: 120px; background: #0a0a0a; padding: 18px 22px; border-radius: 16px; text-align: center; border: 1px solid var(--dark-border); backdrop-filter: blur(10px); }
+        .stat-card { flex: 1; min-width: 120px; background: #0a0a0a; padding: 18px 22px; border-radius: 16px; text-align: center; border: 1px solid var(--dark-border); backdrop-filter: blur(4px); }
         .stat-value { font-size: 34px; font-weight: 700; background: linear-gradient(135deg, var(--primary-start), var(--primary-end)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.2; }
         .qris-mode .stat-value { background: linear-gradient(135deg, var(--qris-start), var(--qris-end)); -webkit-background-clip: text; background-clip: text; }
         .stat-label { font-size: 15px; color: var(--text-secondary); margin-top: 5px; font-weight: 500; }
@@ -192,6 +191,34 @@
         }
 
 
+        /* FAST/LITE PERFORMANCE RULES */
+        .card, .stat-card { contain: layout paint; }
+
+        @media (max-width: 768px) {
+            body {
+                background-attachment: scroll;
+                background-image: linear-gradient(135deg, rgba(15, 23, 42, 0.96) 0%, rgba(30, 41, 59, 0.94) 50%, rgba(15, 23, 42, 0.96) 100%);
+            }
+            .snow-container,
+            .santa-container { display: none !important; }
+            .tabs, .card, .stat-card, .provider-selector, .pending-format-selector {
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+            }
+            body::before { display: none; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            .snow-container,
+            .santa-container { display: none !important; }
+        }
+
+
         /* PROVIDER SELECTOR: MINERAPAY / XPAY */
         .provider-selector {
             display: grid;
@@ -203,7 +230,7 @@
             border: 1px solid rgba(99, 102, 241, 0.45);
             border-radius: 22px;
             box-shadow: 0 18px 45px rgba(0, 0, 0, 0.24);
-            backdrop-filter: blur(18px);
+            backdrop-filter: blur(6px);
         }
         .provider-btn {
             min-height: 58px;
@@ -353,7 +380,7 @@
             background: rgba(10, 10, 10, 0.82);
             border: 1px solid rgba(236, 72, 153, 0.34);
             border-radius: 18px;
-            backdrop-filter: blur(14px);
+            backdrop-filter: blur(5px);
         }
         .pending-format-btn {
             min-height: 58px;
@@ -409,7 +436,7 @@
         <header class="header">
             <div class="logo">
                 <div class="logo-icon">🎄</div>
-                <h1>Withdraw Formatter Pro</h1>
+                <h1>Withdraw Formatter Pro <span style="font-size:.42em;vertical-align:middle;color:#a7f3d0;-webkit-text-fill-color:#a7f3d0;">FAST/LITE</span></h1>
             </div>
             <p class="subtitle">Formatter withdraw MINERAPAY dan XPAY / M2QRIS</p>
         </header>
@@ -708,6 +735,7 @@
                     </div></div>
                     <div class="btn-group">
                         <button class="btn btn-success" type="button" onclick="copyP2MIHFailed()"><span>📋</span> Copy Hasil</button>
+                        <button class="btn btn-success" type="button" onclick="copyP2MIHDocsWD()"><span>🧾</span> Salin ke Docs WD</button>
                         <button class="btn btn-success" type="button" onclick="copyP2MIHUserIds()"><span>👤</span> Copy User ID Saja</button>
                         <button class="btn btn-success" type="button" onclick="copyP2MIHOrderAndUserIds()"><span>🔗</span> Copy Order ID + User ID</button>
                         <button class="btn btn-secondary" type="button" onclick="downloadP2MIHFailedCSV()"><span>💾</span> Download CSV</button>
@@ -718,25 +746,104 @@
         </section>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script>
-        // SNOW
-        (function() {
-            const container = document.getElementById('snowContainer');
-            for (let i = 0; i < 1500; i++) {
-                const flake = document.createElement('div');
-                flake.classList.add('snowflake');
-                const size = Math.random() * 10 + 2;
-                flake.style.width = size + 'px'; flake.style.height = size + 'px';
-                flake.style.left = Math.random() * 100 + 'vw';
-                flake.style.opacity = Math.random() * 0.5 + 0.3;
-                const fallDuration = Math.random() * 7 + 3;
-                const swayDuration = Math.random() * 4 + 2;
-                flake.style.animationDuration = `${fallDuration}s, ${swayDuration}s`;
-                flake.style.animationDelay = `-${Math.random() * fallDuration}s, 0s`;
-                container.appendChild(flake);
-            }
+        // FAST/LITE — dekorasi dibuat ringan dan dimuat setelah UI siap.
+        (function initLiteDecorations() {
+            const run = () => {
+                if (window.innerWidth <= 768 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+                const container = document.getElementById('snowContainer');
+                if (!container) return;
+
+                const fragment = document.createDocumentFragment();
+                const snowCount = 45;
+                for (let i = 0; i < snowCount; i++) {
+                    const flake = document.createElement('div');
+                    flake.className = 'snowflake';
+                    const size = Math.random() * 5 + 2;
+                    flake.style.width = size + 'px';
+                    flake.style.height = size + 'px';
+                    flake.style.left = Math.random() * 100 + 'vw';
+                    flake.style.opacity = Math.random() * 0.35 + 0.20;
+                    const fallDuration = Math.random() * 8 + 7;
+                    const swayDuration = Math.random() * 5 + 4;
+                    flake.style.animationDuration = `${fallDuration}s, ${swayDuration}s`;
+                    flake.style.animationDelay = `-${Math.random() * fallDuration}s, 0s`;
+                    fragment.appendChild(flake);
+                }
+                container.appendChild(fragment);
+            };
+
+            if ('requestIdleCallback' in window) requestIdleCallback(run, { timeout: 1200 });
+            else setTimeout(run, 350);
         })();
+
+        // FAST/LITE — SheetJS/XLSX hanya dimuat saat file Excel benar-benar dipilih.
+        let xlsxLoadPromise = null;
+        function ensureXLSXLoaded() {
+            if (window.XLSX) return Promise.resolve(window.XLSX);
+            if (xlsxLoadPromise) return xlsxLoadPromise;
+
+            xlsxLoadPromise = new Promise((resolve, reject) => {
+                const existing = document.querySelector('script[data-xlsx-lite="1"]');
+                if (existing) {
+                    existing.addEventListener('load', () => resolve(window.XLSX), { once: true });
+                    existing.addEventListener('error', () => reject(new Error('Library XLSX gagal dimuat')), { once: true });
+                    return;
+                }
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+                script.async = true;
+                script.dataset.xlsxLite = '1';
+                script.onload = () => window.XLSX ? resolve(window.XLSX) : reject(new Error('Library XLSX tidak tersedia'));
+                script.onerror = () => reject(new Error('Library XLSX gagal dimuat. Periksa koneksi internet.'));
+                document.head.appendChild(script);
+            }).catch(error => {
+                xlsxLoadPromise = null;
+                throw error;
+            });
+            return xlsxLoadPromise;
+        }
+
+        function detectLiteDelimiter(text) {
+            const line = String(text || '').split(/\r?\n/).find(v => v.trim()) || '';
+            const candidates = ['\t', ',', ';'];
+            let best = '\t';
+            let bestCount = -1;
+            for (const delimiter of candidates) {
+                const count = line.split(delimiter).length - 1;
+                if (count > bestCount) { bestCount = count; best = delimiter; }
+            }
+            return best;
+        }
+
+        function parseDelimitedLineLite(line, delimiter) {
+            if (delimiter === '\t') return line.split('\t');
+            const result = [];
+            let value = '';
+            let quoted = false;
+            for (let i = 0; i < line.length; i++) {
+                const ch = line[i];
+                if (ch === '"') {
+                    if (quoted && line[i + 1] === '"') { value += '"'; i++; }
+                    else quoted = !quoted;
+                } else if (ch === delimiter && !quoted) {
+                    result.push(value);
+                    value = '';
+                } else {
+                    value += ch;
+                }
+            }
+            result.push(value);
+            return result;
+        }
+
+        function parseDelimitedTextLite(text) {
+            const clean = String(text || '').replace(/^\uFEFF/, '');
+            const delimiter = detectLiteDelimiter(clean);
+            return clean.split(/\r?\n/)
+                .filter(line => line.trim())
+                .map(line => parseDelimitedLineLite(line, delimiter));
+        }
 
         // GLOBAL FUNCTIONS
         function switchProvider(provider) {
@@ -1050,16 +1157,11 @@
             const file = input?.files?.[0];
             if (!file) return;
 
-            if (typeof XLSX === 'undefined') {
-                setXPayExcelStatus('Library pembaca Excel gagal dimuat. Pastikan internet aktif, lalu buka ulang halaman.', 'error');
-                showToast('❌ Pembaca Excel tidak tersedia', 'warning');
-                input.value = '';
-                return;
-            }
-
-            setXPayExcelStatus(`Sedang membaca ${file.name}...`, 'warning');
+            setXPayExcelStatus(`Sedang menyiapkan pembaca Excel untuk ${file.name}...`, 'warning');
 
             try {
+                const XLSX = await ensureXLSXLoaded();
+                setXPayExcelStatus(`Sedang membaca ${file.name}...`, 'warning');
                 const buffer = await file.arrayBuffer();
                 const workbook = XLSX.read(buffer, { type: 'array', cellDates: false });
                 const lookup = new Map();
@@ -1566,33 +1668,40 @@
             const file = input?.files?.[0];
             if (!file) return;
 
-            if (typeof XLSX === 'undefined') {
-                setP2MIHZonamainStatus('Library Excel belum termuat. Refresh halaman lalu coba lagi.', 'error');
-                return;
-            }
-
             setP2MIHZonamainStatus(`Membaca ${file.name}...`);
 
             try {
-                const buffer = await file.arrayBuffer();
-                const workbook = XLSX.read(buffer, { type: 'array', raw: false });
                 const newMap = new Map();
                 let sheetsRead = 0;
                 let sheetsMatched = 0;
+                const lowerName = file.name.toLowerCase();
 
-                workbook.SheetNames.forEach(sheetName => {
-                    const sheet = workbook.Sheets[sheetName];
-                    if (!sheet) return;
-                    const rows = XLSX.utils.sheet_to_json(sheet, {
-                        header: 1,
-                        defval: '',
-                        raw: false,
-                        blankrows: false
-                    });
-                    sheetsRead++;
+                // CSV diproses langsung tanpa library XLSX agar jauh lebih cepat/ringan.
+                if (lowerName.endsWith('.csv') || lowerName.endsWith('.txt')) {
+                    const text = await file.text();
+                    const rows = parseDelimitedTextLite(text);
+                    sheetsRead = 1;
                     const result = extractP2MIHZonamainRows(rows, newMap);
-                    if (result.found > 0) sheetsMatched++;
-                });
+                    if (result.found > 0) sheetsMatched = 1;
+                } else {
+                    const XLSX = await ensureXLSXLoaded();
+                    const buffer = await file.arrayBuffer();
+                    const workbook = XLSX.read(buffer, { type: 'array', raw: false });
+
+                    workbook.SheetNames.forEach(sheetName => {
+                        const sheet = workbook.Sheets[sheetName];
+                        if (!sheet) return;
+                        const rows = XLSX.utils.sheet_to_json(sheet, {
+                            header: 1,
+                            defval: '',
+                            raw: false,
+                            blankrows: false
+                        });
+                        sheetsRead++;
+                        const result = extractP2MIHZonamainRows(rows, newMap);
+                        if (result.found > 0) sheetsMatched++;
+                    });
+                }
 
                 if (!newMap.size) {
                     p2mihUserIdByOrder = new Map();
@@ -1768,6 +1877,56 @@
                     .catch(() => fallbackCopy(output));
             } else {
                 fallbackCopy(output);
+            }
+        }
+
+        function copyP2MIHDocsWD() {
+            const output = getP2MIHFailedOutput();
+            if (!output) {
+                showToast('⚠️ Tidak ada hasil P2MIH untuk disalin!', 'warning');
+                return;
+            }
+
+            /*
+             * FORMAT DOCS WD:
+             * A = kosong
+             * B = Bank / Payment
+             * C = Nomor Rekening
+             * D = User ID
+             * E = Nama Rekening
+             * F = Nominal
+             *
+             * Sumber output P2MIH:
+             * A = Bank / Payment
+             * B = User ID
+             * C = Order ID / LIT
+             * D = Nomor Rekening
+             * E = Nama Rekening
+             * F = kosong
+             * G = Nominal
+             */
+            const docsOutput = output
+                .split('\n')
+                .map(line => {
+                    const fields = line.split('\t');
+                    const bank = fields[0] || '';
+                    const userId = fields[1] || '';
+                    const account = fields[3] || '';
+                    const accountName = fields[4] || '';
+                    const amount = fields[6] || '';
+
+                    // TAB pertama dikosongkan agar data mulai masuk dari Kolom B.
+                    return ['', bank, account, userId, accountName, amount].join('\t');
+                })
+                .join('\n');
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard
+                    .writeText(docsOutput)
+                    .then(() => showToast('✅ Format Docs WD berhasil disalin!'))
+                    .catch(() => fallbackCopy(docsOutput));
+            } else {
+                fallbackCopy(docsOutput);
             }
         }
 
