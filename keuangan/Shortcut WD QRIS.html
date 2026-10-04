@@ -195,7 +195,7 @@
         /* PROVIDER SELECTOR: MINERAPAY / XPAY */
         .provider-selector {
             display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+            grid-template-columns: repeat(3, minmax(0, 1fr));
             gap: 10px;
             margin: 2px 0 24px;
             padding: 8px;
@@ -423,6 +423,9 @@
             <button class="provider-btn" type="button" data-provider="xpay" onclick="switchProvider('xpay')">
                 <span class="provider-dot"></span> XPAY / M2QRIS
             </button>
+            <button class="provider-btn" type="button" data-provider="p2mih" onclick="switchProvider('p2mih')">
+                <span class="provider-dot"></span> P2MIH
+            </button>
         </div>
 
         <section id="provider-minerapay" class="provider-content active">
@@ -648,6 +651,46 @@
                             <div class="output-area" id="outputXPayPendingCashout"><em style="color:#888888;">✨ Hasil Cash Out / WITHDRAW akan muncul di sini...</em></div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="provider-p2mih" class="provider-content">
+            <nav class="tabs">
+                <button class="tab-btn failed-mode active" type="button"><span>❌</span> Failed Status</button>
+            </nav>
+
+            <div class="card">
+                <div class="card-title">📥 Input Data P2MIH Failed</div>
+                <p style="font-size:15px;color:var(--text-secondary);margin-bottom:12px;">
+                    Tempel satu atau banyak baris withdraw P2MIH berstatus <strong>REJECTED</strong> (tab-separated).
+                </p>
+                <textarea id="inputP2MIHFailed" placeholder="LEON PBR 1	XX - XX	085290038798	SULISTIYO	OVO	B2C	202.000,00	1.600,00	b2c-20261004074307960335-01m425tmvz8qkxab7shp35r2k7	I028n5qvmy5hera1k1l_da	LIT-84724c64-ad42-44a1-91e3-4d756e8c345d		2026-10-04 07:43:07	REJECTED	2026-10-04 07:43:17"></textarea>
+                <div class="loading-bar" id="barP2MIHFailed"></div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="btnP2MIHFailed" type="button" onclick="processP2MIHFailed()"><span>🔄</span> Proses Data</button>
+                    <button class="btn btn-secondary" type="button" onclick="clearP2MIHFailed()"><span>🗑️</span> Hapus</button>
+                </div>
+            </div>
+
+            <div class="stats hidden" id="statsP2MIHFailed">
+                <div class="stat-card"><div class="stat-value" id="p2mihFailedTotal">0</div><div class="stat-label">Total Baris</div></div>
+                <div class="stat-card"><div class="stat-value" id="p2mihFailedFiltered">0</div><div class="stat-label">Status REJECTED</div></div>
+                <div class="stat-card"><div class="stat-value" id="p2mihFailedProcessed">0</div><div class="stat-label">Diproses</div></div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">📤 Output P2MIH Failed (7 Kolom)</div>
+                <div class="output-wrapper">
+                    <div class="mode-info"><span>📋</span><div>
+                        <strong>Format:</strong> <code>A</code>=Payment | <code>B</code>=User ID (kosong) | <code>C</code>=TxID / LIT | <code>D</code>=Nomor Rekening | <code>E</code>=Nama | <code>F</code>=(kosong) | <code>G</code>=Nominal minus.<br>
+                        <span>💰 Contoh: <strong>202.000,00 → -202,000</strong> | 🔁 Urutan: bawah → atas.</span>
+                    </div></div>
+                    <div class="btn-group">
+                        <button class="btn btn-success" type="button" onclick="copyP2MIHFailed()"><span>📋</span> Copy Hasil</button>
+                        <button class="btn btn-secondary" type="button" onclick="downloadP2MIHFailedCSV()"><span>💾</span> Download CSV</button>
+                    </div>
+                    <div class="output-area" id="outputP2MIHFailed"><em style="color:#888888;">✨ Hasil P2MIH failed akan muncul di sini...</em></div>
                 </div>
             </div>
         </section>
@@ -1403,6 +1446,135 @@
                 getXPayPendingOutput(format),
                 `xpay_pending_${format}_${new Date().toISOString().slice(0,10)}.csv`
             );
+        }
+
+
+
+        // P2MIH FAILED / REJECTED
+        function formatP2MIHAmount(value) {
+            let raw = String(value ?? '').trim().replace(/\s/g, '').replace(/Rp/gi, '');
+            if (!raw) return '';
+
+            // Format Indonesia: 202.000,00 / 1.200.000,00 / 202000,00
+            if (/^-?\d{1,3}(?:\.\d{3})+(?:,\d{1,2})?$/.test(raw)) {
+                raw = raw.replace(/\./g, '').replace(/,\d{1,2}$/, '');
+            } else if (/^-?\d+(?:,\d{1,2})$/.test(raw)) {
+                raw = raw.replace(/,\d{1,2}$/, '');
+            } else {
+                raw = raw.replace(/[^0-9-]/g, '');
+            }
+
+            const number = Math.abs(parseInt(raw, 10));
+            if (!Number.isFinite(number)) return '';
+            return '-' + number.toLocaleString('en-US');
+        }
+
+        function processP2MIHFailed() {
+            const input = document.getElementById('inputP2MIHFailed').value.trim();
+            if (!input) {
+                showToast('⚠️ Paste data P2MIH dulu!', 'warning');
+                return;
+            }
+
+            const btn = document.getElementById('btnP2MIHFailed');
+            const bar = document.getElementById('barP2MIHFailed');
+            setLoading(btn, bar);
+
+            setTimeout(() => {
+                const lines = input.split(/\r?\n/).filter(line => line.trim());
+                const results = [];
+                let rejectedCount = 0;
+
+                lines.forEach((line, idx) => {
+                    const fields = line.split('\t');
+                    if (fields.length < 14) return;
+
+                    const status = String(fields[13] || '').trim().toUpperCase();
+                    if (status !== 'REJECTED') return;
+                    rejectedCount++;
+
+                    const payment = String(fields[4] || '').trim();
+                    const txid = String(fields[10] || '').trim();
+                    const account = String(fields[2] || '').trim();
+                    const name = String(fields[3] || '').trim();
+                    const amount = formatP2MIHAmount(fields[6]);
+
+                    if (!payment || !txid || !account || !name || !amount) return;
+
+                    // A=Payment, B=User ID kosong, C=LIT, D=Rekening, E=Nama, F=kosong, G=Nominal minus
+                    results.push({
+                        idx,
+                        line: [payment, '', txid, account, name, '', amount].join('\t')
+                    });
+                });
+
+                // Samakan dengan formatter lain: data paling bawah menjadi output paling atas.
+                results.sort((a, b) => b.idx - a.idx);
+                const output = results.map(item => item.line);
+
+                document.getElementById('p2mihFailedTotal').textContent = lines.length;
+                document.getElementById('p2mihFailedFiltered').textContent = rejectedCount;
+                document.getElementById('p2mihFailedProcessed').textContent = output.length;
+                document.getElementById('statsP2MIHFailed').classList.remove('hidden');
+
+                const outputElement = document.getElementById('outputP2MIHFailed');
+                if (output.length) {
+                    outputElement.textContent = output.join('\n');
+                    showToast(`✅ ${output.length} data P2MIH REJECTED berhasil diproses`);
+                } else {
+                    outputElement.innerHTML = '<em style="color:#ff6b6b;">❌ Tidak ditemukan data P2MIH berstatus REJECTED yang valid.</em>';
+                    showToast('⚠️ Data P2MIH REJECTED tidak ditemukan', 'warning');
+                }
+
+                finishLoading(btn, bar);
+            }, 300);
+        }
+
+        function getP2MIHFailedOutput() {
+            const element = document.getElementById('outputP2MIHFailed');
+            if (!element) return '';
+            const output = element.textContent.replace(/\r/g, '').replace(/\n+$/, '');
+            if (!output || output.includes('Tidak ditemukan') || output.includes('akan muncul')) return '';
+            return output;
+        }
+
+        function copyP2MIHFailed() {
+            const output = getP2MIHFailedOutput();
+            if (!output) {
+                showToast('⚠️ Tidak ada hasil P2MIH untuk disalin!', 'warning');
+                return;
+            }
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(output)
+                    .then(() => showToast('✅ Hasil P2MIH berhasil disalin!'))
+                    .catch(() => fallbackCopy(output));
+            } else {
+                fallbackCopy(output);
+            }
+        }
+
+        function downloadP2MIHFailedCSV() {
+            const output = getP2MIHFailedOutput();
+            if (!output) {
+                showToast('⚠️ Tidak ada hasil P2MIH untuk didownload!', 'warning');
+                return;
+            }
+            downloadTabSeparatedCSV(
+                output,
+                `p2mih_failed_${new Date().toISOString().slice(0,10)}.csv`
+            );
+        }
+
+        function clearP2MIHFailed() {
+            document.getElementById('inputP2MIHFailed').value = '';
+            document.getElementById('statsP2MIHFailed').classList.add('hidden');
+            document.getElementById('barP2MIHFailed').classList.remove('active');
+            const btn = document.getElementById('btnP2MIHFailed');
+            if (btn) {
+                btn.classList.remove('loading');
+                btn.disabled = false;
+            }
+            document.getElementById('outputP2MIHFailed').innerHTML = '<em style="color:#888888;">✨ Hasil P2MIH failed akan muncul di sini...</em>';
         }
 
         document.getElementById('copyQRISBtn').addEventListener('click', copyQRISResult);
