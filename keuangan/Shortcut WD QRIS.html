@@ -686,6 +686,7 @@
             <nav class="tabs">
                 <button class="tab-btn failed-mode active" type="button" data-p2mih-tab="failed" onclick="switchP2MIHTab('failed')"><span>❌</span> Failed Status</button>
                 <button class="tab-btn pending-mode" type="button" data-p2mih-tab="pending" onclick="switchP2MIHTab('pending')"><span>⏳</span> Pending Status</button>
+                <button class="tab-btn qris-mode" type="button" data-p2mih-tab="depositreport" onclick="switchP2MIHTab('depositreport')"><span>🧾</span> Report Deposit Pending</button>
             </nav>
 
             <div id="p2mih-tab-failed" class="tab-content active">
@@ -779,6 +780,55 @@
                             <button class="btn btn-secondary" type="button" onclick="downloadP2MIHPendingCSV()"><span>💾</span> Download CSV</button>
                         </div>
                         <div class="output-area" id="outputP2MIHPending"><em style="color:#888888;">✨ Hasil P2MIH pending akan muncul di sini...</em></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="p2mih-tab-depositreport" class="tab-content">
+                <div class="card">
+                    <div class="card-title">📥 Input Report Deposit Pending P2MIH</div>
+                    <p style="font-size:15px;color:var(--text-secondary);margin-bottom:12px;">
+                        Tempel satu atau banyak transaksi. Mendukung format berlabel seperti <strong>User ID / Order ID / RRN / Nominal / Bukti</strong>, atau format TAB sederhana:<br>
+                        <code>User ID\tOrder ID\tRRN\tNominal\tBukti1\tBukti2...</code>
+                    </p>
+                    <textarea id="inputP2MIHDepositReport" placeholder="User ID : Ginberka1234
+Order ID : -
+RRN : 1svcgcm50051
+Nominal : Rp. 100,000,-
+Bukti :
+https://sleekshot.app/v/1qpqVXPKWJUj
+https://sleekshot.app/v/L0WP28Kl2IHW
+
+User ID : sokimin
+Order ID : -
+RRN : 6fdcb21fcd72
+Nominal : Rp. 25,000,-
+Bukti :
+https://sleekshot.app/v/ucTW1pU7uSqW"></textarea>
+                    <div class="loading-bar" id="barP2MIHDepositReport"></div>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" id="btnP2MIHDepositReport" type="button" onclick="processP2MIHDepositReport()"><span>🔄</span> Proses Report</button>
+                        <button class="btn btn-secondary" type="button" onclick="clearP2MIHDepositReport()"><span>🗑️</span> Hapus</button>
+                    </div>
+                </div>
+
+                <div class="stats hidden" id="statsP2MIHDepositReport">
+                    <div class="stat-card"><div class="stat-value" id="p2mihDepositReportTotal">0</div><div class="stat-label">Total Transaksi</div></div>
+                    <div class="stat-card"><div class="stat-value" id="p2mihDepositReportProofs">0</div><div class="stat-label">Total Bukti</div></div>
+                    <div class="stat-card"><div class="stat-value" id="p2mihDepositReportIncomplete">0</div><div class="stat-label">Data Tidak Lengkap</div></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">📤 Report Deposit Pending P2MIH</div>
+                    <div class="output-wrapper">
+                        <div class="mode-info"><span>📋</span><div>
+                            <strong>Header otomatis:</strong> Info : Linetogel / Perihal : Cek bukti QRIS P2MIH.<br>
+                            <span>Order ID kosong otomatis menjadi <strong>-</strong>. Nominal otomatis menjadi format <strong>Rp. 100,000,-</strong>. Satu transaksi dapat memiliki beberapa link bukti.</span>
+                        </div></div>
+                        <div class="btn-group">
+                            <button class="btn btn-success" type="button" onclick="copyP2MIHDepositReport()"><span>📋</span> Salin Report</button>
+                        </div>
+                        <div class="output-area" id="outputP2MIHDepositReport"><em style="color:#888888;">✨ Hasil report deposit pending akan muncul di sini...</em></div>
                     </div>
                 </div>
             </div>
@@ -1815,9 +1865,182 @@
             const selectedButton = root.querySelector(`.tab-btn[data-p2mih-tab="${mode}"]`);
             if (selectedButton) selectedButton.classList.add('active');
 
-            root.querySelectorAll('#p2mih-tab-failed, #p2mih-tab-pending').forEach(tab => tab.classList.remove('active'));
+            root.querySelectorAll('#p2mih-tab-failed, #p2mih-tab-pending, #p2mih-tab-depositreport').forEach(tab => tab.classList.remove('active'));
             const selectedTab = document.getElementById(`p2mih-tab-${mode}`);
             if (selectedTab) selectedTab.classList.add('active');
+        }
+
+        let currentP2MIHDepositReportData = [];
+
+        function normalizeP2MIHDepositNominal(value) {
+            const formatted = formatP2MIHPendingAmount(value);
+            return formatted ? `Rp. ${formatted},-` : '';
+        }
+
+        function extractP2MIHDepositUrls(value) {
+            return (String(value ?? '').match(/https?:\/\/[^\s]+/gi) || [])
+                .map(url => url.replace(/[),.;]+$/, ''));
+        }
+
+        function parseP2MIHDepositLabeledInput(input) {
+            const lines = String(input || '').replace(/\r/g, '').split('\n');
+            const items = [];
+            let current = null;
+            let collectingProofs = false;
+
+            const pushCurrent = () => {
+                if (!current) return;
+                current.userId = String(current.userId || '').trim();
+                current.orderId = String(current.orderId || '').trim() || '-';
+                current.rrn = String(current.rrn || '').trim();
+                current.nominal = normalizeP2MIHDepositNominal(current.nominal);
+                current.proofs = Array.from(new Set((current.proofs || []).filter(Boolean)));
+                if (current.userId || current.rrn || current.nominal || current.proofs.length) items.push(current);
+                current = null;
+                collectingProofs = false;
+            };
+
+            for (const rawLine of lines) {
+                const line = rawLine.replace(/[\u200E\u200F\u202A-\u202E]/g, '').trim();
+                if (!line) continue;
+                if (/^Info\s*:/i.test(line) || /^Perihal\s*:/i.test(line)) continue;
+
+                let m;
+                if ((m = line.match(/^User\s*ID\s*:\s*(.*)$/i))) {
+                    pushCurrent();
+                    current = { userId: m[1], orderId: '-', rrn: '', nominal: '', proofs: [] };
+                    collectingProofs = false;
+                    continue;
+                }
+                if (!current) continue;
+
+                if ((m = line.match(/^Order\s*ID\s*:\s*(.*)$/i))) {
+                    current.orderId = m[1] || '-';
+                    collectingProofs = false;
+                    continue;
+                }
+                if ((m = line.match(/^RRN\s*:\s*(.*)$/i))) {
+                    current.rrn = m[1];
+                    collectingProofs = false;
+                    continue;
+                }
+                if ((m = line.match(/^Nominal\s*:\s*(.*)$/i))) {
+                    current.nominal = m[1];
+                    collectingProofs = false;
+                    continue;
+                }
+                if ((m = line.match(/^Bukti\s*:\s*(.*)$/i))) {
+                    collectingProofs = true;
+                    current.proofs.push(...extractP2MIHDepositUrls(m[1]));
+                    continue;
+                }
+
+                if (collectingProofs) current.proofs.push(...extractP2MIHDepositUrls(line));
+            }
+
+            pushCurrent();
+            return items;
+        }
+
+        function parseP2MIHDepositTabInput(input) {
+            const rows = String(input || '').replace(/\r/g, '').split('\n').filter(line => line.trim());
+            const items = [];
+            for (const line of rows) {
+                if (!line.includes('\t')) continue;
+                const fields = line.split('\t');
+                if (fields.length < 4) continue;
+                const userId = String(fields[0] || '').trim();
+                if (!userId || /^user\s*id$/i.test(userId)) continue;
+                const orderId = String(fields[1] || '').trim() || '-';
+                const rrn = String(fields[2] || '').trim();
+                const nominal = normalizeP2MIHDepositNominal(fields[3]);
+                const proofs = Array.from(new Set(fields.slice(4).flatMap(extractP2MIHDepositUrls)));
+                items.push({ userId, orderId, rrn, nominal, proofs });
+            }
+            return items;
+        }
+
+        function buildP2MIHDepositReport(items) {
+            let result = 'Info : Linetogel\nPerihal : Cek bukti QRIS P2MIH\n\n';
+            result += items.map(item => {
+                const proofText = item.proofs.length ? item.proofs.join('\n') : '';
+                return [
+                    `User ID : ${item.userId || ''}`,
+                    `Order ID : ${item.orderId || '-'}`,
+                    `RRN : ${item.rrn || ''}`,
+                    `Nominal : ${item.nominal || ''}`,
+                    'Bukti :',
+                    proofText
+                ].join('\n').replace(/\n+$/, '');
+            }).join('\n\n');
+            return result;
+        }
+
+        function processP2MIHDepositReport() {
+            const input = document.getElementById('inputP2MIHDepositReport').value.trim();
+            if (!input) {
+                showToast('⚠️ Paste data report deposit P2MIH dulu!', 'warning');
+                return;
+            }
+
+            const btn = document.getElementById('btnP2MIHDepositReport');
+            const bar = document.getElementById('barP2MIHDepositReport');
+            setLoading(btn, bar);
+
+            setTimeout(() => {
+                let items = parseP2MIHDepositLabeledInput(input);
+                if (!items.length) items = parseP2MIHDepositTabInput(input);
+
+                currentP2MIHDepositReportData = items;
+                const totalProofs = items.reduce((sum, item) => sum + item.proofs.length, 0);
+                const incomplete = items.filter(item => !item.userId || !item.rrn || !item.nominal || !item.proofs.length).length;
+
+                document.getElementById('p2mihDepositReportTotal').textContent = items.length;
+                document.getElementById('p2mihDepositReportProofs').textContent = totalProofs;
+                document.getElementById('p2mihDepositReportIncomplete').textContent = incomplete;
+                document.getElementById('statsP2MIHDepositReport').classList.remove('hidden');
+
+                const output = document.getElementById('outputP2MIHDepositReport');
+                if (items.length) {
+                    output.textContent = buildP2MIHDepositReport(items);
+                    showToast(`✅ ${items.length} transaksi report berhasil dibuat`);
+                } else {
+                    output.innerHTML = '<em style="color:#ff6b6b;">❌ Format report deposit P2MIH tidak terbaca.</em>';
+                    showToast('⚠️ Format data tidak terbaca', 'warning');
+                }
+                finishLoading(btn, bar);
+            }, 150);
+        }
+
+        function getP2MIHDepositReportOutput() {
+            const element = document.getElementById('outputP2MIHDepositReport');
+            if (!element) return '';
+            const output = element.textContent.replace(/\r/g, '').replace(/\n+$/, '');
+            if (!output || output.includes('tidak terbaca') || output.includes('akan muncul')) return '';
+            return output;
+        }
+
+        function copyP2MIHDepositReport() {
+            const output = getP2MIHDepositReportOutput();
+            if (!output) {
+                showToast('⚠️ Belum ada report untuk disalin!', 'warning');
+                return;
+            }
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(output)
+                    .then(() => showToast('✅ Report Deposit Pending P2MIH berhasil disalin!'))
+                    .catch(() => fallbackCopy(output));
+            } else fallbackCopy(output);
+        }
+
+        function clearP2MIHDepositReport() {
+            document.getElementById('inputP2MIHDepositReport').value = '';
+            document.getElementById('statsP2MIHDepositReport').classList.add('hidden');
+            document.getElementById('outputP2MIHDepositReport').innerHTML = '<em style="color:#888888;">✨ Hasil report deposit pending akan muncul di sini...</em>';
+            document.getElementById('barP2MIHDepositReport').classList.remove('active');
+            const btn = document.getElementById('btnP2MIHDepositReport');
+            if (btn) { btn.classList.remove('loading'); btn.disabled = false; }
+            currentP2MIHDepositReportData = [];
         }
 
         function formatP2MIHPendingAmount(value) {
