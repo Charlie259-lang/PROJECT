@@ -1878,8 +1878,29 @@ https://sleekshot.app/v/ucTW1pU7uSqW"></textarea>
         }
 
         function extractP2MIHDepositUrls(value) {
-            return (String(value ?? '').match(/https?:\/\/[^\s]+/gi) || [])
+            const text = String(value ?? '')
+                .replace(/<br\s*\/?>(?=.)/gi, '\n')
+                .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/gi, '$2');
+            return (text.match(/https?:\/\/[^\s|<>]+/gi) || [])
                 .map(url => url.replace(/[),.;]+$/, ''));
+        }
+
+        function splitP2MIHDepositTableLine(line) {
+            const raw = String(line ?? '').trim();
+            if (!raw) return [];
+
+            // Prioritas data hasil copy tabel browser / spreadsheet.
+            if (raw.includes('\t')) return raw.split('\t').map(v => v.trim());
+
+            // Dukungan jika data tercopy sebagai Markdown table: | a | b | c |
+            if (raw.includes('|')) {
+                let cells = raw.split('|').map(v => v.trim());
+                if (!cells[0]) cells.shift();
+                if (!cells[cells.length - 1]) cells.pop();
+                return cells;
+            }
+
+            return [];
         }
 
         function parseP2MIHDepositLabeledInput(input) {
@@ -1945,16 +1966,50 @@ https://sleekshot.app/v/ucTW1pU7uSqW"></textarea>
         function parseP2MIHDepositTabInput(input) {
             const rows = String(input || '').replace(/\r/g, '').split('\n').filter(line => line.trim());
             const items = [];
+
             for (const line of rows) {
-                if (!line.includes('\t')) continue;
-                const fields = line.split('\t');
+                const fields = splitP2MIHDepositTableLine(line);
                 if (fields.length < 4) continue;
+
+                // Abaikan baris separator Markdown seperti | :---: | --- |
+                if (fields.every(v => !v || /^:?-{1,}:?$/.test(v))) continue;
+
                 const userId = String(fields[0] || '').trim();
                 if (!userId || /^user\s*id$/i.test(userId)) continue;
-                const orderId = String(fields[1] || '').trim() || '-';
-                const rrn = String(fields[2] || '').trim();
-                const nominal = normalizeP2MIHDepositNominal(fields[3]);
-                const proofs = Array.from(new Set(fields.slice(4).flatMap(extractP2MIHDepositUrls)));
+
+                let orderId = '-';
+                let rrn = '';
+                let nominalRaw = '';
+                let proofs = [];
+
+                /*
+                 * FORMAT P2MIH REPORT DEPOSIT DARI TABEL ZONAMAIN:
+                 * 0 = User ID
+                 * 1 = kosong
+                 * 2 = Bukti / URL
+                 * 3 = kosong
+                 * 4 = Order ID (bisa '-')
+                 * 5 = RRN
+                 * 6 = Nominal
+                 */
+                if (fields.length >= 7 && extractP2MIHDepositUrls(fields[2]).length) {
+                    proofs = extractP2MIHDepositUrls(fields[2]);
+                    orderId = String(fields[4] || '').trim() || '-';
+                    rrn = String(fields[5] || '').trim();
+                    nominalRaw = String(fields[6] || '').trim();
+                } else {
+                    // Format sederhana lama: User ID | Order ID | RRN | Nominal | Bukti...
+                    orderId = String(fields[1] || '').trim() || '-';
+                    rrn = String(fields[2] || '').trim();
+                    nominalRaw = String(fields[3] || '').trim();
+                    proofs = fields.slice(4).flatMap(extractP2MIHDepositUrls);
+                }
+
+                proofs = Array.from(new Set(proofs.filter(Boolean)));
+                const nominal = normalizeP2MIHDepositNominal(nominalRaw);
+
+                // Masukkan hanya baris data yang benar-benar terbaca.
+                if (!rrn && !nominal && !proofs.length) continue;
                 items.push({ userId, orderId, rrn, nominal, proofs });
             }
             return items;
@@ -1963,14 +2018,16 @@ https://sleekshot.app/v/ucTW1pU7uSqW"></textarea>
         function buildP2MIHDepositReport(items) {
             let result = 'Info : Linetogel\nPerihal : Cek bukti QRIS P2MIH\n\n';
             result += items.map(item => {
-                const proofText = item.proofs.length ? item.proofs.join('\n') : '';
+                const proofs = item.proofs || [];
+                const buktiLine = proofs.length ? `Bukti : ${proofs[0]}` : 'Bukti :';
+                const extraProofs = proofs.slice(1);
                 return [
                     `User ID : ${item.userId || ''}`,
                     `Order ID : ${item.orderId || '-'}`,
                     `RRN : ${item.rrn || ''}`,
                     `Nominal : ${item.nominal || ''}`,
-                    'Bukti :',
-                    proofText
+                    buktiLine,
+                    ...extraProofs
                 ].join('\n').replace(/\n+$/, '');
             }).join('\n\n');
             return result;
