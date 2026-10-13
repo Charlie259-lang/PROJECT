@@ -11,7 +11,7 @@
 <label class="upload" for="admFile"><span class="up-icon">02</span><strong>ADM</strong><small>Report popup (ACCEPT)</small><span class="file-state" id="admState">Pilih Excel / CSV</span><input type="file" accept=".xlsx,.xls,.csv" id="admFile"></label>
 <label class="upload" for="p2mFile"><span class="up-icon">03</span><strong>P2M</strong><small>Withdraw transaction</small><span class="file-state" id="p2mState">Pilih Excel / CSV</span><input type="file" accept=".xlsx,.xls,.csv" id="p2mFile"></label>
 <div class="upload docs-card"><span class="up-icon">04</span><strong>GOOGLE DOCS</strong><small>Input manual koreksi: LIT (C), nominal negatif (G)</small><span class="file-state" id="docsState">Belum ada data</span><button type="button" class="subtle" id="focusDocs">Isi / Tempel Data</button></div>
-</div><div class="manual-docs"><div class="section-head"><div><h3>04 · Input Manual Google Docs</h3><p>Tambahkan satu transaksi atau tempel banyak baris dari Google Sheets. Semua isian diproses lokal di browser.</p></div><span class="manual-count" id="docsCount">0 koreksi</span></div><div class="docs-entry"><label>Kode LIT<input id="docsLitInput" placeholder="LIT-e5285666-dcac-4306-a550-8775be639160" autocomplete="off"></label><label>Nominal koreksi (minus)<input id="docsNominalInput" placeholder="(101,000) atau -101000" autocomplete="off"></label><button id="addDocsBtn" type="button">+ Tambah Koreksi</button></div><label class="paste-label" for="docsPaste">Tempel banyak baris sekaligus (mendukung tabel Markdown dengan |, salinan Google Sheets A–G, atau LIT + nominal)</label><textarea id="docsPaste" rows="4" placeholder="| **BRI** | **soejasmin95** | **LIT-4ea746d3-faf1-45a7-a784-38885ed53326** | **001701010853539** | **TARSIANUS SUJA** |   | **(5,044,000)** |&#10;| :-----: | :-----: | :-----: | :-----: | :-----: | - | :-----: |"></textarea><div class="docs-tools"><button id="importDocsBtn" type="button" class="subtle">Impor Teks yang Ditempel</button><button id="clearDocsBtn" type="button" class="subtle">Hapus Semua Koreksi</button><span id="docsInfo" role="status">Format nominal negatif wajib digunakan.</span></div><div class="docs-table-wrap"><table><thead><tr><th>No.</th><th>LIT</th><th>Nominal koreksi</th><th>Tindakan</th></tr></thead><tbody id="docsPreview"><tr><td colspan="4">Belum ada pencatatan Docs.</td></tr></tbody></table></div></div><div class="actions"><button class="primary" id="runBtn">⌕ &nbsp; CEK SEMUA LIT</button><button id="exportBtn" disabled>↓ &nbsp; EKSPOR EXCEL</button><span id="statusText" role="status">Menunggu 3 file dan input Docs...</span></div><div class="notice">Privasi: isi file diproses di perangkat Anda dan tidak diunggah ke GitHub. Library pembaca Excel dimuat dari CDN saat website dibuka.</div></section>
+</div><div class="manual-docs"><div class="section-head"><div><h3>04 · Input Manual Google Docs</h3><p>Tambahkan satu transaksi atau tempel banyak baris dari Google Sheets. Teks tempelan tidak dihapus setelah pemeriksaan.</p></div><span class="manual-count" id="docsCount">0 koreksi</span></div><div class="docs-entry"><label>Kode LIT<input id="docsLitInput" placeholder="LIT-e5285666-dcac-4306-a550-8775be639160" autocomplete="off"></label><label>Nominal koreksi (minus)<input id="docsNominalInput" placeholder="(101,000) atau -101000" autocomplete="off"></label><button id="addDocsBtn" type="button">+ Tambah Koreksi</button></div><label class="paste-label" for="docsPaste">Tempel banyak baris sekaligus (mendukung tabel Markdown dengan |, salinan Google Sheets A–G, atau LIT + nominal)</label><textarea id="docsPaste" rows="4" placeholder="| **BRI** | **soejasmin95** | **LIT-4ea746d3-faf1-45a7-a784-38885ed53326** | **001701010853539** | **TARSIANUS SUJA** |   | **(5,044,000)** |&#10;| :-----: | :-----: | :-----: | :-----: | :-----: | - | :-----: |"></textarea><div class="docs-tools"><button id="importDocsBtn" type="button" class="subtle">Validasi Teks Docs</button><button id="clearDocsBtn" type="button" class="subtle">Hapus Semua Koreksi</button><span id="docsInfo" role="status">Format nominal negatif wajib digunakan.</span></div><div class="docs-table-wrap"><table><thead><tr><th>No.</th><th>LIT</th><th>Nominal koreksi</th><th>Tindakan</th></tr></thead><tbody id="docsPreview"><tr><td colspan="4">Belum ada pencatatan Docs.</td></tr></tbody></table></div></div><div class="actions"><button class="primary" id="runBtn">⌕ &nbsp; CEK SEMUA LIT</button><button id="exportBtn" disabled>↓ &nbsp; EKSPOR EXCEL</button><span id="statusText" role="status">Menunggu 3 file dan input Docs...</span></div><div class="notice">Privasi: isi file diproses di perangkat Anda dan tidak diunggah ke GitHub. Library pembaca Excel dimuat dari CDN saat website dibuka.</div></section>
 <section id="results" hidden><div class="section-head separated"><div><h2>2. Ringkasan pemeriksaan</h2><p>Angka selisih bukan otomatis bukti kehilangan dana. Tinjau kategori dan kesesuaian periode.</p></div></div><div class="stats" id="stats"></div><div id="warnings"></div><div class="panel result-panel"><div class="section-head"><div><h2>3. Detail transaksi</h2><p>Secara default hanya masalah yang ditampilkan. Pilih Sesuai untuk melihat transaksi normal.</p></div><div class="toolbar"><input id="searchBox" placeholder="Cari LIT / User ID / nominal..." aria-label="Cari transaksi"><select id="filterBox" aria-label="Filter hasil"><option value="issue" selected>Semua masalah</option><option value="adm">Kandidat selisih ADM</option><option value="p2m">Masalah P2M</option><option value="docs">Masalah Docs</option><option value="ok">Sesuai</option></select></div></div><div class="table-wrap"><table><thead><tr><th>LIT</th><th>User ID</th><th>Nominal</th><th>Status Main</th><th>ADM</th><th>P2M</th><th>Docs</th><th>Temuan</th></tr></thead><tbody id="resultBody"></tbody></table></div><div class="pager"><span id="pageInfo"></span><div><button id="prevBtn" class="subtle">← Sebelumnya</button><button id="nextBtn" class="subtle">Berikutnya →</button></div></div></div><div class="panel"><div class="section-head"><div><h2>4. Selisih kelompok Main–ADM</h2><p>Jumlah terkonfirmasi berdasarkan User ID + nominal. Kandidat LIT tidak dipaksakan menjadi satu jika atribut identik.</p></div></div><div class="table-wrap"><table><thead><tr><th>User ID</th><th>Nominal</th><th>Main wajib ADM</th><th>ADM</th><th>Selisih jumlah</th><th>Kandidat LIT</th><th>Catatan</th></tr></thead><tbody id="groupsBody"></tbody></table></div></div></section>
 <footer>Crosscheck QRIS V2HIM · Mode upload Main/ADM/P2M + input manual Docs · Tidak menyimpan data setelah halaman ditutup</footer></main><script>
 'use strict';
@@ -79,13 +79,25 @@ function parseDocsPaste(text) {
  if(!entries.length)throw Error('Tidak ada transaksi Docs yang valid ditemukan.');
  return {entries,skipped};
 }
-function docsDataset(){return {rows:docsManual.map((r,i)=>({...r,row:i+1})),skipped:0}}
+function docsDataset(){
+ // Teks tempelan adalah sumber data aktif, bukan antrean yang akan dihapus.
+ // Tidak digabung dua kali ketika tombol CEK SEMUA LIT ditekan berulang.
+ const raw=$('docsPaste').value.trim();
+ const pasted=raw?parseDocsPaste(raw).entries:[];
+ return {rows:[...docsManual,...pasted].map((r,i)=>({...r,row:i+1})),skipped:0};
+}
 function docsUpdate(){
- $('docsCount').textContent=docsManual.length.toLocaleString('id-ID')+' koreksi';
- $('docsState').textContent=docsManual.length?docsManual.length.toLocaleString('id-ID')+' transaksi diinput':'Belum ada data';
- let total=docsManual.reduce((s,x)=>s+x.signed,0);
- $('docsInfo').textContent=docsManual.length?'Total koreksi: '+money(total):'Format nominal negatif wajib digunakan.';
- $('docsPreview').innerHTML=docsManual.length?docsManual.slice(-100).map((r,i)=>`<tr><td>${Math.max(0,docsManual.length-100)+i+1}</td><td><code>${safe(r.lit)}</code></td><td>${money(r.signed)}</td><td><button type="button" class="subtle" data-delete-doc="${Math.max(0,docsManual.length-100)+i}">Hapus</button></td></tr>`).join(''):'<tr><td colspan="4">Belum ada pencatatan Docs.</td></tr>';
+ let rows=[],error='';
+ try{rows=docsDataset().rows;}catch(e){error=e.message;rows=[...docsManual];}
+ $('docsCount').textContent=rows.length.toLocaleString('id-ID')+' koreksi';
+ $('docsState').textContent=rows.length?rows.length.toLocaleString('id-ID')+' transaksi diinput':'Belum ada data';
+ const total=rows.reduce((sum,r)=>sum+r.signed,0);
+ $('docsInfo').textContent=error?'Periksa teks Docs: '+error:(rows.length?'Total koreksi: '+money(total):'Format nominal negatif wajib digunakan.');
+ $('docsPreview').innerHTML=rows.length?rows.slice(-100).map((r,i)=>{
+   const index=Math.max(0,rows.length-100)+i;
+   const action=index<docsManual.length?`<button type="button" class="subtle" data-delete-doc="${index}">Hapus</button>`:'Dari teks tempelan';
+   return `<tr><td>${index+1}</td><td><code>${safe(r.lit)}</code></td><td>${money(r.signed)}</td><td>${action}</td></tr>`;
+ }).join(''):'<tr><td colspan="4">Belum ada pencatatan Docs.</td></tr>';
  invalidateResults();
 }
 function invalidateResults(){report=null;$('results').hidden=true;$('exportBtn').disabled=true;}
@@ -126,11 +138,18 @@ function assess(main,adm,p2m,docs){const admMatch=groupAdm(main.rows.map(r=>({..
  if(ds.length>1&&ds.some(x=>Math.abs(x.amount-r.amount)>0.01))issues.push('NOMINAL KOREKSI SALAH');
  // Transaksi wajib koreksi yang memiliki tepat satu baris dan nominal benar ditandai sebagai sudah sesuai.
  const docsCorrect=needDocs===true&&ds.length===1&&docsNegative&&Math.abs(ds[0].amount-r.amount)<=0.01;
- const docsLabel=normalKhusus&&!ds.length?'NORMAL KHUSUS — TIDAK PERLU CATAT DOCS':docsCorrect?'KOREKSI SESUAI':(issues.find(x=>x.includes('DOCS')||x.includes('KOREKSI'))||'');
  if(admMatch.litFlag.has(r.lit))flags.push(admMatch.litFlag.get(r.lit));
- // Pengaman terakhir: larangan status BELUM DICATAT DOCS untuk SUCCESS/FAILED/FAILED.
- if(normalKhusus){needDocs=false;issues=issues.filter(x=>x!=='BELUM DICATAT DOCS');}
- // P2M REJECTED mewajibkan koreksi kecuali untuk NORMAL KHUSUS (SUCCESS/FAILED/FAILED).
+ // Finalisasi wajib Docs HANYA setelah status utama diketahui.
+ // SUCCESS/FAILED/FAILED tidak pernah wajib Docs, termasuk saat P2M REJECTED.
+ if(normalKhusus){
+   needDocs=false;
+   issues=issues.filter(x=>x!=='BELUM DICATAT DOCS');
+   flags=flags.filter(x=>!x.includes('BELUM DICATAT DOCS'));
+ }
+ const docsLabel=normalKhusus
+  ?(ds.length?'SALAH PENCATATAN DOCS':'NORMAL KHUSUS — TIDAK PERLU CATAT DOCS')
+  :docsCorrect?'KOREKSI SESUAI'
+  :(issues.find(x=>x.includes('DOCS')||x.includes('KOREKSI'))||'');
  let mismatch=issues.length>0;let needsReview=flags.length>0;return {...r,expectedAdm,needDocs,needP2m,special,p2mRows:ps,docsRows:ds,pDebit,pReject,docSum,docsLabel,issues,flags,mismatch,needsReview}
  });
  const litSet=new Set(main.rows.map(r=>r.lit));const extras=[];for(const [lit,ps] of pmap)if(!litSet.has(lit))extras.push({lit,source:'P2M',count:ps.length,amount:ps.reduce((s,x)=>s+x.amount,0)});for(const [lit,ds] of dmap)if(!litSet.has(lit))extras.push({lit,source:'DOCS',count:ds.length,amount:ds.reduce((s,x)=>s+x.amount,0)});
@@ -151,9 +170,10 @@ async function run(){const btn=$('runBtn');try{btn.disabled=true;$('statusText')
 for(const [k,id] of Object.entries(inputs))$(id).addEventListener('change',e=>{$(k+'State').textContent=e.target.files[0]?.name||'Pilih Excel / CSV';invalidateResults()});
 $('focusDocs').addEventListener('click',()=>{$('docsLitInput').focus();$('docsLitInput').scrollIntoView({behavior:'smooth',block:'center'})});
 $('addDocsBtn').addEventListener('click',()=>{try{docsManual.push(validateDocsEntry($('docsLitInput').value,$('docsNominalInput').value));$('docsLitInput').value='';$('docsNominalInput').value='';docsUpdate();$('docsLitInput').focus()}catch(e){alert(e.message)}});
-$('importDocsBtn').addEventListener('click',()=>{try{const parsed=parseDocsPaste($('docsPaste').value);docsManual.push(...parsed.entries);$('docsPaste').value='';docsUpdate();$('docsInfo').textContent='Berhasil impor '+parsed.entries.length.toLocaleString('id-ID')+' baris'+(parsed.skipped?' ('+parsed.skipped+' baris header/pemisah diabaikan)':'')+'; duplikat tetap disimpan.'}catch(e){alert('Impor Docs gagal: '+e.message)}});
-$('clearDocsBtn').addEventListener('click',()=>{if(docsManual.length&&!confirm('Hapus seluruh '+docsManual.length+' koreksi Docs yang telah dimasukkan?'))return;docsManual=[];docsUpdate()});
+$('importDocsBtn').addEventListener('click',()=>{try{const parsed=parseDocsPaste($('docsPaste').value);docsUpdate();$('docsInfo').textContent='Siap diperiksa: '+parsed.entries.length.toLocaleString('id-ID')+' baris tempelan; teks tetap tersimpan di kolom. Klik CEK SEMUA LIT.';}catch(e){alert('Impor Docs gagal: '+e.message)}});
+$('clearDocsBtn').addEventListener('click',()=>{if((docsManual.length||$('docsPaste').value.trim())&&!confirm('Hapus seluruh koreksi Docs dan teks yang ditempel?'))return;docsManual=[];$('docsPaste').value='';docsUpdate()});
 $('docsPreview').addEventListener('click',e=>{const btn=e.target.closest('[data-delete-doc]');if(!btn)return;docsManual.splice(Number(btn.dataset.deleteDoc),1);docsUpdate()});
+$('docsPaste').addEventListener('input',()=>{invalidateResults();});
 $('runBtn').addEventListener('click',run);$('exportBtn').addEventListener('click',exportExcel);
 $('clearBtn').addEventListener('click',()=>{for(let [k,id] of Object.entries(inputs)){$(id).value='';$(k+'State').textContent='Pilih Excel / CSV'}docsManual=[];$('docsLitInput').value='';$('docsNominalInput').value='';$('docsPaste').value='';docsUpdate();$('statusText').textContent='Menunggu 3 file dan input Docs...'});
 $('searchBox').addEventListener('input',filterResults);$('filterBox').addEventListener('change',filterResults);$('prevBtn').addEventListener('click',()=>{page--;renderPage()});$('nextBtn').addEventListener('click',()=>{page++;renderPage()});
