@@ -103,7 +103,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
     <div>
       <div class="eyebrow">GOOGLE SHEETS · GITHUB PAGES · 3D DASHBOARD</div>
       <h1>CHECK AKSES LINK</h1>
-      <div class="subtitle">Dashboard modern dengan tampilan 3D, pengelompokan otomatis berdasarkan kategori di Google Sheets, serta progres buka link per kategori.</div>
+      <div class="subtitle">Dashboard modern dengan tampilan 3D, pengelompokan otomatis berdasarkan kategori di Google Sheets, progres buka link per kategori, dan filter duplikat otomatis (http/https tidak ditampilkan dua kali).</div>
     </div>
     <div class="hero-badges">
       <div class="badge">● Apps Script tersambung otomatis</div>
@@ -155,12 +155,46 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 <script>
 'use strict';
 const ENDPOINT='https://script.google.com/macros/s/AKfycbxzjes9G0cfexOMNETcs3vz6rYdHGgJGKozW9gMW70Www_XyCYuyIkbBXNskur4XQKEYw/exec';
-const STORAGE_OPENED='checkAksesOpened_v6';
+const STORAGE_OPENED='checkAksesOpened_v8';
 const $=id=>document.getElementById(id);
 let links=[],chosen=new Set(),collapsed=new Set(),running=false,stopped=false,openedKeys=new Set(loadOpened());
 function loadOpened(){try{return JSON.parse(localStorage.getItem(STORAGE_OPENED)||'[]')}catch{return []}}
 function saveOpened(){localStorage.setItem(STORAGE_OPENED, JSON.stringify([...openedKeys]))}
-function linkKey(l){return `${(l.category||'LAINNYA').trim()}||${l.redirectUrl||l.url}`}
+function normalizeUrlForCompare(raw){
+  try{
+    let text=String(raw||'').trim();
+    if(!text)return '';
+    if(!/^https?:\/\//i.test(text)) text='https://'+text;
+    const u=new URL(text);
+    const host=u.hostname.toLowerCase();
+    let path=u.pathname || '/';
+    path=path.replace(/\/+$/,'');
+    if(!path) path='/';
+    const search=u.search || '';
+    return host + path + search;
+  }catch{
+    return String(raw||'').trim().toLowerCase().replace(/^https?:\/\//,'').replace(/\/+$/,'');
+  }
+}
+function preferLink(a,b){
+  const ua=String(a.url||''); const ub=String(b.url||'');
+  const aHttps=/^https:\/\//i.test(ua), bHttps=/^https:\/\//i.test(ub);
+  if(aHttps && !bHttps) return a;
+  if(bHttps && !aHttps) return b;
+  return a;
+}
+function dedupeLinks(items){
+  const map=new Map();
+  let removed=0;
+  for(const item of items){
+    const category=(item.category||'LAINNYA').trim()||'LAINNYA';
+    const key=category+'||'+normalizeUrlForCompare(item.url);
+    if(!map.has(key)) map.set(key,item);
+    else { removed++; map.set(key, preferLink(map.get(key), item)); }
+  }
+  return {links:[...map.values()], removed};
+}
+function linkKey(l){return `${(l.category||'LAINNYA').trim()}||${normalizeUrlForCompare(l.redirectUrl||l.url)}`}
 function markOpened(items){for(const l of items){openedKeys.add(linkKey(l))}saveOpened()}
 function clearOpened(){openedKeys=new Set();saveOpened();render()}
 function isOpened(l){return openedKeys.has(linkKey(l))}
@@ -211,7 +245,6 @@ function render(){stats();const q=$('search').value.trim().toLowerCase();const r
     button('✓ Pilih Aktif','btn-dark',()=>{arr.filter(l=>l.status==='MERESPONS').forEach(l=>chosen.add(l.index));render()}),
     button('Centang semua','btn-dark',()=>{arr.forEach(l=>chosen.add(l.index));render()}),
     button('Hapus pilihan','btn-dark',()=>{arr.forEach(l=>chosen.delete(l.index));render()}),
-    button('Reset status grup','btn-dark',()=>{arr.forEach(l=>openedKeys.delete(linkKey(l)));saveOpened();render();notice('Status buka untuk grup '+category+' telah direset.')}),
   );
   body.append(tools);
   for(const l of vis){const line=el('div','entry');const ck=el('input');ck.type='checkbox';ck.checked=chosen.has(l.index);ck.addEventListener('change',()=>{ck.checked?chosen.add(l.index):chosen.delete(l.index);render()});const content=el('div');const link=el('a','',l.url);link.href=l.url;link.target='_blank';link.rel='noopener noreferrer';content.append(link);if(l.redirectUrl){content.append(el('small','', '↳ Redirect: '+l.redirectUrl));const a=el('a','mini','Buka tujuan redirect');a.href=l.redirectUrl;a.target='_blank';a.rel='noopener noreferrer';content.append(a)}if(l.detail)content.append(el('small','',l.detail));if(isOpened(l))content.append(el('small','mini','✓ Sudah dibuka'));const status=el('span','tag '+(l.status||''),l.status||'BELUM DICEK');line.append(ck,content,status);body.append(line)}
@@ -220,7 +253,7 @@ function render(){stats();const q=$('search').value.trim().toLowerCase();const r
   stats();
 }
 function busy(x){running=x;$('refresh').disabled=x;$('check').disabled=x;$('stop').disabled=!x}
-$('refresh').onclick=async()=>{if(running)return;busy(true);notice('Mengambil daftar dari Google Sheets...');try{const r=await call('list');if(!r.ok)throw new Error(r.error||'Gagal membaca sheet');links=(r.links||[]).map((x,i)=>({...x,index:i,status:'',detail:'',redirectUrl:''}));chosen.clear();collapsed.clear();$('progress').style.width='0%';render();notice('Berhasil memuat '+links.length+' link dalam '+groupMap().size+' kategori.')}catch(e){notice('Gagal: '+e.message)}finally{busy(false)}};
+$('refresh').onclick=async()=>{if(running)return;busy(true);notice('Mengambil daftar dari Google Sheets...');try{const r=await call('list');if(!r.ok)throw new Error(r.error||'Gagal membaca sheet');const raw=(r.links||[]).map((x,i)=>({...x,index:i,status:'',detail:'',redirectUrl:''}));const dd=dedupeLinks(raw);links=dd.links.map((x,i)=>({...x,index:i}));chosen.clear();collapsed=new Set(links.map(l=>(l.category||'LAINNYA').trim()||'LAINNYA'));$('progress').style.width='0%';render();notice('Berhasil memuat '+links.length+' link dalam '+groupMap().size+' kategori.' + (dd.removed?(' '+dd.removed+' link duplikat otomatis disembunyikan.'):''));}catch(e){notice('Gagal: '+e.message)}finally{busy(false)}};
 async function checkSubset(arr){if(running||!arr.length)return;busy(true);stopped=false;let processed=0;const chunk=Number($('parallel').value),delay=Number($('delay').value);for(const l of arr){l.status='';l.detail='';l.redirectUrl=''}render();try{for(let i=0;i<arr.length&&!stopped;i+=chunk){const subset=arr.slice(i,i+chunk);notice('Memeriksa '+Math.min(i+1,arr.length)+'–'+Math.min(i+chunk,arr.length)+' dari '+arr.length+' link...');try{const r=await call('check',{indices:subset.map(x=>x.index).join(',')});if(!r.ok)throw Error(r.error||'Pemeriksaan gagal');for(const res of r.results||[]){const l=links[res.index];if(l){l.status=res.status;l.redirectUrl=res.redirectUrl||'';l.detail=(res.code?'HTTP '+res.code+' — ':'')+(res.detail||'')}}}catch(e){for(const l of subset){l.status='TIDAK_PASTI';l.detail=e.message}}processed+=subset.length;$('progress').style.width=Math.round(processed/arr.length*100)+'%';render();if(i+chunk<arr.length&&!stopped)await pause(delay)}notice(stopped?'Pemeriksaan dihentikan.':'Pemeriksaan selesai: '+processed+' link.')}finally{busy(false)}}
 $('check').onclick=()=>links.length?checkSubset(links):notice('Refresh Sheets terlebih dahulu.');
 $('stop').onclick=()=>{stopped=true;notice('Menghentikan setelah batch saat ini...')};
