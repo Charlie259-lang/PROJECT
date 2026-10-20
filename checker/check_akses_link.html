@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHECK AKSES LINK — Dual Check Otomatis</title>
+<title>CHECK AKSES LINK — 3D Dual Network</title>
 <style>
 :root{
   --bg:#071019;--panel:#0b1722;--panel2:#0d2230;--line:#1be4c0;--line2:#3ea4ff;--text:#eaf8ff;--muted:#8da5b5;
@@ -76,7 +76,7 @@ button:disabled{opacity:.45;cursor:default;transform:none}
 .entry input{width:18px;height:18px;accent-color:#14dfb1;margin-top:4px}
 .entry a{color:#afdcff;text-decoration:none;word-break:break-all;font-weight:700}
 .entry a:hover{text-decoration:underline}
-.entry small,.entry .mini{display:block;margin-top:4px;font-size:11px;color:#8fb1bb;word-break:break-all}
+.browserstatus{display:block;margin-top:7px;padding:7px 9px;border:1px solid rgba(60,144,168,.25);border-radius:10px;background:rgba(13,41,56,.55);font-size:11px;color:#b4d7f3;overflow-wrap:anywhere}.browserstatus strong{color:#85cfff}.entry small,.entry .mini{display:block;margin-top:4px;font-size:11px;color:#8fb1bb;word-break:break-all}
 .tag{padding:8px 10px;border-radius:12px;font-size:11px;font-weight:900;white-space:nowrap;border:1px solid rgba(255,255,255,.06);box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
 .tag.MERESPONS{background:linear-gradient(135deg,#0d5c4c,#15a97d);color:#cbfff0}
 .tag.DIBATASI{background:linear-gradient(135deg,#68481f,#9f6a1a);color:#fff0cf}
@@ -94,8 +94,6 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
   .entry{grid-template-columns:25px minmax(120px,1fr);}
   .entry .tag{grid-column:2;justify-self:start}
 }
-.redirectRow{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:9px;padding:9px 11px;border:1px solid rgba(64,136,143,.3);border-radius:11px;background:rgba(8,25,32,.65)}
-.redirectLabel{font-size:10px;font-weight:900;letter-spacing:.7px;color:#16e4b8;min-width:110px}.redirectValue{font-size:12px;color:#b7d8e7;overflow-wrap:anywhere}.chromeInput{flex:1;min-width:210px;height:36px!important;font-size:12px}.btn-mini{height:34px;font-size:11px;padding:0 10px!important}.mini{color:#8ecaff!important;font-size:11px!important}.redirectRow .mini{display:inline;margin:0}
 </style>
 </head>
 <body>
@@ -105,11 +103,11 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
     <div>
       <div class="eyebrow">GOOGLE SHEETS · GITHUB PAGES · 3D DASHBOARD</div>
       <h1>CHECK AKSES LINK</h1>
-      <div class="subtitle">Dashboard modern dengan tampilan 3D, pengelompokan otomatis berdasarkan kategori di Google Sheets, progres buka link per kategori, dan filter duplikat otomatis (http/https tidak ditampilkan dua kali).</div>
+      <div class="subtitle">Pemeriksaan otomatis dari server Google tanpa ekstensi atau aplikasi laptop. Kategori tetap rapi, anti-duplikat, dan link dapat dibuka bertahap.</div>
     </div>
     <div class="hero-badges">
-      <div class="badge">● Apps Script tersambung otomatis</div>
-      <div class="badge">↗ Google + Chrome otomatis dengan ekstensi</div>
+      <div class="badge">● Server Google terhubung otomatis</div>
+      <div class="badge">↗ Redirect dari server Google</div>
       <div class="badge">✓ Status buka link tersimpan di browser</div>
     </div>
   </div>
@@ -118,7 +116,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 <section class="panel">
   <div class="controls">
     <button id="refresh" class="btn-teal">↻ Refresh Sheets</button>
-    <button id="check" class="btn-green">▶ Cek Server Google</button><button id="checkChrome" class="btn-teal">◎ Cek Chrome Otomatis</button>
+    <button id="check" class="btn-green">▶ Cek Semua (Google + Browser)</button>
     <button id="stop" class="btn-red" disabled>■ Hentikan</button>
     <label>Per batch
       <select id="parallel">
@@ -152,20 +150,14 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 </section>
 
 <div class="gridGroups" id="groups"><section class="panel empty">Belum ada daftar. Klik <b>Refresh Sheets</b>.</section></div>
-<footer>Pemeriksaan Server Google dilakukan melalui Apps Script. Pemeriksaan Chrome otomatis memerlukan ekstensi pendamping Chrome yang terpasang, dan memuat halaman satu per satu dalam tab sementara. Status <b>✓ SELESAI</b> berarti semua link dalam kategori tersebut sudah diperintahkan untuk dibuka, bukan jaminan seluruh halaman berhasil dimuat penuh.</footer>
+<footer>Redirect dan status diperiksa dari jaringan server Google, bukan Chrome Anda. Tujuan redirect bisa berbeda sesuai jaringan. Status <b>✓ SELESAI</b> berarti semua link dalam kategori tersebut sudah diperintahkan untuk dibuka, bukan jaminan seluruh halaman berhasil dimuat penuh.</footer>
 </main>
 <script>
 'use strict';
 const ENDPOINT='https://script.google.com/macros/s/AKfycbxzjes9G0cfexOMNETcs3vz6rYdHGgJGKozW9gMW70Www_XyCYuyIkbBXNskur4XQKEYw/exec';
-const STORAGE_OPENED='checkAksesOpened_v8';
-const STORAGE_CHROME='checkAksesChromeRedirect_v11_auto';
-let chromeRunning=false,chromeStop=false;
+const STORAGE_OPENED='checkAksesOpened_v12';
 const $=id=>document.getElementById(id);
 let links=[],chosen=new Set(),collapsed=new Set(),running=false,stopped=false,openedKeys=new Set(loadOpened());
-let chromeRedirects=(()=>{try{return JSON.parse(localStorage.getItem(STORAGE_CHROME)||'{}')}catch{return {}}})();
-function originalKey(l){return (l.category||'LAINNYA').trim()+'||'+normalizeUrlForCompare(l.url)}
-function getChrome(l){return chromeRedirects[originalKey(l)]||''}
-function saveChrome(l,value){if(value)chromeRedirects[originalKey(l)]=value;else delete chromeRedirects[originalKey(l)];localStorage.setItem(STORAGE_CHROME,JSON.stringify(chromeRedirects));}
 function loadOpened(){try{return JSON.parse(localStorage.getItem(STORAGE_OPENED)||'[]')}catch{return []}}
 function saveOpened(){localStorage.setItem(STORAGE_OPENED, JSON.stringify([...openedKeys]))}
 function normalizeUrlForCompare(raw){
@@ -202,7 +194,7 @@ function dedupeLinks(items){
   }
   return {links:[...map.values()], removed};
 }
-function linkKey(l){return originalKey(l)}
+function linkKey(l){return `${(l.category||'LAINNYA').trim()}||${normalizeUrlForCompare(l.url)}`}
 function markOpened(items){for(const l of items){openedKeys.add(linkKey(l))}saveOpened()}
 function clearOpened(){openedKeys=new Set();saveOpened();render()}
 function isOpened(l){return openedKeys.has(linkKey(l))}
@@ -255,61 +247,63 @@ function render(){stats();const q=$('search').value.trim().toLowerCase();const r
     button('Hapus pilihan','btn-dark',()=>{arr.forEach(l=>chosen.delete(l.index));render()}),
   );
   body.append(tools);
-  for(const l of vis){const line=el('div','entry');const ck=el('input');ck.type='checkbox';ck.checked=chosen.has(l.index);ck.addEventListener('change',()=>{ck.checked?chosen.add(l.index):chosen.delete(l.index);render()});const content=el('div');const link=el('a','',l.url);link.href=l.url;link.target='_blank';link.rel='noopener noreferrer';content.append(link);const googleRow=el('div','redirectRow');googleRow.append(el('span','redirectLabel','SERVER GOOGLE'));const gValue=el('span','redirectValue',l.redirectUrl||'Belum ada tujuan redirect terdeteksi');googleRow.append(gValue);if(l.redirectUrl){const ga=el('a','mini','Buka tujuan Google');ga.href=l.redirectUrl;ga.target='_blank';ga.rel='noopener noreferrer';googleRow.append(ga)}content.append(googleRow);
-    const chromeRow=el('div','redirectRow');chromeRow.append(el('span','redirectLabel','CHROME ANDA'));
-    const known=getChrome(l);
-    chromeRow.append(el('span','redirectValue',known||'Belum dicek otomatis'));
-    if(known){const c=el('a','mini','Buka tujuan Chrome');c.href=known;c.target='_blank';c.rel='noopener noreferrer';chromeRow.append(c)}
-    const single=button('◎ Cek di Chrome','btn-dark',()=>checkChromeList([l]));single.classList.add('btn-mini');chromeRow.append(single);
-    content.append(chromeRow);
-    if(l.chromeError)content.append(el('small','', 'Chrome: '+l.chromeError));if(l.detail)content.append(el('small','',l.detail));if(isOpened(l))content.append(el('small','mini','✓ Sudah dibuka'));const status=el('span','tag '+(l.status||''),l.status||'BELUM DICEK');line.append(ck,content,status);body.append(line)}
+  for(const l of vis){const line=el('div','entry');const ck=el('input');ck.type='checkbox';ck.checked=chosen.has(l.index);ck.addEventListener('change',()=>{ck.checked?chosen.add(l.index):chosen.delete(l.index);render()});const content=el('div');const link=el('a','',l.url);link.href=l.url;link.target='_blank';link.rel='noopener noreferrer';content.append(link);if(l.redirectUrl){content.append(el('small','', '↳ Tujuan menurut Server Google: '+l.redirectUrl));const a=el('a','mini','Lihat tujuan server Google');a.href=l.redirectUrl;a.target='_blank';a.rel='noopener noreferrer';content.append(a)}if(l.detail)content.append(el('small','','Server Google: '+l.detail));const bs=el('div','browserstatus');bs.append(el('strong','','BROWSER ANDA: '+(l.browserStatus||'BELUM DICEK')));if(l.browserUrl)bs.append(el('div','', 'URL akhir: '+l.browserUrl));if(l.browserDetail)bs.append(el('div','',l.browserDetail));content.append(bs);if(isOpened(l))content.append(el('small','mini','✓ Sudah dibuka'));const status=el('span','tag '+(l.status||''),l.status||'BELUM DICEK');line.append(ck,content,status);body.append(line)}
   section.append(body);root.append(section)}
   if(!root.children.length)root.append(el('section','panel empty','Tidak ada kategori yang cocok.'));
   stats();
 }
 function busy(x){running=x;$('refresh').disabled=x;$('check').disabled=x;$('stop').disabled=!x}
-$('refresh').onclick=async()=>{if(running||chromeRunning)return;busy(true);notice('Mengambil daftar dari Google Sheets...');try{const r=await call('list');if(!r.ok)throw new Error(r.error||'Gagal membaca sheet');const raw=(r.links||[]).map((x,i)=>({...x,index:i,status:'',detail:'',redirectUrl:''}));const dd=dedupeLinks(raw);links=dd.links;chosen.clear();collapsed=new Set(links.map(l=>(l.category||'LAINNYA').trim()||'LAINNYA'));$('progress').style.width='0%';render();notice('Berhasil memuat '+links.length+' link dalam '+groupMap().size+' kategori.' + (dd.removed?(' '+dd.removed+' link duplikat otomatis disembunyikan.'):''));}catch(e){notice('Gagal: '+e.message)}finally{busy(false)}};
-async function checkSubset(arr){if(running||chromeRunning||!arr.length)return;busy(true);stopped=false;let processed=0;const chunk=Number($('parallel').value),delay=Number($('delay').value);for(const l of arr){l.status='';l.detail='';l.redirectUrl=''}render();try{for(let i=0;i<arr.length&&!stopped;i+=chunk){const subset=arr.slice(i,i+chunk);notice('Memeriksa '+Math.min(i+1,arr.length)+'–'+Math.min(i+chunk,arr.length)+' dari '+arr.length+' link...');try{const r=await call('check',{indices:subset.map(x=>x.index).join(',')});if(!r.ok)throw Error(r.error||'Pemeriksaan gagal');for(const res of r.results||[]){const l=links.find(x=>x.index===res.index);if(l){l.status=res.status;l.redirectUrl=res.redirectUrl||'';l.detail=(res.code?'HTTP '+res.code+' — ':'')+(res.detail||'')}}}catch(e){for(const l of subset){l.status='TIDAK_PASTI';l.detail=e.message}}processed+=subset.length;$('progress').style.width=Math.round(processed/arr.length*100)+'%';render();if(i+chunk<arr.length&&!stopped)await pause(delay)}notice(stopped?'Pemeriksaan dihentikan.':'Pemeriksaan selesai: '+processed+' link.')}finally{busy(false)}}
+$('refresh').onclick=async()=>{if(running)return;busy(true);notice('Mengambil daftar dari Google Sheets...');try{const r=await call('list');if(!r.ok)throw new Error(r.error||'Gagal membaca sheet');const raw=(r.links||[]).map((x,i)=>({...x,index:i,status:'',detail:'',redirectUrl:'',browserStatus:'BELUM DICEK',browserUrl:'',browserDetail:''}));const dd=dedupeLinks(raw);links=dd.links.map((x,i)=>({...x,index:i,sourceIndex:x.index}));chosen.clear();collapsed=new Set(links.map(l=>(l.category||'LAINNYA').trim()||'LAINNYA'));$('progress').style.width='0%';render();notice('Berhasil memuat '+links.length+' link dalam '+groupMap().size+' kategori.' + (dd.removed?(' '+dd.removed+' link duplikat otomatis disembunyikan.'):''));}catch(e){notice('Gagal: '+e.message)}finally{busy(false)}};
+
+// Pemeriksaan benar-benar dari koneksi browser (bukan server Google).
+// Browser hanya mengizinkan hasil dibaca ketika situs target mendukung CORS.
+async function browserCheck(link){
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),12000);
+  try{
+    // Fetch mengikuti redirect. Response.url memberi URL terakhir hanya jika CORS mengizinkan.
+    const res=await fetch(link.url,{method:'GET',mode:'cors',redirect:'follow',cache:'no-store',credentials:'omit',signal:controller.signal});
+    link.browserStatus='TERBACA';
+    link.browserUrl=res.url||'';
+    link.browserDetail='HTTP '+res.status+(res.redirected?' · redirect terikuti':' · tanpa redirect terdeteksi');
+  }catch(e){
+    link.browserStatus='TIDAK DAPAT DIPERIKSA';
+    link.browserUrl='';
+    link.browserDetail=e?.name==='AbortError'?'Waktu habis (12 detik); hasil tidak diketahui.':'CORS, jaringan, atau kebijakan browser membatasi pembacaan; hasil tidak diketahui.';
+  }finally{clearTimeout(timer)}
+}
+
+async function checkSubset(arr){
+  if(running||!arr.length)return;
+  busy(true);stopped=false;
+  const chunk=Number($('parallel').value),delay=Number($('delay').value);
+  for(const l of arr){l.status='';l.detail='';l.redirectUrl='';l.browserStatus='BELUM DICEK';l.browserUrl='';l.browserDetail=''}
+  render(); let processed=0;
+  try{
+    for(let i=0;i<arr.length&&!stopped;i+=chunk){
+      const subset=arr.slice(i,i+chunk);
+      notice('Memeriksa '+Math.min(i+1,arr.length)+'–'+Math.min(i+chunk,arr.length)+' dari '+arr.length+' link (Google + browser)...');
+      // Jalankan pengecekan browser bersamaan dengan server; jangan salah menganggap kegagalan CORS sebagai HTTP error.
+      const browserJobs=subset.map(l=>browserCheck(l));
+      try{
+        const r=await call('check',{indices:subset.map(x=>x.sourceIndex).join(',')});
+        if(!r.ok)throw Error(r.error||'Pemeriksaan Google gagal');
+        for(const res of r.results||[]){
+          const l=links.find(x=>x.sourceIndex===res.index);
+          if(l){l.status=res.status||'TIDAK_PASTI';l.redirectUrl=res.redirectUrl||'';l.detail=(res.code?'HTTP '+res.code+' — ':'')+(res.detail||'')}
+        }
+        for(const l of subset){if(!l.status){l.status='TIDAK_PASTI';l.detail='Server Google tidak mengembalikan hasil untuk link ini.'}}
+      }catch(e){for(const l of subset){l.status='TIDAK_PASTI';l.detail='Google: '+e.message}}
+      await Promise.allSettled(browserJobs);
+      processed+=subset.length;
+      $('progress').style.width=Math.round(processed/arr.length*100)+'%';render();
+      if(i+chunk<arr.length&&!stopped)await pause(delay);
+    }
+    notice(stopped?'Pemeriksaan dihentikan setelah batch terakhir.':'Pemeriksaan selesai: '+processed+' link. Hasil browser yang dibatasi CORS ditandai tidak dapat diperiksa.');
+  }finally{busy(false)}
+}
 $('check').onclick=()=>links.length?checkSubset(links):notice('Refresh Sheets terlebih dahulu.');
-$('stop').onclick=()=>{stopped=true;chromeStop=true;notice('Menghentikan setelah pemeriksaan saat ini...')};
-
-// Komunikasi otomatis dengan ekstensi pendamping Chrome. Tidak menggunakan clipboard atau input URL manual.
-const pendingChrome=new Map();
-window.addEventListener('message',event=>{
-  if(event.source!==window || event.origin!==location.origin || !event.data || event.data.channel!=='CHECK_AKSES_EXTENSION_RESULT')return;
-  const p=pendingChrome.get(event.data.id);if(!p)return;
-  clearTimeout(p.timer);pendingChrome.delete(event.data.id);p.resolve(event.data);
-});
-function chromeNavigate(url){
-  return new Promise((resolve,reject)=>{
-    const id='chk_'+crypto.randomUUID();
-    const timer=setTimeout(()=>{pendingChrome.delete(id);reject(new Error('Ekstensi tidak merespons. Pasang dan aktifkan ekstensi Chrome dari ZIP, lalu refresh website.'))},30000);
-    pendingChrome.set(id,{resolve,timer});
-    window.postMessage({channel:'CHECK_AKSES_EXTENSION_REQUEST',id,url},location.origin);
-  });
-}
-async function checkChromeList(arr){
- if(chromeRunning||running){notice('Tunggu pemeriksaan sebelumnya selesai.');return}
- if(!arr.length){notice('Belum ada link. Klik Refresh Sheets.');return}
- chromeRunning=true;chromeStop=false;$('checkChrome').disabled=true;$('refresh').disabled=true;$('check').disabled=true;
- try{
-  let n=0,failed=0;
-  for(const l of arr){
-   if(chromeStop)break;
-   notice(`Chrome otomatis: ${n+1}/${arr.length} — ${l.url}`);
-   try{
-    const res=await chromeNavigate(l.url);
-    if(res.ok && /^https?:\/\//i.test(res.finalUrl||'')){saveChrome(l,res.finalUrl)}
-    else {failed++;saveChrome(l,'');l.chromeError=res.error||'Gagal memuat halaman'}
-   }catch(e){failed++;l.chromeError=e.message; if(e.message.includes('Ekstensi tidak merespons')){notice(e.message);break}}
-   n++;render();$('progress').style.width=Math.round(n/arr.length*100)+'%';
-   if(n<arr.length)await pause(Number($('delay').value));
-  }
-  if(n>0)notice(`Pemeriksaan Chrome selesai: ${n} link, ${failed} gagal/tidak pasti. URL akhir ditampilkan pada CHROME ANDA.`);
- }finally{chromeRunning=false;$('checkChrome').disabled=false;$('refresh').disabled=false;$('check').disabled=false}
-}
-$('checkChrome').onclick=()=>checkChromeList(links);
-
+$('stop').onclick=()=>{stopped=true;notice('Menghentikan setelah batch saat ini...')};
 $('search').oninput=render;
 $('resetOpen').onclick=()=>{if(confirm('Reset semua status buka link?')){clearOpened();notice('Semua status buka link berhasil direset.')}};
 $('refresh').click();
