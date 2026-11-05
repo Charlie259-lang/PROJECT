@@ -94,6 +94,16 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
   .entry{grid-template-columns:25px minmax(120px,1fr);}
   .entry .tag{grid-column:2;justify-self:start}
 }
+
+/* Informasi IP publik dari jaringan pengunjung */
+.network-strip{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:-2px 0 18px;padding:12px 17px;border-radius:17px;border:1px solid rgba(24,204,176,.28);background:linear-gradient(105deg,rgba(6,35,38,.95),rgba(13,19,33,.95));box-shadow:0 8px 26px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.05)}
+.network-main{display:flex;gap:12px;align-items:center;min-width:0}
+.network-icon{font-size:22px;filter:drop-shadow(0 0 8px rgba(25,226,179,.32))}
+.network-values{font-size:13px;color:#bbcfda;line-height:1.5;overflow-wrap:anywhere}
+.network-values strong{color:#e6ffff;font-weight:800}
+.network-note{font-size:11px;color:#789eab;margin-top:2px}
+.network-reload{height:34px;padding:0 12px;font-size:12px}
+@media(max-width:600px){.network-values{font-size:12px}.network-strip{padding:12px}.network-main{align-items:flex-start}}
 </style>
 </head>
 <body>
@@ -112,6 +122,17 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
     </div>
   </div>
 </header>
+
+<section class="network-strip" aria-label="Informasi jaringan pengunjung">
+  <div class="network-main">
+    <span class="network-icon" aria-hidden="true">🌐</span>
+    <div>
+      <div class="network-values" id="networkInfo" aria-live="polite"><strong>IP:</strong> Memeriksa… <span aria-hidden="true">|</span> <strong>Lokasi:</strong> Memeriksa…</div>
+      <div class="network-note" id="networkNote">IP publik browser · Lokasi perkiraan dari IP, bukan GPS atau IP server Google Apps Script</div>
+    </div>
+  </div>
+  <button id="refreshNetwork" class="btn-dark network-reload" type="button" title="Perbarui informasi IP publik">↻ Perbarui IP</button>
+</section>
 
 <section class="panel">
   <div class="controls">
@@ -306,6 +327,38 @@ $('check').onclick=()=>links.length?checkSubset(links):notice('Refresh Sheets te
 $('stop').onclick=()=>{stopped=true;notice('Menghentikan setelah batch saat ini...')};
 $('search').oninput=render;
 $('resetOpen').onclick=()=>{if(confirm('Reset semua status buka link?')){clearOpened();notice('Semua status buka link berhasil direset.')}};
+
+// IP publik berasal dari koneksi browser pengunjung, bukan server Google Apps Script.
+async function refreshNetworkInfo(){
+  const output=$('networkInfo'), btn=$('refreshNetwork'), note=$('networkNote');
+  btn.disabled=true;
+  output.textContent='IP: Memeriksa… | Lokasi: Memeriksa…';
+  const controller=new AbortController();
+  const timeout=setTimeout(()=>controller.abort(),8500);
+  try{
+    const resp=await fetch('https://ipwho.is/', {signal:controller.signal,cache:'no-store'});
+    if(!resp.ok)throw new Error('HTTP '+resp.status);
+    const data=await resp.json();
+    if(data.success===false || !data.ip)throw new Error('Layanan IP tidak mengembalikan hasil');
+    const ip=String(data.ip);
+    const place=[data.city,data.region,data.country].map(v=>String(v||'').trim()).filter(Boolean);
+    // Hilangkan duplikasi kota/provinsi/negara jika API mengembalikannya sama.
+    const unique=place.filter((v,i)=>place.findIndex(x=>x.toLowerCase()===v.toLowerCase())===i);
+    output.replaceChildren();
+    const b1=document.createElement('strong');b1.textContent='IP: ';
+    const b2=document.createElement('strong');b2.textContent='Lokasi: ';
+    output.append(b1,document.createTextNode(ip+'  |  '),b2,document.createTextNode(unique.join(', ')||'Tidak diketahui'));
+    note.textContent='IP publik browser · Lokasi perkiraan, dapat berbeda saat VPN/proxy aktif';
+  }catch(e){
+    output.textContent='IP: Tidak tersedia | Lokasi: Tidak tersedia';
+    note.textContent='Gagal membaca layanan IP. Klik Perbarui IP untuk mencoba lagi.';
+  }finally{
+    clearTimeout(timeout);btn.disabled=false;
+  }
+}
+$('refreshNetwork').addEventListener('click',refreshNetworkInfo);
+refreshNetworkInfo();
+
 $('refresh').click();
 </script>
 </body>
