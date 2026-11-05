@@ -154,7 +154,6 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
       </select>
     </label>
     <input id="search" type="search" placeholder="Cari domain atau kategori..." aria-label="Cari domain atau kategori">
-    <button id="resetOpen" class="btn-dark">↺ Reset Status Buka</button>
   </div>
 
   <div class="summary">
@@ -176,11 +175,8 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 <script>
 'use strict';
 const ENDPOINT='https://script.google.com/macros/s/AKfycbxzjes9G0cfexOMNETcs3vz6rYdHGgJGKozW9gMW70Www_XyCYuyIkbBXNskur4XQKEYw/exec';
-const STORAGE_OPENED='checkAksesOpened_v12';
 const $=id=>document.getElementById(id);
-let links=[],chosen=new Set(),collapsed=new Set(),running=false,stopped=false,openedKeys=new Set(loadOpened());
-function loadOpened(){try{return JSON.parse(localStorage.getItem(STORAGE_OPENED)||'[]')}catch{return []}}
-function saveOpened(){localStorage.setItem(STORAGE_OPENED, JSON.stringify([...openedKeys]))}
+let links=[],chosen=new Set(),collapsed=new Set(),running=false,stopped=false,openedKeys=new Set();
 function normalizeUrlForCompare(raw){
   try{
     let text=String(raw||'').trim();
@@ -216,8 +212,7 @@ function dedupeLinks(items){
   return {links:[...map.values()], removed};
 }
 function linkKey(l){return `${(l.category||'LAINNYA').trim()}||${normalizeUrlForCompare(l.url)}`}
-function markOpened(items){for(const l of items){openedKeys.add(linkKey(l))}saveOpened()}
-function clearOpened(){openedKeys=new Set();saveOpened();render()}
+function markOpened(items){for(const l of items){openedKeys.add(linkKey(l))}}
 function isOpened(l){return openedKeys.has(linkKey(l))}
 function notice(s){$('message').textContent=s}
 function pause(ms){return new Promise(r=>setTimeout(r,ms))}
@@ -326,7 +321,6 @@ async function checkSubset(arr){
 $('check').onclick=()=>links.length?checkSubset(links):notice('Refresh Sheets terlebih dahulu.');
 $('stop').onclick=()=>{stopped=true;notice('Menghentikan setelah batch saat ini...')};
 $('search').oninput=render;
-$('resetOpen').onclick=()=>{if(confirm('Reset semua status buka link?')){clearOpened();notice('Semua status buka link berhasil direset.')}};
 
 // IP publik berasal dari koneksi browser pengunjung, bukan server Google Apps Script.
 async function refreshNetworkInfo(){
